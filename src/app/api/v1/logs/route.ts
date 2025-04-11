@@ -21,7 +21,9 @@ export async function POST(req: NextRequest) {
   try {
     const req_payload = await req.json();
     log = {
-      PRI: req_payload["PRI"],
+      caa_user_id: userAuthenticatedID,
+      PRI_FACILITY: req_payload["PRI_FACILITY"],
+      PRI_SEVERITY: req_payload["PRI_SEVERITY"],
       VER: req_payload["VER"],
       TIMESTAMP: req_payload["TIMESTAMP"],
       HOSTNAME: req_payload["HOSTNAME"],

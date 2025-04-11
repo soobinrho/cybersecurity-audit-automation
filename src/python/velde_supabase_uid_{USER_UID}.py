@@ -147,14 +147,15 @@ def get_findings_summary_string(list_findings):
 
 
 def get_log_template(
-        PRI,
+        PRI_SEVERITY,
         VER,
         MSG,
         TIMESTAMP=f'{datetime.datetime.now(datetime.timezone.utc).isoformat(timespec='milliseconds').replace('+00:00', 'Z')}',
         HOSTNAME=f'{platform.uname()[1].replace(' ', '_')}',
         APPNAME=f'Supabase_secured_by_caa',
         PROCID=f'{os.path.realpath(__file__).replace(' ', '_')}'):
-    dict_log = {'PRI': PRI,
+    dict_log = {'PRI_FACILITY': 23,
+                'PRI_SEVERITY': PRI_SEVERITY,
                 'VER': VER,
                 'TIMESTAMP': TIMESTAMP,
                 'HOSTNAME': HOSTNAME,
@@ -169,7 +170,7 @@ def print_info(str_info, org_id='', user_email='', project_id=''):
         # Green background color.
         print('\x1b[6;30;42m' + str_info + '\x1b[0m')
 
-    payload = get_log_template(PRI='<23.6>',
+    payload = get_log_template(PRI_SEVERITY=6,
                                VER=1,
                                MSG=str_info)
     if org_id != '':
@@ -195,7 +196,7 @@ def print_error(str_error, org_id='', user_email='', project_id='', do_not_send_
         # Yellow background color.
         print('\x1b[6;30;43m' + str_error + '\x1b[0m')
 
-    payload = get_log_template(PRI='<23.3>',
+    payload = get_log_template(PRI_SEVERITY=3,
                                VER=1,
                                MSG=str_error)
     if org_id != '':
@@ -217,7 +218,7 @@ def print_finding(str_finding, org_id='', user_email='', project_id=''):
         # Yellow background color.
         print('\x1b[6;30;43m' + str_finding + '\x1b[0m')
 
-    payload = get_log_template(PRI='<23.2>',
+    payload = get_log_template(PRI_SEVERITY=2,
                                VER=1,
                                MSG=str_finding)
     if org_id != '':
