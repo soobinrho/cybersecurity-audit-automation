@@ -1,89 +1,61 @@
 -- This sql script creates main.db
-CREATE TABLE Applications (
-  ApplicationID INTEGER PRIMARY KEY NOT NULL,
-  ApplicationName TEXT NOT NULL COLLATE NOCASE,
-  ApplicationStatus TEXT NOT NULL COLLATE NOCASE
-                    CHECK (ApplicationStatus IN ('Active', 'Inactive'),
-  TimeAddedTocaa INTEGER NOT NULL DEFAULT (unixepoch('now','subsec'))
+-- Store only what we need. Extra data = extra liability.
+CREATE TABLE Organizations (
+  OrganizationID TEXT PRIMARY KEY NOT NULL,
+  OrganizationName TEXT NOT NULL COLLATE NOCASE,
+  OrganizationURL TEXT NOT NULL
+);
+
+CREATE TABLE Projects (
+  ProjectID TEXT PRIMARY KEY NOT NULL,
+  OrganizationID_fk TEXT NOT NULL,
+  ProjectName TEXT NOT NULL COLLATE NOCASE,
+  IsPITREnabled INTEGER NOT NULL
+                CHECK (IsPITREnabled BETWEEN 0 and 1),
+  FOREIGN KEY(OrganizationID_fk) REFERENCES Organizations(OrganizationID)
 );
 
 CREATE TABLE Users (
   UserID INTEGER PRIMARY KEY NOT NULL,
-  FirstName TEXT NOT NULL COLLATE NOCASE,
-  LastName TEXT NOT NULL COLLATE NOCASE,
   Email TEXT NOT NULL COLLATE NOCASE
         CHECK (Email LIKE '%@%'),
-  Group TEXT COLLATE NOCASE
-);
-
-CREATE TABLE Databases (
-  DatabaseID INTEGER PRIMARY KEY NOT NULL,
-  DatabaseName TEXT NOT NULL COLLATE NOCASE,
-  AccessPoint TEXT NOT NULL COLLATE NOCASE 
+  IsMFAEnabled INTEGER NOT NULL
+               CHECK (IsMFAEnabled BETWEEN 0 and 1)
 );
 
 CREATE TABLE Tables (
   TableID INTEGER PRIMARY KEY NOT NULL,
+  ProjectID_fk TEXT NOT NULL,
   TableName TEXT NOT NULL COLLATE NOCASE,
-  DatabaseID_fk INTEGER NOT NULL,
-  FOREIGN KEY(DatabaseID_fk) REFERENCES Databases(DatabaseID)
+  IsRLSEnabled INTEGER NOT NULL
+               CHECK (IsRLSEnabled BETWEEN 0 and 1),
+  FOREIGN KEY(ProjectID_fk) REFERENCES Projects(ProjectID)
 );
 
-CREATE TABLE Projects (
-  ProjectID INTEGER PRIMARY KEY NOT NULL,
-  ProjectName TEXT NOT NULL COLLATE NOCASE 
-);
-
-CREATE TABLE UsersRegisteredInApplication (
+CREATE TABLE OrganizationsThatUsersAreIn (
+  OrganizationID_fk TEXT NOT NULL,
   UserID_fk INTEGER NOT NULL,
-  ApplicationID_fk INTEGER NOT NULL,
-  IsMFAEnabled BOOLEAN NOT NULL,
-  UserNote TEXT,
-  PRIMARY KEY (UserID_fk, ApplicationID_fk),
-  FOREIGN KEY(UserID_fk) REFERENCES Users(UserID),
-  FOREIGN KEY(ApplicationID_fk) REFERENCES Applications(ApplicationID_fk)
-);
-
-CREATE TABLE ProjectsRegisteredInApplication (
-  ProjectID_fk INTEGER NOT NULL,
-  ApplicationID_fk INTEGER NOT NULL,
-  IsPITREnabled BOOLEAN NOT NULL,
-  ProjectNote TEXT,
-  PRIMARY KEY (ProjectID_fk, ApplicationID_fk),
-  FOREIGN KEY(ProjectID_fk) REFERENCES Projects(ProjectID),
-  FOREIGN KEY(ApplicationID_fk) REFERENCES Applications(ApplicationID_fk)
-);
-
-CREATE TABLE DatabasesUsedByApplication (
-  DatabaseID_fk INTEGER NOT NULL,
-  ApplicationID_fk INTEGER NOT NULL,
-  DatabaseNote TEXT,
-  PRIMARY KEY (DatabaseID_fk, ApplicationID_fk),
-  FOREIGN KEY(DatabaseID_fk) REFERENCES Databases(DatabaseID),
-  FOREIGN KEY(ApplicationID_fk) REFERENCES Applications(ApplicationID_fk)
-);
-
-CREATE TABLE TablesUsedByApplication (
-  TableID_fk INTEGER NOT NULL,
-  ApplicationID_fk INTEGER NOT NULL,
-  IsRowLevelSecurityEnabled BOOLEAN NOT NULL,
-  TableNote TEXT,
-  PRIMARY KEY (TableID_fk, ApplicationID_fk),
-  FOREIGN KEY(TableID_fk) REFERENCES Tables(TableID),
-  FOREIGN KEY(ApplicationID_fk) REFERENCES Applications(ApplicationID_fk)
+  UserRoleInOrganization TEXT NOT NULL,
+  PRIMARY KEY (OrganizationID_fk, UserID_fk),
+  FOREIGN KEY(OrganizationID_fk) REFERENCES Organizations(OrganizationID),
+  FOREIGN KEY(UserID_fk) REFERENCES Users(UserID)
 );
 
 CREATE TABLE Logs (
   LogID INTEGER PRIMARY KEY NOT NULL,
-  ApplicationID_fk INTEGER,
+  OrganizationID_fk TEXT,
   UserID_fk INTEGER,
-  DatabaseID_fk INTEGER,
+  ProjectID_fk TEXT,
   TableID_fk INTEGER,
   TimeRecorded INTEGER NOT NULL DEFAULT (unixepoch('now','subsec')),
+  IsComplianceRelated INTEGER NOT NULL
+                      CHECK (IsComplianceRelated BETWEEN 0 and 1),
+  ComplianceStatus TEXT NOT NULL COLLATE NOCASE
+                   CHECK (ComplianceStatus IN ('Pass', 'Fail', 'Not Applicable')),
   LogMessage TEXT NOT NULL COLLATE NOCASE,
-  FOREIGN KEY(ApplicationID_fk) REFERENCES Applications(ApplicationID_fk)
+  FOREIGN KEY(OrganizationID_fk) REFERENCES Organizations(OrganizationID),
   FOREIGN KEY(UserID_fk) REFERENCES Users(UserID),
-  FOREIGN KEY(DatabaseID_fk) REFERENCES Databases(DatabaseID),
-  FOREIGN KEY(TableID_fk) REFERENCES Tables(TableID),
+  FOREIGN KEY(ProjectID_fk) REFERENCES Projects(ProjectID),
+  FOREIGN KEY(TableID_fk) REFERENCES Tables(TableID)
 );
 
