@@ -77,7 +77,7 @@ export function ChatInterface() {
     // TODO: Connect to real API once I get some credit.
     const randomTimeout = Math.random() * 3000;
     setTimeout(() => {
-      // Context to add: Hi! Thanks again for helping out. I always appreciate it. Again, I need you to have a look at my security controls for compliance and regulations.
+      // Context to add: You're a privacy-focused cybersecurity consultant. Answer all of my questions while complying to all local and federal regulations.
       const assistantMessage: Message = {
         role: "llm",
         content:
