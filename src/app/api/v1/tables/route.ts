@@ -21,7 +21,6 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   let array_table: Array<Prisma.tablesCreateInput> = []
-
   try {
     const req_payload = await req.json()
     for (const json_req of req_payload) {
@@ -79,5 +78,63 @@ export async function POST(req: NextRequest) {
     )
   }
 }
+
+export async function DELETE(req: NextRequest) {
+  const params = req.nextUrl.searchParams
+  try {
+    const delete_all = params.get('delete_all')?.toLowerCase()
+    if (delete_all === 'true') {
+      const deleteTables = prisma.tables.deleteMany()
+      const transaction = await prisma.$transaction([
+        deleteTables,
+      ])
+
+      if (process.env.NODE_ENV === 'development') {
+        console.log(transaction)
+      }
+
+      // By convention, HTTP 204 code must not contain any body, and must 
+      // only contain the status code.
+      return new Response(null, {
+        status: 204,
+      })
+    }
+
+    else {
+      const project_id_fk = params.get('project_id_fk')
+      const table_name = params.get('table_name')
+      if (!project_id_fk || project_id_fk === '' || !table_name || table_name === '') {
+        return NextResponse.json(
+          "Please use correct URL params to specify which organization_member you'd like to delete.",
+          { status: 404, statusText: 'Not Found' }
+        )
+      }
+
+      const deleteTable = await prisma.tables.delete({
+        where: {
+          project_id_fk_table_name: {
+            project_id_fk: project_id_fk,
+            table_name: table_name,
+          }
+        }
+      })
+
+      if (process.env.NODE_ENV === 'development') {
+        console.log(deleteTable)
+      }
+
+      return new Response(null, {
+        status: 204,
+      })
+    }
+  } catch (err) {
+    console.log(err)
+    return NextResponse.json(
+      "Please use correct URL params to specify which organization_member you'd like to delete.",
+      { status: 404, statusText: 'Not Found' }
+    )
+  }
+}
+
 
 

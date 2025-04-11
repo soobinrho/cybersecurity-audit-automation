@@ -9,8 +9,12 @@ export async function middleware(req: NextRequest) {
       const authValue = basicAuth.split(' ')[1]
       const [user, pass] = atob(authValue).split(':')
     
-      // TODO: Generate secure user / pass values for each user.
-      if (user === 'testvaluefornow' && pass === 'testvaluefornow_pass') {
+      // TODO: Use OAuth 2.0 for dashboard login authentication and
+      //       authorization for internal dashboard API calls.
+      // TODO: Use database caa_user_id, caa_user_api_key, and
+      //       caa_user_permission for client-side Python scripts
+      //       with only read access. Give an option to regenerate.
+      if (user === 'UID4.0_this_is_a_test_value' && pass === 'RANDOM_API_KEY_this_is_a_test_value') {
         return NextResponse.next()
       }
     }

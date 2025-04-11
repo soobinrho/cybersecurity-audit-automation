@@ -39,6 +39,7 @@ import requests
 import re
 import time
 import datetime
+import urllib.parse
 from time import strftime
 from requests.auth import HTTPBasicAuth
 
@@ -67,8 +68,8 @@ finally:
 # WARNING: Do not share this file outside your company. The values below are
 # unique for you. The authentication key and secret below grant this program
 # access rights to the API routs of each specific user's dashboard on caa.
-VELDE_REST_API_USER = 'testvaluefornow'
-VELDE_REST_API_PASS = 'testvaluefornow_pass'
+VELDE_REST_API_USER = 'UID4.0_this_is_a_test_value'
+VELDE_REST_API_KEY = 'RANDOM_API_KEY_this_is_a_test_value'
 VELDE_URL_BASE = 'http://localhost:3000/'
 VELDE_EMAIL = ''
 USER_EMAIL = ''
@@ -165,10 +166,9 @@ def print_info(str_info, org_id='', user_email='', project_id=''):
         payload['project_id'] = project_id
 
     payload = json.dumps(payload)
-    request_rest_api(json_payload=payload,
+    request_post_api(json_payload=payload,
                      db_table_name='logs',
-                     route_url='api/v1/logs',
-                     http_method='POST')
+                     route_url='api/v1/logs')
 
 
 def print_debug(str_debug, *args):
@@ -192,10 +192,9 @@ def print_error(str_error, org_id='', user_email='', project_id=''):
         payload['project_id'] = project_id
 
     payload = json.dumps(payload)
-    request_rest_api(json_payload=payload,
+    request_post_api(json_payload=payload,
                      db_table_name='logs',
-                     route_url='api/v1/logs',
-                     http_method='POST')
+                     route_url='api/v1/logs')
 
 
 def print_finding(str_finding, org_id='', user_email='', project_id=''):
@@ -214,10 +213,9 @@ def print_finding(str_finding, org_id='', user_email='', project_id=''):
         payload['project_id'] = project_id
 
     payload = json.dumps(payload)
-    request_rest_api(json_payload=payload,
+    request_post_api(json_payload=payload,
                      db_table_name='logs',
-                     route_url='api/v1/logs',
-                     http_method='POST')
+                     route_url='api/v1/logs')
 
 
 def print_warning(str_warning):
@@ -225,41 +223,53 @@ def print_warning(str_warning):
     print('\x1b[6;30;43m' + str_warning + '\x1b[0m')
 
 
-def request_rest_api(json_payload, db_table_name, route_url, http_method):
+def request_post_api(json_payload, db_table_name, route_url):
     # The API key in this file only allows you to call POST and PUT methods.
     # GET can only be called internally via the dashboard.
     # Also, the HTTPBasicAuth object doesn't encrypt the data on its own.
     # Thus, make sure HTTPS/SSL is set up correctly.
-    api_auth = HTTPBasicAuth(VELDE_REST_API_USER, VELDE_REST_API_PASS)
+    api_auth = HTTPBasicAuth(VELDE_REST_API_USER, VELDE_REST_API_KEY)
     api_url = f'{VELDE_URL_BASE}{route_url}'
 
     try:
-        if http_method == 'POST':
-            req = requests.post(api_url,
-                                data=json_payload,
-                                auth=api_auth)
-            if req.status_code == 201:  # HTTP status code 201 (Created).
-                print_debug(
-                    f"[DEBUG] Successful HTTP {http_method} request for the '{db_table_name}' table.")
-            else:
-                print_debug(
-                    f'[DEBUG] {req.status_code} "{req.reason}" error on HTTP PUT request for updating {db_table_name} via {api_url}.')
-                print_debug(f'[DEBUG] {req.json()}')
+        req = requests.post(api_url,
+                            data=json_payload,
+                            auth=api_auth)
+        if req.status_code == 201:  # HTTP status code 201 (Created).
+            print_debug(
+                f"[DEBUG] Successful HTTP POST request for the '{db_table_name}' table.")
+        else:
+            print_debug(
+                f'[DEBUG] {req.status_code} "{req.reason}" error on HTTP PUT request for updating {db_table_name} via {route_url}.')
+            print_debug(f'[DEBUG] {req.json()}')
     
-        elif http_method == 'PUT':
-            req = requests.put(api_url,
-                               data=json_payload,
-                               auth=api_auth)
-            if req.status_code == 200:  # HTTP status code 200 (OK).
-                print_debug(
-                    f"[DEBUG] Successful HTTP {http_method} request for the '{db_table_name}' table.")
-            else:
-                print_debug(
-                    f'[DEBUG] {req.status_code} "{req.reason}" error on HTTP PUT request for updating {db_table_name} via {api_url}.')
-                print_debug(f'[DEBUG] {req.json()}')
     except:
         print_debug(
-            f'[DEBUG] Error on HTTP REST API request for updating {db_table_name} via {api_url}.')
+            f'[DEBUG] Error on HTTP POST request for updating {db_table_name} via {route_url}.')
+
+def request_delete_api(params, db_table_name, route_url):
+    # The API key in this file only allows you to call POST and PUT methods.
+    # GET can only be called internally via the dashboard.
+    # Also, the HTTPBasicAuth object doesn't encrypt the data on its own.
+    # Thus, make sure HTTPS/SSL is set up correctly.
+    api_auth = HTTPBasicAuth(VELDE_REST_API_USER, VELDE_REST_API_KEY)
+    api_url = f'{VELDE_URL_BASE}{route_url}'
+
+    try:
+        req = requests.delete(api_url,
+                              params=params,
+                              auth=api_auth)
+        if req.status_code == 204:  # HTTP status code 204 (No Content).
+            print_debug(
+                f"[DEBUG] Successful HTTP DELETE request for the '{db_table_name}' table.")
+        else:
+            print_debug(
+                f'[DEBUG] {req.status_code} "{req.reason}" error on HTTP PUT request for updating {db_table_name} via {route_url}.')
+            print_debug(f'[DEBUG] {req.json()}')
+    
+    except:
+        print_debug(
+            f'[DEBUG] Error on HTTP DELETE request for {db_table_name} via {route_url}.')
 
 
 def wait_for_all_loading(page, HIGHLIGHT_DURATION):
@@ -413,6 +423,9 @@ def test_supabase_action_flow_core():
             list_org_name.append(org_name)
             list_org_url.append(org_url)
 
+    request_delete_api(params={'delete_all': True},
+                       db_table_name='organizations',
+                       route_url='api/v1/organizations')
 
     print_debug('[DEBUG] list_org_id, list_org_name')
     print_debug(list_org_id, list_org_name)
@@ -424,11 +437,9 @@ def test_supabase_action_flow_core():
         list_json_payload.append(payload)
     
     json_payload = json.dumps(list_json_payload)
-    request_rest_api(json_payload=json_payload,
+    request_post_api(json_payload=json_payload,
                      db_table_name='organizations',
-                     route_url='api/v1/organizations',
-                     http_method='POST')
-
+                     route_url='api/v1/organizations')
 
     NAME_MFA = 'MFA (Multi Factor Authentication)'
     NAME_PITR = 'PITR (Point-In-Time Recovery)'
@@ -516,10 +527,9 @@ def test_supabase_action_flow_core():
         list_json_payload.append(payload)
     
     json_payload = json.dumps(list_json_payload)
-    request_rest_api(json_payload=json_payload,
+    request_post_api(json_payload=json_payload,
                      db_table_name='users',
-                     route_url='api/v1/users',
-                     http_method='POST')
+                     route_url='api/v1/users')
 
     list_json_payload = []
     for i in range(len(list_org_member_org_id_fk)):
@@ -529,10 +539,9 @@ def test_supabase_action_flow_core():
         list_json_payload.append(payload)
 
     json_payload = json.dumps(list_json_payload)
-    request_rest_api(json_payload=json_payload,
+    request_post_api(json_payload=json_payload,
                      db_table_name='organization_members',
-                     route_url='api/v1/organization-members',
-                     http_method='POST')
+                     route_url='api/v1/organization-members')
 
     # ----------------------------------------------------------------------- #
     # Check PITR (Point-In-Time Recovery) is on for all projects.
@@ -637,10 +646,9 @@ def test_supabase_action_flow_core():
         list_json_payload.append(payload)
     
     json_payload = json.dumps(list_json_payload)
-    request_rest_api(json_payload=json_payload,
+    request_post_api(json_payload=json_payload,
                      db_table_name='projects',
-                     route_url='api/v1/projects',
-                     http_method='POST')
+                     route_url='api/v1/projects')
 
     # ----------------------------------------------------------------------- #
     # Check RLS (Row Level Security) is on for all Postgres tables.
@@ -709,11 +717,9 @@ def test_supabase_action_flow_core():
         list_json_payload.append(payload)
     
     json_payload = json.dumps(list_json_payload)
-    request_rest_api(json_payload=json_payload,
+    request_post_api(json_payload=json_payload,
                      db_table_name='tables',
-                     route_url='api/v1/tables',
-                     http_method='POST')
-
+                     route_url='api/v1/tables')
 
     print_info(
         f'[INFO] Your dashboard is now updated at {USER_DASHBOARD_URL}')
@@ -918,10 +924,9 @@ def test_supabase_action_flow_core():
             list_json_payload.append(payload)
         
         json_payload = json.dumps(list_json_payload)
-        request_rest_api(json_payload=json_payload,
+        request_post_api(json_payload=json_payload,
                          db_table_name='tables',
-                         route_url='api/v1/tables',
-                         http_method='PUT')
+                         route_url='api/v1/tables')
 
     # ----------------------------------------------------------------------- #
     # Conclusion of Remediation Action Flows
