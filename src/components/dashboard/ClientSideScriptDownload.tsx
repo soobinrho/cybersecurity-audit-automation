@@ -32,7 +32,10 @@ export function ClientSideScriptDownload() {
             setIsChecked(!isChecked);
           }}
         />
-        <label className="space-y-1 leading-normal" htmlFor="iUnderstand">
+        <label
+          className="space-y-1 leading-normal cursor-pointer"
+          htmlFor="iUnderstand"
+        >
           <p>
             API keys in all of your previously downloaded Python scripts will be
             revoked every time you click download, and only the
