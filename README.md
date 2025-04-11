@@ -75,13 +75,13 @@ It's possible to query for security controls using API's, but I decided to not g
 
 ## API Endpoints
 
-| **Resource** | **GET** | **POST** | **PUT** |
+| **Resource** | **GET** | **POST** | **DELETE** |
 | ------------ | ------- | -------- | ------- |
-| `/api/v1/organization_members` | Retrieve all org members. | Create or overwrite a new record of org members. | Make an update on org members. |
-| `/api/v1/organizations` | Retrieve all orgs. | Create or overwrite a new record of orgs. | Make an update on orgs. |
-| `/api/v1/users` | Retrieve all users. | Create or overwrite a new record of users. | Make an update on users. |
-| `/api/v1/projects` | Retrieve all projects. | Create or overwrite a new record of projects. | Make an update on projects. |
-| `/api/v1/tables` | Retrieve all tables. | Create or overwrite a new record of tables. | Make an update on tables. |
+| `/api/v1/organization_members` | Retrieve all org members. | Create or update org members. | Delete one or more org members. |
+| `/api/v1/organizations` | Retrieve all orgs. | Create or update orgs. | Delete one or more orgs. |
+| `/api/v1/users` | Retrieve all users. | Create or update users. | Delete one or more users. |
+| `/api/v1/projects` | Retrieve all projects. | Create or update projects. | Delete one or more projects. |
+| `/api/v1/tables` | Retrieve all tables. | Create or update tables. | Delete one or more tables. |
 | `/api/v1/logs` | Retrieve all logs. | Push a new record of logs. | N/A (Logs must not be edited or deleted) |
 
 <br>

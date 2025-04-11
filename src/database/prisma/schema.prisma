@@ -12,7 +12,7 @@ model logs {
   org_id_fk     String?
   user_email_fk String?
   project_id_fk String?
-  PRI           Int
+  PRI           String
   VER           Int
   TIMESTAMP     String
   HOSTNAME      String

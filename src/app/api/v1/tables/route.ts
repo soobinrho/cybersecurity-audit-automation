@@ -1,0 +1,83 @@
+import { NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
+import prisma from '@/lib/prisma'
+import { Prisma } from '@prisma/client'
+
+export async function GET(req: NextRequest) {
+  try {
+    const tables = await prisma.tables.findMany()
+    return NextResponse.json(
+      tables,
+      { status: 200, statusText: 'OK' }
+    )
+  } catch (err) {
+    console.log(err)
+    return NextResponse.json(
+      'Error occurred.',
+      { status: 500, statusText: 'Internal Server Error' }
+    )
+  }
+}
+
+export async function POST(req: NextRequest) {
+  let array_table: Array<Prisma.tablesCreateInput> = []
+
+  try {
+    const req_payload = await req.json()
+    for (const json_req of req_payload) {
+      const table: Prisma.tablesCreateInput = {
+          projects: json_req['project_id_fk'],
+          table_name: json_req['table_name'],
+          table_is_rls_enabled: json_req['table_is_rls_enabled'],
+          table_last_updated_on_caa: json_req['table_last_updated_on_caa'],
+      }
+      array_table.push(table)
+    }
+  } catch (err) {
+    console.log(err)
+    return NextResponse.json(
+      'Error occurred.',
+      { status: 400, statusText: 'Bad Request' }
+    )
+  }
+
+  try {
+    for (const table of array_table) {
+      const upsertTable = await prisma.tables.upsert({
+        where: {
+          project_id_fk_table_name: {
+            project_id_fk: String(table['projects']),
+            table_name: String(table['table_name']),
+          }
+        },
+        update: {
+          table_is_rls_enabled: table['table_is_rls_enabled'],
+          table_last_updated_on_caa: table['table_last_updated_on_caa']
+        },
+        create: {
+          project_id_fk: String(table['projects']),
+          table_name: table['table_name'],
+          table_is_rls_enabled: table['table_is_rls_enabled'],
+          table_last_updated_on_caa: table['table_last_updated_on_caa']
+        }
+      })
+    }
+
+    if (process.env.NODE_ENV === 'development') {
+      console.log(array_table)
+    }
+
+    return NextResponse.json(
+      array_table,
+      { status: 201, statusText: 'Created' }
+    )
+  } catch (err) {
+    console.log(err)
+    return NextResponse.json(
+      'Error occurred.',
+      { status: 500, statusText: 'Internal Server Error' }
+    )
+  }
+}
+
+

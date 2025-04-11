@@ -67,9 +67,9 @@ finally:
 # WARNING: Do not share this file outside your company. The values below are
 # unique for you. The authentication key and secret below grant this program
 # access rights to the API routs of each specific user's dashboard on caa.
-VELDE_REST_API_USER = ''
-VELDE_REST_API_PASS = ''
-VELDE_URL_BASE = ''
+VELDE_REST_API_USER = 'testvaluefornow'
+VELDE_REST_API_PASS = 'testvaluefornow_pass'
+VELDE_URL_BASE = 'http://localhost:3000/'
 VELDE_EMAIL = ''
 USER_EMAIL = ''
 USER_UID = ''
@@ -132,25 +132,40 @@ def get_findings_summary_string(list_findings):
         str_findings_summary += f'\n{i+1}. {list_findings[i]}.'
     return str_findings_summary
 
+def get_log_template(
+        PRI,
+        VER,
+        MSG,
+        TIMESTAMP=f'{datetime.datetime.now(datetime.timezone.utc).isoformat(timespec='milliseconds').replace('+00:00', 'Z')}',
+        HOSTNAME=f'{os.uname()[1].replace(' ', '_')}',
+        APPNAME=f'Supabase_secured_by_caa',
+        PROCID=f'{os.path.realpath(__file__).replace(' ', '_')}'):
+    dict_log = {'PRI': PRI,
+                'VER': VER,
+                'TIMESTAMP': TIMESTAMP,
+                'HOSTNAME': HOSTNAME,
+                'APPNAME': APPNAME,
+                'PROCID': PROCID,
+                'MSG': MSG}
+    return dict_log
 
 def print_info(str_info, org_id='', user_email='', project_id=''):
     if not is_quiet_on:
         # Green background color.
         print('\x1b[6;30;42m' + str_info + '\x1b[0m')
 
-    datetime_now = datetime.datetime.now(
-        datetime.timezone.utc).isoformat(timespec='milliseconds')
-    request_rest_api(dict_payload={'org_id_fk': org_id,
-                                   'user_email_fk': user_email,
-                                   'project_id_fk': project_id,
-                                   'PRI': '<23.6>',
-                                   'VER': '1',
-                                   # This is UTC.
-                                   'TIMESTAMP': f'{datetime_now}Z',
-                                   'HOSTNAME': f'{os.uname()[1].replace(' ', '_')}',
-                                   'APPNAME': f'{APP_NAME}_secured_by_caa',
-                                   'PROCID': f'{os.path.realpath(__file__).replace(' ', '_')}',
-                                   'MSG': str_info},
+    payload = get_log_template(PRI='<23.6>',
+                               VER=1,
+                               MSG=str_info)
+    if org_id != '':
+        payload['org_id'] = org_id
+    if user_email != '':
+        payload['user_email'] = user_email
+    if project_id != '':
+        payload['project_id'] = project_id
+
+    payload = json.dumps(payload)
+    request_rest_api(json_payload=payload,
                      db_table_name='logs',
                      route_url='api/v1/logs',
                      http_method='POST')
@@ -166,19 +181,18 @@ def print_error(str_error, org_id='', user_email='', project_id=''):
         # Yellow background color.
         print('\x1b[6;30;43m' + str_error + '\x1b[0m')
 
-    datetime_now = datetime.datetime.now(
-        datetime.timezone.utc).isoformat(timespec='milliseconds')
-    request_rest_api(dict_payload={'org_id_fk': org_id,
-                                   'user_email_fk': user_email,
-                                   'project_id_fk': project_id,
-                                   'PRI': '<23.3>',
-                                   'VER': '1',
-                                   # This is UTC.
-                                   'TIMESTAMP': f'{datetime_now}Z',
-                                   'HOSTNAME': f'{os.uname()[1].replace(' ', '_')}',
-                                   'APPNAME': f'{APP_NAME}_secured_by_caa',
-                                   'PROCID': f'{os.path.realpath(__file__).replace(' ', '_')}',
-                                   'MSG': str_error},
+    payload = get_log_template(PRI='<23.3>',
+                               VER=1,
+                               MSG=str_error)
+    if org_id != '':
+        payload['org_id'] = org_id
+    if user_email != '':
+        payload['user_email'] = user_email
+    if project_id != '':
+        payload['project_id'] = project_id
+
+    payload = json.dumps(payload)
+    request_rest_api(json_payload=payload,
                      db_table_name='logs',
                      route_url='api/v1/logs',
                      http_method='POST')
@@ -189,19 +203,18 @@ def print_finding(str_finding, org_id='', user_email='', project_id=''):
         # Yellow background color.
         print('\x1b[6;30;43m' + str_finding + '\x1b[0m')
 
-    datetime_now = datetime.datetime.now(
-        datetime.timezone.utc).isoformat(timespec='milliseconds')
-    request_rest_api(dict_payload={'org_id_fk': org_id,
-                                   'user_email_fk': user_email,
-                                   'project_id_fk': project_id,
-                                   'PRI': '<23.2>',
-                                   'VER': '1',
-                                   # This is UTC.
-                                   'TIMESTAMP': f'{datetime_now}Z',
-                                   'HOSTNAME': f'{os.uname()[1].replace(' ', '_')}',
-                                   'APPNAME': f'{APP_NAME}_secured_by_caa',
-                                   'PROCID': f'{os.path.realpath(__file__).replace(' ', '_')}',
-                                   'MSG': str_finding},
+    payload = get_log_template(PRI='<23.2>',
+                               VER=1,
+                               MSG=str_finding)
+    if org_id != '':
+        payload['org_id'] = org_id
+    if user_email != '':
+        payload['user_email'] = user_email
+    if project_id != '':
+        payload['project_id'] = project_id
+
+    payload = json.dumps(payload)
+    request_rest_api(json_payload=payload,
                      db_table_name='logs',
                      route_url='api/v1/logs',
                      http_method='POST')
@@ -212,7 +225,7 @@ def print_warning(str_warning):
     print('\x1b[6;30;43m' + str_warning + '\x1b[0m')
 
 
-def request_rest_api(dict_payload, table_name, route_url, http_method):
+def request_rest_api(json_payload, db_table_name, route_url, http_method):
     # The API key in this file only allows you to call POST and PUT methods.
     # GET can only be called internally via the dashboard.
     # Also, the HTTPBasicAuth object doesn't encrypt the data on its own.
@@ -220,31 +233,33 @@ def request_rest_api(dict_payload, table_name, route_url, http_method):
     api_auth = HTTPBasicAuth(VELDE_REST_API_USER, VELDE_REST_API_PASS)
     api_url = f'{VELDE_URL_BASE}{route_url}'
 
-    # TODO: Delete this later
-    if False and http_method == 'POST':
-        req = requests.post(api_url,
-                            data=dict_payload,
-                            auth=api_auth)
-        if req.status_code == 201:  # HTTP status code 201 (Created).
-            print_debug(
-                f"[DEBUG] Successful HTTP {http_method} request for the '{table_name}' table.")
-        else:
-            print_debug(
-                f'[DEBUG] {req.status_code} error on HTTP PUT request for updating {table_name} via {api_url}.')
-            print_debug(f'[DEBUG] {req.reason}')
-
-    # TODO: Delete this later
-    elif False and http_method == 'PUT':
-        req = requests.put(api_url,
-                           data=dict_payload,
-                           auth=api_auth)
-        if req.status_code == 200:  # HTTP status code 200 (OK).
-            print_debug(
-                f"[DEBUG] Successful HTTP {http_method} request for the '{table_name}' table.")
-        else:
-            print_debug(
-                f'[DEBUG] {req.status_code} error on HTTP PUT request for updating {table_name} via {api_url}.')
-            print_debug(f'[DEBUG] {req.reason}')
+    try:
+        if http_method == 'POST':
+            req = requests.post(api_url,
+                                data=json_payload,
+                                auth=api_auth)
+            if req.status_code == 201:  # HTTP status code 201 (Created).
+                print_debug(
+                    f"[DEBUG] Successful HTTP {http_method} request for the '{db_table_name}' table.")
+            else:
+                print_debug(
+                    f'[DEBUG] {req.status_code} "{req.reason}" error on HTTP PUT request for updating {db_table_name} via {api_url}.')
+                print_debug(f'[DEBUG] {req.json()}')
+    
+        elif http_method == 'PUT':
+            req = requests.put(api_url,
+                               data=json_payload,
+                               auth=api_auth)
+            if req.status_code == 200:  # HTTP status code 200 (OK).
+                print_debug(
+                    f"[DEBUG] Successful HTTP {http_method} request for the '{db_table_name}' table.")
+            else:
+                print_debug(
+                    f'[DEBUG] {req.status_code} "{req.reason}" error on HTTP PUT request for updating {db_table_name} via {api_url}.')
+                print_debug(f'[DEBUG] {req.json()}')
+    except:
+        print_debug(
+            f'[DEBUG] Error on HTTP REST API request for updating {db_table_name} via {api_url}.')
 
 
 def wait_for_all_loading(page, HIGHLIGHT_DURATION):
@@ -398,14 +413,22 @@ def test_supabase_action_flow_core():
             list_org_name.append(org_name)
             list_org_url.append(org_url)
 
-    print_debug('[DEBUG] list_org_name')
-    print_debug(list_org_name)
-    request_rest_api(dict_payload={'org_id': list_org_id,
-                                   'org_name': list_org_name,
-                                   'org_last_updated_on_caa': [int(time.time())] * len(list_org_id)},
+
+    print_debug('[DEBUG] list_org_id, list_org_name')
+    print_debug(list_org_id, list_org_name)
+    list_json_payload = []
+    for i in range(len(list_org_id)):
+        payload = {'org_id': list_org_id[i],
+                   'org_name': list_org_name[i],
+                   'org_last_updated_on_caa': int(time.time())}
+        list_json_payload.append(payload)
+    
+    json_payload = json.dumps(list_json_payload)
+    request_rest_api(json_payload=json_payload,
                      db_table_name='organizations',
                      route_url='api/v1/organizations',
                      http_method='POST')
+
 
     NAME_MFA = 'MFA (Multi Factor Authentication)'
     NAME_PITR = 'PITR (Point-In-Time Recovery)'
@@ -484,15 +507,29 @@ def test_supabase_action_flow_core():
 
     print_debug('[DEBUG] list_user_email, list_user_is_mfa_enabled')
     print_debug(list_user_email, list_user_is_mfa_enabled)
-    request_rest_api(dict_payload={'user_email': list_user_email,
-                                   'user_is_mfa_enabled': list_user_is_mfa_enabled,
-                                   'user_last_updated_on_caa': [int(time.time())] * len(list_user_email)},
+    list_json_payload = []
+    for i in range(len(list_user_email)):
+        user_is_mfa_enabled = 1 if list_user_is_mfa_enabled[i] else 0
+        payload = {'user_email': list_user_email[i],
+                   'user_is_mfa_enabled': user_is_mfa_enabled,
+                   'user_last_updated_on_caa': int(time.time())}
+        list_json_payload.append(payload)
+    
+    json_payload = json.dumps(list_json_payload)
+    request_rest_api(json_payload=json_payload,
                      db_table_name='users',
                      route_url='api/v1/users',
                      http_method='POST')
-    request_rest_api(dict_payload={'org_id_fk': list_org_member_org_id_fk,
-                                   'user_email_fk': list_org_member_user_email_fk,
-                                   'org_member_role': list_org_member_role},
+
+    list_json_payload = []
+    for i in range(len(list_org_member_org_id_fk)):
+        payload = {'org_id_fk': list_org_member_org_id_fk[i],
+                   'user_email_fk': list_org_member_user_email_fk[i],
+                   'org_member_role': list_org_member_role[i]}
+        list_json_payload.append(payload)
+
+    json_payload = json.dumps(list_json_payload)
+    request_rest_api(json_payload=json_payload,
                      db_table_name='organization_members',
                      route_url='api/v1/organization-members',
                      http_method='POST')
@@ -589,11 +626,18 @@ def test_supabase_action_flow_core():
     print_debug(
         '[DEBUG] list_project_name, list_project_is_pitr_enabled')
     print_debug(list_project_name, list_project_is_pitr_enabled)
-    request_rest_api(dict_payload={'project_id': list_project_id,
-                                   'org_id_fk': list_project_org_id_fk,
-                                   'project_name': list_project_name,
-                                   'project_is_pitr_enalbed': list_project_is_pitr_enabled,
-                                   'project_last_updated_on_caa': [int(time.time())] * len(list_project_id)},
+    list_json_payload = []
+    for i in range(len(list_project_id)):
+        project_is_pitr_enabled = 1 if list_project_is_pitr_enabled[i] else 0
+        payload = {'project_id': list_project_id[i],
+                   'org_id_fk': list_project_org_id_fk[i],
+                   'project_name': list_project_name[i],
+                   'project_is_pitr_enabled': project_is_pitr_enabled,
+                   'project_last_updated_on_caa': int(time.time())}
+        list_json_payload.append(payload)
+    
+    json_payload = json.dumps(list_json_payload)
+    request_rest_api(json_payload=json_payload,
                      db_table_name='projects',
                      route_url='api/v1/projects',
                      http_method='POST')
@@ -655,13 +699,21 @@ def test_supabase_action_flow_core():
         '[DEBUG] list_table_name, list_table_project_id_fk, list_table_is_rls_enabled')
     print_debug(list_table_name, list_table_project_id_fk,
                 list_table_is_rls_enabled)
-    request_rest_api(dict_payload={'project_id_fk': list_table_project_id_fk,
-                                   'table_name': list_table_name,
-                                   'table_is_rls_enabled': list_table_is_rls_enabled,
-                                   'table_last_updated_on_caa': [int(time.time())] * len(list_table_name)},
+    list_json_payload = []
+    for i in range(len(list_table_project_id_fk)):
+        table_is_rls_enabled = 1 if list_table_is_rls_enabled[i] else 0
+        payload = {'project_id_fk': list_table_project_id_fk[i],
+                   'table_name': list_table_name[i],
+                   'table_is_rls_enabled': table_is_rls_enabled,
+                   'table_last_updated_on_caa': int(time.time())}
+        list_json_payload.append(payload)
+    
+    json_payload = json.dumps(list_json_payload)
+    request_rest_api(json_payload=json_payload,
                      db_table_name='tables',
                      route_url='api/v1/tables',
                      http_method='POST')
+
 
     print_info(
         f'[INFO] Your dashboard is now updated at {USER_DASHBOARD_URL}')
@@ -857,10 +909,16 @@ def test_supabase_action_flow_core():
             messagebox.showinfo(
                 title='caa', message=f"{NAME_RLS} remediation process has failed. Please check the logs and contact us <{VELDE_EMAIL}>.")
 
-        request_rest_api(dict_payload={'project_id_fk': list_updated_table_project_id_fk,
-                                       'table_name': list_updated_table_name,
-                                       'table_is_rls_enabled': list_updated_table_is_rls_enabled,
-                                       'table_last_updated_on_caa': [int(time.time())] * len(list_updated_table_project_id_fk)},
+        list_json_payload = []
+        for i in range(len(list_updated_table_project_id_fk)):
+            table_is_rls_enabled = 1 if list_updated_table_is_rls_enabled[i] else 0
+            payload = {'project_id_fk': list_updated_table_project_id_fk[i],
+                       'table_name': list_updated_table_name[i],
+                       'table_is_rls_enabled': table_is_rls_enabled}
+            list_json_payload.append(payload)
+        
+        json_payload = json.dumps(list_json_payload)
+        request_rest_api(json_payload=json_payload,
                          db_table_name='tables',
                          route_url='api/v1/tables',
                          http_method='PUT')
