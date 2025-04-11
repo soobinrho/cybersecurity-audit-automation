@@ -43,7 +43,7 @@ interface DataTableProps<TData extends Record<string, any>, TValue> {
 
 const csvConfig = mkConfig({
   useKeysAsHeaders: true,
-  filename: `${new Date().toISOString().split("T")[0]}`,
+  filename: `caa_${new Date().toISOString().split("T")[0]}`,
 });
 
 export default function DataTable<TData extends Record<string, any>, TValue>({
@@ -163,7 +163,7 @@ export default function DataTable<TData extends Record<string, any>, TValue>({
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} className="text-ellipsis">
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
