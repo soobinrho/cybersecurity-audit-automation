@@ -21,7 +21,7 @@ export default function SidebarItem(props: props) {
       <Link href={href}>
         <Button
           variant="ghost"
-          className={`${className} w-full justify-start font-normal overflow-clip px-2 dark:text-xs active:text-lg ${
+          className={`${className} w-full justify-start font-normal overflow-clip px-2 dark:text-xs active:text-lg cursor-pointer ${
             isActive ? "font-bold bg-accent" : ""
           }`}
         >
