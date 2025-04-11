@@ -1,5 +1,7 @@
 "use client";
 
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+
 // Source:
 //   https://tanstack.com/query/latest/docs/framework/react/guides/advanced-ssr
 
@@ -50,6 +52,9 @@ export default function ReactQueryProvider({
   const queryClient = getQueryClient();
 
   return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <QueryClientProvider client={queryClient}>
+      {children}
+      <ReactQueryDevtools />
+    </QueryClientProvider>
   );
 }

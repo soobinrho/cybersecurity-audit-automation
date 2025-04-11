@@ -135,7 +135,8 @@ sudo docker compose exec -it caa sh
 sudo docker compose exec -it nginx sh
 
 # How to read the Nginx and Next.js logs.
-sudo docker compose logs | ccze -m ansi -o nolookups | less -R
+sudo docker compose logs | ccze -m ansi -o nolookups | less -R  # Color code all logs.
+sudo docker compose logs -f  # Listen in real time.
 ```
 
 <br>

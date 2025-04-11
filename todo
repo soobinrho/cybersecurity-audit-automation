@@ -1,0 +1,5 @@
+TODO: UseEvidenceQueries: False for refetch stuff.
+
+TODO: Do not load all evidence images at first. When the view button is clicked, convert to blob and create url.
+Make a UseEvidenceQueries hook that takes the id as url param. Don't forget to add id as React Query key.
+Add as reference: https://tkdodo.eu/blog/react-query-data-transformations
