@@ -11,8 +11,8 @@ I am in a unique position where I can create a web app that understands the ever
 ```bash
 git clone https://github.com/soobinrho/caa-supabase.git
 cd caa-supabase
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 <br>
