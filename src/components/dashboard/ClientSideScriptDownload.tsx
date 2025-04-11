@@ -25,20 +25,23 @@ export function ClientSideScriptDownload() {
     <div className="flex flex-col gap-4 items-start rounded-md border p-4 shadow text-sm">
       <div className="flex flex-row items-center space-x-3 space-y-0">
         <Checkbox
+          className="ring-1 ring-accent-foreground/30"
+          id="iUnderstand"
           checked={isChecked || isGenerating}
           onCheckedChange={() => {
             setIsChecked(!isChecked);
           }}
         />
-        <div className="space-y-1 leading-normal">
+        <label className="space-y-1 leading-normal" htmlFor="iUnderstand">
           <p>
-            API keys in all of my previously downloaded Python scripts will be
-            revoked everytime I download, and only the lastest-downloaded
-            version will retain its access rights to my caa Dashboard. This is
-            a security measure (we do not store any of your sensitive
-            information including your API keys).
+            API keys in all of your previously downloaded Python scripts will be
+            revoked every time you click download, and only the
+            latest-downloaded version will retain its access rights to your own
+            caa Dashboard. This is a security measure (we do not store any of
+            your sensitive information and that includes your caa Dashboard
+            API key).
           </p>
-        </div>
+        </label>
       </div>
       <div className="flex flex-col md:flex-row gap-2 justify-between w-full">
         <Button

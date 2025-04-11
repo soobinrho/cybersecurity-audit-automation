@@ -65,3 +65,6 @@ src/python/**/*.jpg
 
 # Python virtual environments
 .venv*
+
+# Production nginx.conf
+nginx.conf

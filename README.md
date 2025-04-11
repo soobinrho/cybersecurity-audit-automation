@@ -4,7 +4,7 @@
 
 # caa
 
-The purpose of this project is to help you with compliance and regulations by using technology we have available today, and to do so in a way that does not access, transmit, or store any of your sensitive information, such as your API tokens, GLB data (customer data), or PCI data (card numbers).
+The purpose of this project is to help you with compliance and regulations by using technology we have available today, and to do so in a way that does not access, transmit, or store any of your sensitive information, such as your API keys, GLB data (customer data), or PCI data (card numbers).
 
 I am in a unique position where I can create a web app that understands the everyday needs of CyberGRC teams (Cybersecurity Governance, Risk, and Compliance) because I'm in one of them.
 
@@ -18,9 +18,13 @@ git clone https://github.com/soobinrho/caa-supabase.git
 cd caa-supabase
 pnpm install
 
+# Fill in sensitive env variables for development and production.
+cp .env.development.local.example .env.development.local
+cp .env.production.local.example .env.production.local
+
 # Create a random string required by Auth.js for encryption.
-cp .env.local.example .env.local
-pnpm npx auth secret
+pnpm npx auth secret --copy >> .env.development.local
+pnpm npx auth secret --copy >> .env.production.local
 
 # Initialize Prisma objects for the database.
 pnpm npx prisma db push --schema ./src/database/prisma/schema.prisma
@@ -39,10 +43,16 @@ Run caa and Nginx using Docker Compose.
 git clone https://github.com/soobinrho/caa-supabase.git
 cd caa-supabase
 
-# Fill in all of the credentials required to run Auth.js
-cp .env.local.example .env.development.local
-cp .env.local.example .env.production.local
+# Fill in sensitive env variables for development and production.
+cp .env.development.local.example .env.development.local
+cp .env.production.local.example .env.production.local
 
+# Create a random string required by Auth.js for encryption.
+pnpm npx auth secret --copy >> .env.development.local
+pnpm npx auth secret --copy >> .env.production.local
+
+# Build based on `Dockerfile`, `Dockerfile.nginx`, and `compose.yaml`.
+cp docker/nginx.conf.beforeCertbot docker/nginx.conf
 sudo docker compose build
 sudo docker compose up -d
 ```
@@ -81,8 +91,7 @@ The first one runs in HTTP, while the new one directs all traffic to HTTPS.
 
 ```bash
 cd caa-supabase
-mv nginx.conf nginx.conf.backup
-mv nginx.conf.afterCertbot nginx.conf
+cp docker/nginx.conf.afterCertbot docker/nginx.conf
 ```
 
 This is not a required step, but I also prefer to set up a cron job so that the certbot automatically renews before it expires without us having to manually do so.
@@ -90,6 +99,26 @@ This is not a required step, but I also prefer to set up a cron job so that the 
 ```bash
 # Example:
 sudo ln -s /home/soobinrho/git/caa-supabase/docker/certbot_runner /etc/cron.daily/certbot_runner
+```
+
+<br>
+
+## Useful workflows
+
+
+### How I redeploy whenever I made a new update
+
+
+```bash
+# First, ssh into the server.
+ssh caa
+cd caa-supabase
+git pull
+
+# Rebuild the docker image and redeploy.
+sudo docker compose build
+sudo docker compose up -d
+
 ```
 
 <br>
