@@ -3,6 +3,7 @@ import GitHub from "next-auth/providers/github";
 import Credentials from "next-auth/providers/credentials";
 import type { Provider } from "next-auth/providers";
 import Google from "next-auth/providers/google";
+import {v4 as uuidv4} from 'uuid';
 
 const providers: Provider[] = [
   Credentials({
@@ -21,10 +22,10 @@ const providers: Provider[] = [
         }
       }
       return {
-        id: "5256e280-0038-4235-a643-ac66740db6c3",
+        id: uuidv4(),
         name: "Soobin",
         email: String(inputCredential.email),
-        image: "/resources/caa_logo.png",
+        image: "https://github.com/soobinrho.png",
       };
     },
   }),
