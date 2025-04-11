@@ -32,6 +32,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env*.example
 
 # env file defaults
 !.env.test
@@ -53,3 +54,8 @@ node_modules/
 /playwright/.cache/
 __pycache__/
 _test*.json
+
+# Evidence collected
+src/python/**/*.png
+src/python/**/*.jpeg
+src/python/**/*.jpg
