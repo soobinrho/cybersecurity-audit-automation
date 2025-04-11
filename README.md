@@ -11,9 +11,19 @@ I am in a unique position where I can create a web app that understands the ever
 ## How to spin up a dev server
 
 ```bash
+# Install the dependencies.
 git clone https://github.com/soobinrho/caa-supabase.git
 cd caa-supabase
 pnpm install
+
+# Create a random string required by Auth.js for encryption.
+cp .env.local.example .env.local
+pnpm npx auth secret
+
+# Initialize Prisma objects for the database.
+pnpm npx prisma generate --schema src/database/prisma/schema.prisma
+
+# Run a dev server.
 pnpm dev
 ```
 
