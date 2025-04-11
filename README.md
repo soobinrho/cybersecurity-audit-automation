@@ -33,13 +33,63 @@ pnpm dev
 
 ## How I deploy caa for prod
 
-First, ...
-Then, ...
+Run caa and Nginx using Docker Compose.
 
 ```bash
 git clone https://github.com/soobinrho/caa-supabase.git
 cd caa-supabase
-# TODO: ...
+
+# Fill in all of the credentials required to run Auth.js
+cp .env.local.example .env.development.local
+cp .env.local.example .env.production.local
+
+sudo docker compose build
+sudo docker compose up -d
+```
+
+Set up an HTTPS certificate using Certbot.
+Before running in Letsencrypt's prod server, test in the staging server first like this:
+
+```bash
+cd caa-supabase
+docker compose exec nginx certbot certonly --text --non-interactive \
+  --agree-tos --verbose --keep-until-expiring --webroot \
+  --webroot-path /var/www/letsencrypt/ \
+  --server https://acme-staging-v02.api.letsencrypt.org/directory \
+  --rsa-key-size 4096 \
+  --email <your_email> \
+  --preferred-challenges=http \
+  -d <your_domain_name>
+```
+
+After you pass the tests in the staging server, issue the certs in prod.
+
+```bash
+cd caa-supabase
+docker compose exec nginx certbot certonly --text --non-interactive \
+  --agree-tos --verbose --keep-until-expiring --webroot \
+  --webroot-path /var/www/letsencrypt/ \
+  --server https://acme-v02.api.letsencrypt.org/directory \
+  --rsa-key-size 4096 \
+  --email <your_email> \
+  --preferred-challenges=http \
+  -d <your_domain_name>
+```
+
+Finally, switch out the `nginx.conf`.
+The first one runs in HTTP, while the new one directs all traffic to HTTPS.
+
+```bash
+cd caa-supabase
+mv nginx.conf nginx.conf.backup
+mv nginx.conf.afterCertbot nginx.conf
+```
+
+This is not a required step, but I also prefer to set up a cron job so that the certbot automatically renews before it expires without us having to manually do so.
+
+```bash
+# Example:
+sudo ln -s /home/soobinrho/git/caa-supabase/cron/certbot_runner /etc/cron.daily/certbot_runner
 ```
 
 <br>
@@ -49,7 +99,7 @@ cd caa-supabase
 | **_Stack_**    | **_Description_**                                                          |
 | -------------- | -------------------------------------------------------------------------- |
 | **_Server_**   | Hetzner CPX11: Ubuntu, 2 vCPU, 2GB RAM, 40GB SSD                           |
-| **_Database_** | SQLite, Prisma                                                            |
+| **_Database_** | SQLite, Prisma                                                             |
 | **_Backend_**  | Next.js, Python (used client side for collecting security controls status) |
 | **_Frontend_** | Next.js, Tailwind CSS, TypeScript                                          |
 | **_CDN_**      | Cloudflare (CDN & web application fire wall)                               |

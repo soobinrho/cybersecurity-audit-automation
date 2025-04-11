@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+# Make sure it's not relative path.
+# Change it to where you store it.
+cd /home/soobinrho/git/caa-supabase
+docker compose exec nginx certbot certonly --text --non-interactive \
+  --agree-tos --verbose --keep-until-expiring --webroot \
+  --webroot-path /var/www/letsencrypt/ \
+  --server https://acme-v02.api.letsencrypt.org/directory \
+  --rsa-key-size 4096 \
+  --email soobinrho@nsustain.com \
+  --preferred-challenges=http \
+  -d soobinrho.com
