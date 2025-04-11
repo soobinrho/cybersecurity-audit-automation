@@ -48,7 +48,7 @@ cd caa-supabase
 
 | **_Stack_**    | **_Description_**                                                          |
 | -------------- | -------------------------------------------------------------------------- |
-| **_Server_**   | Hetzner CPX21: Ubuntu, 3 vCPU, 4GB RAM, 80GB SSD                           |
+| **_Server_**   | Hetzner CPX11: Ubuntu, 2 vCPU, 2GB RAM, 40GB SSD                           |
 | **_Database_** | SQLite, Prisma                                                            |
 | **_Backend_**  | Next.js, Python (used client side for collecting security controls status) |
 | **_Frontend_** | Next.js, Tailwind CSS, TypeScript                                          |
