@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import "@/app/globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Suspense } from "react";
-
+import MainSkeleton from "@/components/MainSkeleton";
+import Loading from "@/app/loading";
 const title = process.env.NEXT_PUBLIC_TITLE || "";
 const description = process.env.NEXT_PUBLIC_DESCRIPTION || "";
 const url = process.env.NEXT_PUBLIC_URL || "";
@@ -58,7 +59,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Suspense>{children}</Suspense>
+          <Suspense fallback={<Loading />}>{children}</Suspense>
         </ThemeProvider>
       </body>
     </html>
