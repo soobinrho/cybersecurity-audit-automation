@@ -38,7 +38,7 @@ export default function Footer(props: props) {
       <span className="pointer-events-none">|</span>
       <a
         className="hover:text-foreground/40 active:text-foreground/60 transition-all duration-75"
-        href="https://github.com/soobinrho/caa-supabase"
+        href="https://github.com/soobinrho/cybersecurity-audit-automation"
         target="_blank"
       >
         © 2025 caa, Soobin Rho.

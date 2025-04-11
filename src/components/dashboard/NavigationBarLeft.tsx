@@ -45,7 +45,7 @@ export default function NavigationBarLeft() {
         LLM for Security
       </Link>
       <a
-        href="https://github.com/soobinrho/caa-supabase"
+        href="https://github.com/soobinrho/cybersecurity-audit-automation"
         target="_blank"
         className="select-none text-foreground/70 active:font-bold transition-all duration-75"
       >

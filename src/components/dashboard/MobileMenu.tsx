@@ -75,7 +75,7 @@ export default function MobileMenu() {
             </div>
             <a
               target="_blank"
-              href="https://github.com/soobinrho/caa-supabase"
+              href="https://github.com/soobinrho/cybersecurity-audit-automation"
             >
               <DrawerClose>
                 <DrawerTitle>Documentation</DrawerTitle>
