@@ -15,7 +15,6 @@ export default auth((req) => {
       },
       { status: 401, statusText: "Unauthorized" }
     );
- 
   }
 
   return NextResponse.next();

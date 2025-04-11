@@ -1,25 +1,25 @@
-import type { MetadataRoute } from 'next'
- 
+import type { MetadataRoute } from "next";
+
 export default function sitemap(): MetadataRoute.Sitemap {
-  const url = `${process.env.NEXT_PUBLIC_URL}`
+  const url = `${process.env.NEXT_PUBLIC_URL}`;
   return [
     {
       url: url,
       lastModified: new Date(),
-      changeFrequency: 'yearly',
+      changeFrequency: "yearly",
       priority: 0.3,
     },
     {
       url: `${url}/dashboard`,
       lastModified: new Date(),
-      changeFrequency: 'daily',
+      changeFrequency: "daily",
       priority: 0.4,
     },
     {
       url: `${url}/chat`,
       lastModified: new Date(),
-      changeFrequency: 'monthly',
+      changeFrequency: "monthly",
       priority: 0.3,
     },
-  ]
+  ];
 }

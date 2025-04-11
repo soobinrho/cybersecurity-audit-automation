@@ -10,8 +10,11 @@ export async function GET(req: NextRequest) {
     // Check authentication.
     const oAuthSession = await auth();
     const clientSideAuthForAPI = req.headers.get("authorization");
-    const userAuthenticatedID = await checkAuthenticationForAPI(oAuthSession, clientSideAuthForAPI);
-    if (!userAuthenticatedID || userAuthenticatedID === '') {
+    const userAuthenticatedID = await checkAuthenticationForAPI(
+      oAuthSession,
+      clientSideAuthForAPI
+    );
+    if (!userAuthenticatedID || userAuthenticatedID === "") {
       return NextResponse.json(
         {
           message: "Authentication failed.",
@@ -24,29 +27,32 @@ export async function GET(req: NextRequest) {
     const logs = await prisma.logs.findMany({
       where: {
         caa_user_id: userAuthenticatedID,
-      }
+      },
     });
     return NextResponse.json(logs, {
       status: 200,
       statusText: "OK",
     });
-    } catch (err) {
-      console.log(err);
-      return NextResponse.json("Error occurred.", {
-        status: 500,
-        statusText: "Internal Server Error",
-      });
+  } catch (err) {
+    console.log(err);
+    return NextResponse.json("Error occurred.", {
+      status: 500,
+      statusText: "Internal Server Error",
+    });
   }
 }
 
 export async function POST(req: NextRequest) {
   let log: Prisma.logsCreateInput;
-  let userAuthenticatedID = '';
+  let userAuthenticatedID = "";
   try {
     // Check authentication.
     const oAuthSession = await auth();
     const clientSideAuthForAPI = req.headers.get("authorization");
-    const userAuthenticatedID = await checkAuthenticationForAPI(oAuthSession, clientSideAuthForAPI);
+    const userAuthenticatedID = await checkAuthenticationForAPI(
+      oAuthSession,
+      clientSideAuthForAPI
+    );
     if (!userAuthenticatedID) {
       return NextResponse.json(
         {
@@ -55,7 +61,7 @@ export async function POST(req: NextRequest) {
         { status: 401, statusText: "Unauthorized" }
       );
     }
- 
+
     // Proceed if authenticated.
     const req_payload = await req.json();
     log = {
@@ -112,9 +118,11 @@ export async function POST(req: NextRequest) {
             project_id: project_id,
             caa_user_id: userAuthenticatedID,
             project_is_pitr_enabled: 0,
-            project_name: '',
-            project_last_updated_on_caa: Math.floor(new Date().getTime() / 1000),
-          }
+            project_name: "",
+            project_last_updated_on_caa: Math.floor(
+              new Date().getTime() / 1000
+            ),
+          },
         },
       };
     }

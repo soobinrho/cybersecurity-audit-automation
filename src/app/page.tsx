@@ -7,8 +7,5 @@ export default async function App() {
     redirect("/login");
   }
   redirect("/dashboard");
-  return (
-    <div>
-    </div>
-  )
+  return <div></div>;
 }

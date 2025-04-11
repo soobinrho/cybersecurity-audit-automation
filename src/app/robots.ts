@@ -1,12 +1,12 @@
-import type { MetadataRoute } from 'next'
- 
+import type { MetadataRoute } from "next";
+
 export default function robots(): MetadataRoute.Robots {
-  const url = `${process.env.NEXT_PUBLIC_URL}`
+  const url = `${process.env.NEXT_PUBLIC_URL}`;
   return {
     rules: {
-      userAgent: '*',
-      allow: '/',
+      userAgent: "*",
+      allow: "/",
     },
     sitemap: `${url}/sitemap.xml`,
-  }
+  };
 }

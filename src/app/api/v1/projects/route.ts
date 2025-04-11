@@ -10,8 +10,11 @@ export async function GET(req: NextRequest) {
     // Check authentication.
     const oAuthSession = await auth();
     const clientSideAuthForAPI = req.headers.get("authorization");
-    const userAuthenticatedID = await checkAuthenticationForAPI(oAuthSession, clientSideAuthForAPI);
-    if (!userAuthenticatedID || userAuthenticatedID === '') {
+    const userAuthenticatedID = await checkAuthenticationForAPI(
+      oAuthSession,
+      clientSideAuthForAPI
+    );
+    if (!userAuthenticatedID || userAuthenticatedID === "") {
       return NextResponse.json(
         {
           message: "Authentication failed.",
@@ -24,7 +27,7 @@ export async function GET(req: NextRequest) {
     const projects = await prisma.projects.findMany({
       where: {
         caa_user_id: userAuthenticatedID,
-      }
+      },
     });
     return NextResponse.json(projects, { status: 200, statusText: "OK" });
   } catch (err) {
@@ -38,12 +41,15 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const array_projects: Array<Prisma.projectsCreateInput> = [];
-  let userAuthenticatedID = '';
+  let userAuthenticatedID = "";
   try {
     // Check authentication.
     const oAuthSession = await auth();
     const clientSideAuthForAPI = req.headers.get("authorization");
-    userAuthenticatedID = await checkAuthenticationForAPI(oAuthSession, clientSideAuthForAPI);
+    userAuthenticatedID = await checkAuthenticationForAPI(
+      oAuthSession,
+      clientSideAuthForAPI
+    );
     if (!userAuthenticatedID) {
       return NextResponse.json(
         {
@@ -52,7 +58,7 @@ export async function POST(req: NextRequest) {
         { status: 401, statusText: "Unauthorized" }
       );
     }
- 
+
     // Proceed if authenticated.
     const req_payload = await req.json();
     for (const json_req of req_payload) {
@@ -119,12 +125,15 @@ export async function POST(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   const params = req.nextUrl.searchParams;
-  let userAuthenticatedID = '';
+  let userAuthenticatedID = "";
   try {
     // Check authentication.
     const oAuthSession = await auth();
     const clientSideAuthForAPI = req.headers.get("authorization");
-    userAuthenticatedID = await checkAuthenticationForAPI(oAuthSession, clientSideAuthForAPI);
+    userAuthenticatedID = await checkAuthenticationForAPI(
+      oAuthSession,
+      clientSideAuthForAPI
+    );
     if (!userAuthenticatedID) {
       return NextResponse.json(
         {
@@ -133,19 +142,19 @@ export async function DELETE(req: NextRequest) {
         { status: 401, statusText: "Unauthorized" }
       );
     }
- 
+
     // Proceed if authenticated.
     const delete_all = params.get("delete_all")?.toLowerCase();
     if (delete_all === "true") {
       const deleteTables = prisma.tables.deleteMany({
         where: {
           caa_user_id: userAuthenticatedID,
-        }
+        },
       });
       const deleteProjects = prisma.projects.deleteMany({
         where: {
           caa_user_id: userAuthenticatedID,
-        }
+        },
       });
       const transaction = await prisma.$transaction([
         deleteTables,
