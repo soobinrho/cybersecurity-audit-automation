@@ -106,7 +106,7 @@ sudo ln -s /home/soobinrho/git/caa-supabase/docker/certbot_runner /etc/cron.dail
 ## Useful workflows
 
 
-### How I redeploy whenever I made a new update
+### How I redeploy whenever a new change has been made
 
 
 ```bash
@@ -116,9 +116,20 @@ cd caa-supabase
 git pull
 
 # Rebuild the docker image and redeploy.
-sudo docker compose build
+sudo docker compose build --no-cache
 sudo docker compose up -d
+```
 
+<br>
+
+### How I debug docker images
+
+```bash
+# How to run a shell inside the caa container.
+sudo docker compose exec -it caa sh
+
+# How to run a shell inside the nginx container.
+sudo docker compose exec -it nginx sh
 ```
 
 <br>
