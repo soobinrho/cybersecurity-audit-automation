@@ -82,7 +82,17 @@ export default async function DashboardPage() {
                     This kind of info should be located at the path of least
                     resistance. Mode: How scadcn's website reads. Top to bottom
                     and left to right design principle. Make it easy for user to
-                    follow the instructions, ideally in just one step.
+                    follow the instructions, ideally in just one step. Consider
+                    putting logs here as well.
+                  </p>
+                  <p>
+                    Get all findings: `select * from logs where
+                    caa_user_id='3a8f4c10-d426-43a1-bb72-9f894ff6a52f' AND
+                    PRI_SEVERITY=2;`
+                  </p>
+                  <p>
+                    Get all logs: `select * from logs where
+                    caa_user_id='3a8f4c10-d426-43a1-bb72-9f894ff6a52f'
                   </p>
 
                   <p>

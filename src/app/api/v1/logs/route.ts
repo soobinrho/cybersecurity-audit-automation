@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
     // Check authentication.
     const oAuthSession = await auth();
     const clientSideAuthForAPI = req.headers.get("authorization");
-    const userAuthenticatedID = await checkAuthenticationForAPI(
+    userAuthenticatedID = await checkAuthenticationForAPI(
       oAuthSession,
       clientSideAuthForAPI
     );
@@ -64,6 +64,11 @@ export async function POST(req: NextRequest) {
 
     // Proceed if authenticated.
     const req_payload = await req.json();
+    const org_id = req_payload["org_id"];
+    const user_email = req_payload["user_email"];
+    const project_id = req_payload["project_id"];
+    const table_project_id = req_payload["table_project_id"];
+    const table_name = req_payload["table_name"];
     log = {
       caa_user_id: userAuthenticatedID,
       PRI_FACILITY: req_payload["PRI_FACILITY"],
@@ -75,9 +80,6 @@ export async function POST(req: NextRequest) {
       PROCID: req_payload["PROCID"],
       MSG: req_payload["MSG"],
     };
-    const org_id = req_payload["org_id"];
-    const user_email = req_payload["user_email"];
-    const project_id = req_payload["project_id"];
     if (org_id && org_id !== "") {
       log.organizations = {
         connectOrCreate: {
@@ -86,8 +88,9 @@ export async function POST(req: NextRequest) {
           },
           create: {
             org_id: org_id,
+            org_name:
+              "POST request to the logs table generated this record because there was no pre-existing record for this org_id.",
             caa_user_id: userAuthenticatedID,
-            org_name: "",
             org_last_updated_on_caa: Math.floor(new Date().getTime() / 1000),
           },
         },
@@ -120,6 +123,32 @@ export async function POST(req: NextRequest) {
             project_is_pitr_enabled: 0,
             project_name: "",
             project_last_updated_on_caa: Math.floor(
+              new Date().getTime() / 1000
+            ),
+          },
+        },
+      };
+    }
+    if (
+      table_project_id &&
+      table_project_id !== "" &&
+      table_name &&
+      table_name !== ""
+    ) {
+      log.tables = {
+        connectOrCreate: {
+          where: {
+            project_id_fk_table_name: {
+              project_id_fk: table_project_id,
+              table_name: table_name,
+            },
+          },
+          create: {
+            project_id_fk: table_project_id,
+            table_name: table_name,
+            caa_user_id: userAuthenticatedID,
+            table_is_rls_enabled: 0,
+            table_last_updated_on_caa: Math.floor(
               new Date().getTime() / 1000
             ),
           },

@@ -17,22 +17,25 @@ model client_side_program_api_keys {
 }
 
 model logs {
-  log_id        Int            @id @default(autoincrement())
-  caa_user_id String
-  org_id_fk     String?
-  user_email_fk String?
-  project_id_fk String?
-  PRI_FACILITY  Int
-  PRI_SEVERITY  Int
-  VER           Int
-  TIMESTAMP     String
-  HOSTNAME      String
-  APPNAME       String
-  PROCID        String
-  MSG           String
-  projects      projects?      @relation(fields: [project_id_fk], references: [project_id], onDelete: NoAction, onUpdate: NoAction)
-  users         users?         @relation(fields: [user_email_fk], references: [user_email], onDelete: NoAction, onUpdate: NoAction)
-  organizations organizations? @relation(fields: [org_id_fk], references: [org_id], onDelete: NoAction, onUpdate: NoAction)
+  log_id              Int            @id @default(autoincrement())
+  caa_user_id       String
+  org_id_fk           String?
+  user_email_fk       String?
+  project_id_fk       String?
+  table_project_id_fk String?
+  table_name          String?
+  PRI_FACILITY        Int
+  PRI_SEVERITY        Int
+  VER                 Int
+  TIMESTAMP           String
+  HOSTNAME            String
+  APPNAME             String
+  PROCID              String
+  MSG                 String
+  tables              tables?        @relation(fields: [table_project_id_fk, table_name], references: [project_id_fk, table_name], onDelete: SetNull, onUpdate: Cascade)
+  projects            projects?      @relation(fields: [project_id_fk], references: [project_id], onDelete: SetNull, onUpdate: Cascade)
+  users               users?         @relation(fields: [user_email_fk], references: [user_email], onDelete: SetNull, onUpdate: Cascade)
+  organizations       organizations? @relation(fields: [org_id_fk], references: [org_id], onDelete: SetNull, onUpdate: Cascade)
 }
 
 model organization_members {
@@ -40,8 +43,8 @@ model organization_members {
   user_email_fk   String
   caa_user_id   String
   org_member_role String
-  users           users         @relation(fields: [user_email_fk], references: [user_email], onDelete: NoAction, onUpdate: NoAction)
-  organizations   organizations @relation(fields: [org_id_fk], references: [org_id], onDelete: NoAction, onUpdate: NoAction)
+  users           users         @relation(fields: [user_email_fk], references: [user_email], onDelete: Cascade, onUpdate: Cascade)
+  organizations   organizations @relation(fields: [org_id_fk], references: [org_id], onDelete: Cascade, onUpdate: Cascade)
 
   @@id([org_id_fk, user_email_fk])
 }
@@ -64,7 +67,7 @@ model projects {
   project_is_pitr_enabled       Int
   project_last_updated_on_caa Int
   logs                          logs[]
-  organizations                 organizations? @relation(fields: [org_id_fk], references: [org_id], onDelete: NoAction, onUpdate: NoAction)
+  organizations                 organizations? @relation(fields: [org_id_fk], references: [org_id], onDelete: Cascade, onUpdate: Cascade)
   tables                        tables[]
 }
 
@@ -74,7 +77,8 @@ model tables {
   table_name                  String
   table_is_rls_enabled        Int
   table_last_updated_on_caa Int
-  projects                    projects @relation(fields: [project_id_fk], references: [project_id], onDelete: NoAction, onUpdate: NoAction)
+  logs                        logs[]
+  projects                    projects @relation(fields: [project_id_fk], references: [project_id], onDelete: Cascade, onUpdate: Cascade)
 
   @@id([project_id_fk, table_name])
 }

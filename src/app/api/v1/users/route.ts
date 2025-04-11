@@ -79,26 +79,31 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    let array_upsertUsers = [];
     for (const user of array_user) {
-      await prisma.users.upsert({
-        where: {
-          user_email: user["user_email"],
-        },
-        update: {
-          user_is_mfa_enabled: user["user_is_mfa_enabled"],
-          user_last_updated_on_caa: user["user_last_updated_on_caa"],
-        },
-        create: {
-          user_email: user["user_email"],
-          caa_user_id: userAuthenticatedID,
-          user_is_mfa_enabled: user["user_is_mfa_enabled"],
-          user_last_updated_on_caa: user["user_last_updated_on_caa"],
-        },
-      });
+      array_upsertUsers.push(
+        prisma.users.upsert({
+          where: {
+            user_email: user["user_email"],
+          },
+          update: {
+            user_is_mfa_enabled: user["user_is_mfa_enabled"],
+            user_last_updated_on_caa: user["user_last_updated_on_caa"],
+          },
+          create: {
+            user_email: user["user_email"],
+            caa_user_id: userAuthenticatedID,
+            user_is_mfa_enabled: user["user_is_mfa_enabled"],
+            user_last_updated_on_caa: user["user_last_updated_on_caa"],
+          },
+        })
+      );
     }
 
+    const transaction = await prisma.$transaction(array_upsertUsers);
+
     if (process.env.NODE_ENV === "development") {
-      console.log(array_user);
+      console.log(transaction);
     }
 
     return NextResponse.json(array_user, {
@@ -137,35 +142,14 @@ export async function DELETE(req: NextRequest) {
     // Proceed if authenticated.
     const delete_all = params.get("delete_all")?.toLowerCase();
     if (delete_all === "true") {
-      const deleteTables = prisma.tables.deleteMany({
+      const deleteUsers = await prisma.users.deleteMany({
         where: {
           caa_user_id: userAuthenticatedID,
         },
       });
-      const deleteProjects = prisma.projects.deleteMany({
-        where: {
-          caa_user_id: userAuthenticatedID,
-        },
-      });
-      const deleteOrganizationMembers = prisma.organization_members.deleteMany({
-        where: {
-          caa_user_id: userAuthenticatedID,
-        },
-      });
-      const deleteUsers = prisma.users.deleteMany({
-        where: {
-          caa_user_id: userAuthenticatedID,
-        },
-      });
-      const transaction = await prisma.$transaction([
-        deleteTables,
-        deleteProjects,
-        deleteOrganizationMembers,
-        deleteUsers,
-      ]);
 
       if (process.env.NODE_ENV === "development") {
-        console.log(transaction);
+        console.log(deleteUsers);
       }
 
       // By convention, HTTP 204 code must not contain any body, and must

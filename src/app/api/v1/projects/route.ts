@@ -82,32 +82,37 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    let array_upsertProjects = [];
     for (const project of array_projects) {
-      await prisma.projects.upsert({
-        where: {
-          project_id: project["project_id"],
-        },
-        update: {
-          org_id_fk: String(project["organizations"]),
-          project_name: project["project_name"],
-          project_is_pitr_enabled: project["project_is_pitr_enabled"],
-          project_last_updated_on_caa:
-            project["project_last_updated_on_caa"],
-        },
-        create: {
-          project_id: project["project_id"],
-          caa_user_id: userAuthenticatedID,
-          org_id_fk: String(project["organizations"]),
-          project_name: project["project_name"],
-          project_is_pitr_enabled: project["project_is_pitr_enabled"],
-          project_last_updated_on_caa:
-            project["project_last_updated_on_caa"],
-        },
-      });
+      array_upsertProjects.push(
+        prisma.projects.upsert({
+          where: {
+            project_id: project["project_id"],
+          },
+          update: {
+            org_id_fk: String(project["organizations"]),
+            project_name: project["project_name"],
+            project_is_pitr_enabled: project["project_is_pitr_enabled"],
+            project_last_updated_on_caa:
+              project["project_last_updated_on_caa"],
+          },
+          create: {
+            project_id: project["project_id"],
+            caa_user_id: userAuthenticatedID,
+            org_id_fk: String(project["organizations"]),
+            project_name: project["project_name"],
+            project_is_pitr_enabled: project["project_is_pitr_enabled"],
+            project_last_updated_on_caa:
+              project["project_last_updated_on_caa"],
+          },
+        })
+      );
     }
 
+    const transaction = await prisma.$transaction(array_upsertProjects);
+
     if (process.env.NODE_ENV === "development") {
-      console.log(array_projects);
+      console.log(transaction);
     }
 
     return NextResponse.json(array_projects, {
@@ -146,23 +151,14 @@ export async function DELETE(req: NextRequest) {
     // Proceed if authenticated.
     const delete_all = params.get("delete_all")?.toLowerCase();
     if (delete_all === "true") {
-      const deleteTables = prisma.tables.deleteMany({
+      const deleteProjects = await prisma.projects.deleteMany({
         where: {
           caa_user_id: userAuthenticatedID,
         },
       });
-      const deleteProjects = prisma.projects.deleteMany({
-        where: {
-          caa_user_id: userAuthenticatedID,
-        },
-      });
-      const transaction = await prisma.$transaction([
-        deleteTables,
-        deleteProjects,
-      ]);
 
       if (process.env.NODE_ENV === "development") {
-        console.log(transaction);
+        console.log(deleteProjects);
       }
 
       // By convention, HTTP 204 code must not contain any body, and must

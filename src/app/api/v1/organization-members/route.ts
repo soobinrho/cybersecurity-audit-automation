@@ -83,28 +83,35 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    let array_upsertOrganizationMembers = [];
     for (const organizationMember of array_organizationMember) {
-      await prisma.organization_members.upsert({
-        where: {
-          org_id_fk_user_email_fk: {
-            org_id_fk: String(organizationMember["organizations"]),
-            user_email_fk: String(organizationMember["users"]),
+      array_upsertOrganizationMembers.push(
+        prisma.organization_members.upsert({
+          where: {
+            org_id_fk_user_email_fk: {
+              org_id_fk: String(organizationMember["organizations"]),
+              user_email_fk: String(organizationMember["users"]),
+            },
           },
-        },
-        update: {
-          org_member_role: organizationMember["org_member_role"],
-        },
-        create: {
-          org_id_fk: String(organizationMember["organizations"]),
-          caa_user_id: userAuthenticatedID,
-          user_email_fk: String(organizationMember["users"]),
-          org_member_role: organizationMember["org_member_role"],
-        },
-      });
+          update: {
+            org_member_role: organizationMember["org_member_role"],
+          },
+          create: {
+            org_id_fk: String(organizationMember["organizations"]),
+            caa_user_id: userAuthenticatedID,
+            user_email_fk: String(organizationMember["users"]),
+            org_member_role: organizationMember["org_member_role"],
+          },
+        })
+      );
     }
 
+    const transaction = await prisma.$transaction(
+      array_upsertOrganizationMembers
+    );
+
     if (process.env.NODE_ENV === "development") {
-      console.log(array_organizationMember);
+      console.log(transaction);
     }
 
     return NextResponse.json(array_organizationMember, {
@@ -143,29 +150,15 @@ export async function DELETE(req: NextRequest) {
     // Proceed if authenticated.
     const delete_all = params.get("delete_all")?.toLowerCase();
     if (delete_all === "true") {
-      const deleteTables = prisma.tables.deleteMany({
-        where: {
-          caa_user_id: userAuthenticatedID,
-        },
-      });
-      const deleteProjects = prisma.projects.deleteMany({
-        where: {
-          caa_user_id: userAuthenticatedID,
-        },
-      });
-      const deleteOrganizationMembers = prisma.organization_members.deleteMany({
-        where: {
-          caa_user_id: userAuthenticatedID,
-        },
-      });
-      const transaction = await prisma.$transaction([
-        deleteTables,
-        deleteProjects,
-        deleteOrganizationMembers,
-      ]);
+      const deleteOrganizationMembers =
+        await prisma.organization_members.deleteMany({
+          where: {
+            caa_user_id: userAuthenticatedID,
+          },
+        });
 
       if (process.env.NODE_ENV === "development") {
-        console.log(transaction);
+        console.log(deleteOrganizationMembers);
       }
 
       // By convention, HTTP 204 code must not contain any body, and must

@@ -86,6 +86,7 @@ CREATE TABLE logs (
   org_id_fk TEXT,
   user_email_fk TEXT,
   project_id_fk TEXT,
+  table_name_fk TEXT,
   PRI_FACILITY INTEGER NOT NULL,
   PRI_SEVERITY INTEGER NOT NULL,
   VER INTEGER NOT NULL,
@@ -96,7 +97,8 @@ CREATE TABLE logs (
   MSG TEXT NOT NULL,
   FOREIGN KEY(org_id_fk) REFERENCES organizations(org_id),
   FOREIGN KEY(user_email_fk) REFERENCES users(user_email),
-  FOREIGN KEY(project_id_fk) REFERENCES projects(project_id)
+  FOREIGN KEY(project_id_fk) REFERENCES projects(project_id),
+  FOREIGN KEY(table_name_fk) REFERENCES tables(table_name)
 );
 
 CREATE TABLE client_side_program_api_keys (

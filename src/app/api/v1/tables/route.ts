@@ -80,30 +80,35 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    let array_upsertTables = [];
     for (const table of array_table) {
-      await prisma.tables.upsert({
-        where: {
-          project_id_fk_table_name: {
-            project_id_fk: String(table["projects"]),
-            table_name: String(table["table_name"]),
+      array_upsertTables.push(
+        prisma.tables.upsert({
+          where: {
+            project_id_fk_table_name: {
+              project_id_fk: String(table["projects"]),
+              table_name: String(table["table_name"]),
+            },
           },
-        },
-        update: {
-          table_is_rls_enabled: table["table_is_rls_enabled"],
-          table_last_updated_on_caa: table["table_last_updated_on_caa"],
-        },
-        create: {
-          project_id_fk: String(table["projects"]),
-          caa_user_id: userAuthenticatedID,
-          table_name: table["table_name"],
-          table_is_rls_enabled: table["table_is_rls_enabled"],
-          table_last_updated_on_caa: table["table_last_updated_on_caa"],
-        },
-      });
+          update: {
+            table_is_rls_enabled: table["table_is_rls_enabled"],
+            table_last_updated_on_caa: table["table_last_updated_on_caa"],
+          },
+          create: {
+            project_id_fk: String(table["projects"]),
+            caa_user_id: userAuthenticatedID,
+            table_name: table["table_name"],
+            table_is_rls_enabled: table["table_is_rls_enabled"],
+            table_last_updated_on_caa: table["table_last_updated_on_caa"],
+          },
+        })
+      );
     }
 
+    const transaction = await prisma.$transaction(array_upsertTables);
+
     if (process.env.NODE_ENV === "development") {
-      console.log(array_table);
+      console.log(transaction);
     }
 
     return NextResponse.json(array_table, {
@@ -142,15 +147,14 @@ export async function DELETE(req: NextRequest) {
     // Proceed if authenticated.
     const delete_all = params.get("delete_all")?.toLowerCase();
     if (delete_all === "true") {
-      const deleteTables = prisma.tables.deleteMany({
+      const deleteTables = await prisma.tables.deleteMany({
         where: {
           caa_user_id: userAuthenticatedID,
         },
       });
-      const transaction = await prisma.$transaction([deleteTables]);
 
       if (process.env.NODE_ENV === "development") {
-        console.log(transaction);
+        console.log(deleteTables);
       }
 
       // By convention, HTTP 204 code must not contain any body, and must

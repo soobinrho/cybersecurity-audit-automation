@@ -80,7 +80,7 @@ finally:
 # WARNING: Do not share this file outside your company. The values below are
 # unique for you. The authentication key and secret below grant this program
 # access rights to the API routs of each specific user's dashboard on caa.
-VELDE_REST_API_USER = '3a8f4c10-d426-43a1-bb72-9f894ff6a52f'
+VELDE_REST_API_USER = '4138798a-b55e-44d4-8cd8-8181182eb856'
 VELDE_REST_API_KEY = 'RANDOM_API_KEY_this_is_a_test_value'
 VELDE_URL_BASE = 'http://localhost:3000'
 VELDE_EMAIL = ''
@@ -165,7 +165,7 @@ def get_log_template(
     return dict_log
 
 
-def print_info(str_info, org_id='', user_email='', project_id=''):
+def print_info(str_info, org_id='', user_email='', project_id='', table_project_id='', table_name=''):
     if not is_quiet_on:
         # Green background color.
         print('\x1b[6;30;42m' + str_info + '\x1b[0m')
@@ -179,6 +179,10 @@ def print_info(str_info, org_id='', user_email='', project_id=''):
         payload['user_email'] = user_email
     if project_id != '':
         payload['project_id'] = project_id
+    if table_project_id != '':
+        payload['table_project_id'] = table_project_id
+    if table_name != '':
+        payload['table_name'] = table_name
 
     payload = json.dumps(payload)
     request_post_api(json_payload=payload,
@@ -191,7 +195,7 @@ def print_debug(str_debug, *args):
         print(str_debug, *args)
 
 
-def print_error(str_error, org_id='', user_email='', project_id='', do_not_send_api_request=False):
+def print_error(str_error, org_id='', user_email='', project_id='', table_project_id='', table_name='', do_not_send_api_request=False):
     if not is_quiet_on:
         # Yellow background color.
         print('\x1b[6;30;43m' + str_error + '\x1b[0m')
@@ -205,6 +209,10 @@ def print_error(str_error, org_id='', user_email='', project_id='', do_not_send_
         payload['user_email'] = user_email
     if project_id != '':
         payload['project_id'] = project_id
+    if table_project_id != '':
+        payload['table_project_id'] = table_project_id
+    if table_name != '':
+        payload['table_name'] = table_name
 
     payload = json.dumps(payload)
     if not do_not_send_api_request:
@@ -213,7 +221,7 @@ def print_error(str_error, org_id='', user_email='', project_id='', do_not_send_
                          route_url='api/v1/logs')
 
 
-def print_finding(str_finding, org_id='', user_email='', project_id=''):
+def print_finding(str_finding, org_id='', user_email='', project_id='', table_project_id='', table_name=''):
     if not is_quiet_on:
         # Yellow background color.
         print('\x1b[6;30;43m' + str_finding + '\x1b[0m')
@@ -227,6 +235,10 @@ def print_finding(str_finding, org_id='', user_email='', project_id=''):
         payload['user_email'] = user_email
     if project_id != '':
         payload['project_id'] = project_id
+    if table_project_id != '':
+        payload['table_project_id'] = table_project_id
+    if table_name != '':
+        payload['table_name'] = table_name
 
     payload = json.dumps(payload)
     request_post_api(json_payload=payload,
@@ -526,7 +538,9 @@ def test_supabase_action_flow_core():
                     list_findings_discovered.append(NAME_MFA)
                 if not user_email in dict_user_email_is_finding_printed:
                     print_finding(
-                        f"[FINDING] The user '{user_email}' does not have {NAME_MFA} enabled.", org_id=org_id, user_email=user_email)
+                        f"[FINDING] The user '{user_email}' does not have {NAME_MFA} enabled.",
+                        org_id=org_id,
+                        user_email=user_email)
                     dict_user_email_is_finding_printed[user_email] = True
 
             org_member_org_id_fk = org_id
@@ -652,7 +666,9 @@ def test_supabase_action_flow_core():
 
         if not project_is_pitr_enabled:
             print_finding(
-                f"[FINDING] The project '{project_name}' does not have {NAME_PITR} enabled.", org_id=org_id_fk, project_id=project_id)
+                f"[FINDING] The project '{project_name}' does not have {NAME_PITR} enabled.",
+                org_id=org_id_fk,
+                project_id=project_id)
             if not NAME_PITR in list_findings_discovered:
                 list_findings_discovered.append(NAME_PITR)
 
@@ -724,7 +740,10 @@ def test_supabase_action_flow_core():
                 if not table_is_rls_enabled and not NAME_RLS in list_findings_discovered:
                     list_findings_discovered.append(NAME_RLS)
                     print_finding(
-                        f"[FINDING] The table '{table_name}' ({project_name}) does not have {NAME_RLS} enabled.", project_id=project_id)
+                        f"[FINDING] The table '{table_name}' ({project_name}) does not have {NAME_RLS} enabled.",
+                        project_id=project_id,
+                        table_project_id=project_id,
+                        table_name=table_name)
 
                 list_table_project_id_fk.append(project_id)
                 list_table_name.append(table_name)
@@ -923,7 +942,9 @@ def test_supabase_action_flow_core():
                     rls_button = rls_status_button_outer_element.get_by_text(
                         'Disable RLS').first
                     print_info(f"[INFO] {NAME_RLS} has successfully been enabled for the table {table_name}.",
-                               project_id=table_project_id_fk)
+                               project_id=table_project_id_fk,
+                               table_project_id=table_project_id_fk,
+                               table_name=table_name)
                     list_table_rls_disabled_is_remediated[i] = True
                     list_updated_table_project_id_fk.append(
                         table_project_id_fk)
@@ -932,7 +953,9 @@ def test_supabase_action_flow_core():
 
                 except:
                     print_error(f"[ERROR] {NAME_RLS} couldn't be enabled for the table {table_name}. Please check the logs and contact us <{VELDE_EMAIL}>.",
-                                project_id=table_project_id_fk)
+                                project_id=table_project_id_fk,
+                                table_project_id=table_project_id_fk,
+                                table_name=table_name)
                     is_all_rls_remediated = False
 
         if is_all_rls_remediated:
@@ -951,7 +974,8 @@ def test_supabase_action_flow_core():
             table_is_rls_enabled = 1 if list_updated_table_is_rls_enabled[i] else 0
             payload = {'project_id_fk': list_updated_table_project_id_fk[i],
                        'table_name': list_updated_table_name[i],
-                       'table_is_rls_enabled': table_is_rls_enabled}
+                       'table_is_rls_enabled': table_is_rls_enabled,
+                       'table_last_updated_on_caa': int(time.time())}
             list_json_payload.append(payload)
 
         json_payload = json.dumps(list_json_payload)

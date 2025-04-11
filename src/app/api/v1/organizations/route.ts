@@ -79,26 +79,33 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    let array_upsertOrganizations = [];
     for (const organization of array_organization) {
-      await prisma.organizations.upsert({
-        where: {
-          org_id: organization["org_id"],
-        },
-        update: {
-          org_name: organization["org_name"],
-          org_last_updated_on_caa: organization["org_last_updated_on_caa"],
-        },
-        create: {
-          org_id: organization["org_id"],
-          caa_user_id: userAuthenticatedID,
-          org_name: organization["org_name"],
-          org_last_updated_on_caa: organization["org_last_updated_on_caa"],
-        },
-      });
+      array_upsertOrganizations.push(
+        prisma.organizations.upsert({
+          where: {
+            org_id: organization["org_id"],
+          },
+          update: {
+            org_name: organization["org_name"],
+            org_last_updated_on_caa:
+              organization["org_last_updated_on_caa"],
+          },
+          create: {
+            org_id: organization["org_id"],
+            caa_user_id: userAuthenticatedID,
+            org_name: organization["org_name"],
+            org_last_updated_on_caa:
+              organization["org_last_updated_on_caa"],
+          },
+        })
+      );
     }
 
+    const transaction = await prisma.$transaction(array_upsertOrganizations);
+
     if (process.env.NODE_ENV === "development") {
-      console.log(array_organization);
+      console.log(transaction);
     }
 
     return NextResponse.json(array_organization, {
@@ -137,41 +144,14 @@ export async function DELETE(req: NextRequest) {
     // Proceed if authenticated.
     const delete_all = params.get("delete_all")?.toLowerCase();
     if (delete_all === "true") {
-      const deleteTables = prisma.tables.deleteMany({
+      const deleteOrganizations = await prisma.organizations.deleteMany({
         where: {
           caa_user_id: userAuthenticatedID,
         },
       });
-      const deleteProjects = prisma.projects.deleteMany({
-        where: {
-          caa_user_id: userAuthenticatedID,
-        },
-      });
-      const deleteOrganizationMembers = prisma.organization_members.deleteMany({
-        where: {
-          caa_user_id: userAuthenticatedID,
-        },
-      });
-      const deleteUsers = prisma.users.deleteMany({
-        where: {
-          caa_user_id: userAuthenticatedID,
-        },
-      });
-      const deleteOrganizations = prisma.organizations.deleteMany({
-        where: {
-          caa_user_id: userAuthenticatedID,
-        },
-      });
-      const transaction = await prisma.$transaction([
-        deleteTables,
-        deleteProjects,
-        deleteOrganizationMembers,
-        deleteUsers,
-        deleteOrganizations,
-      ]);
 
       if (process.env.NODE_ENV === "development") {
-        console.log(transaction);
+        console.log(deleteOrganizations);
       }
 
       // By convention, HTTP 204 code must not contain any body, and must
@@ -205,9 +185,9 @@ export async function DELETE(req: NextRequest) {
     }
   } catch (err) {
     console.log(err);
-    return NextResponse.json(
-      "Please use correct URL params to specify which organization_member you'd like to delete.",
-      { status: 404, statusText: "Not Found" }
-    );
+    return NextResponse.json("Error occurred.", {
+      status: 500,
+      statusText: "Internal Server Error",
+    });
   }
 }
