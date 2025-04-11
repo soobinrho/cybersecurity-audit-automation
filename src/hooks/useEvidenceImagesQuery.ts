@@ -1,18 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
 
-export const useLogsQuery = () => {
+export default function useEvidenceImagesQuery() {
   return useQuery({
-    queryKey: ["logs"],
+    queryKey: ["evidence-images"],
     queryFn: () =>
-      fetch(`/api/v1/logs`, {
+      fetch(`/api/v1/evidence-images`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
       }).then((res) => res.json()),
-    refetchOnWindowFocus: "always",
+    refetchOnWindowFocus: true,
     refetchOnMount: true,
-    refetchOnReconnect: "always",
-    refetchInterval: 1000,
+    refetchOnReconnect: true,
+    refetchInterval: 1000 * 60 * 60 * 24,
   });
-};
+}

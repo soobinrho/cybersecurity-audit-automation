@@ -30,6 +30,9 @@ export default function Sidebar(props: props) {
             <SidebarItem href="/dashboard/security-controls/rls">
               RLS
             </SidebarItem>
+            <SidebarItem href="/dashboard/security-controls/evidence-images">
+              Evidence Images
+            </SidebarItem>
             <SidebarItem href="/dashboard/security-controls/caa-logs">
               caa Logs
             </SidebarItem>

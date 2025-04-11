@@ -22,6 +22,7 @@ model evidence_images {
   user_email_fk                        String?
   project_id_fk                        String?
   table_name_fk                        String?
+  evidence_what_for                    String
   evidence_image_name                  String
   evidence_image_size                  Int
   evidence_image_blob                  Bytes

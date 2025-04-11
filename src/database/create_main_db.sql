@@ -90,6 +90,7 @@ CREATE TABLE evidence_images (
   user_email_fk TEXT NULL,
   project_id_fk TEXT NULL,
   table_name_fk TEXT NULL,
+  evidence_what_for TEXT NOT NULL,
   evidence_image_name TEXT NOT NULL,
   evidence_image_size INTEGER NOT NULL
                       CHECK (evidence_image_size > 0),

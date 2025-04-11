@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "@/app/globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Suspense } from "react";
-import MainSkeleton from "@/components/MainSkeleton";
 import Loading from "@/app/loading";
 const title = process.env.NEXT_PUBLIC_TITLE || "";
 const description = process.env.NEXT_PUBLIC_DESCRIPTION || "";

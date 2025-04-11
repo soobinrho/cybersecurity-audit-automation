@@ -1,7 +1,6 @@
 "use client";
 
 import { useUsersQuery } from "@/hooks/useUsersQuery";
-import { useSession } from "next-auth/react";
 import type { users } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
 import DataTable from "@/components/ui/data-table";
@@ -10,7 +9,6 @@ import { Skeleton } from "../ui/skeleton";
 import { Checkbox } from "@/components/ui/checkbox";
 import { getFormattedTimeFromEpoch } from "@/lib/getFormattedTimeFromEpoch";
 import { VisibilityState } from "@tanstack/react-table";
-
 export const columns: ColumnDef<users>[] = [
   {
     id: "select",
@@ -84,19 +82,18 @@ export const columns: ColumnDef<users>[] = [
 ];
 
 export default function MFATable() {
-  const { data: session } = useSession();
-  const userAuthenticatedID = session?.user?.id as string;
-  const { data: users, isLoading } = useUsersQuery(userAuthenticatedID);
-
+  const { data, error, isLoading } = useUsersQuery();
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
-  const filteredData = useMemo(() => users ?? [], [users]);
+  const filteredData = useMemo(() => data ?? [], [data]);
+  if (error) {
+    return <h2>{error.message}</h2>;
+  }
   return (
     <>
       {isLoading ? (
         <div>
-          <Skeleton className="w-full h-[400px] rounded-md" />
-          <Skeleton className="h-10 w-full mt-4 rounded-md" />
+          <Skeleton className="w-full h-full rounded-4xl" />
         </div>
       ) : (
         <DataTable

@@ -26,7 +26,12 @@ export async function GET(req: NextRequest) {
 
     // Proceed if authenticated.
     const userAuthenticatedID = authResults.userAuthenticatedID;
-    const results = await getEvidenceImages(userAuthenticatedID);
+    const results = await getEvidenceImages(
+      userAuthenticatedID,
+      "mfa",
+      "org_id",
+      "project_id"
+    );
     if (results.length > 0) {
       return NextResponse.json(results, {
         status: 200,
@@ -84,12 +89,15 @@ export async function POST(req: NextRequest) {
 
     const array_evidenceImagesCreateInput = [];
     for (const json_req of req_payload) {
+      const evidence_what_for = json_req["evidence_what_for"];
       const evidence_image_name = json_req["evidence_image_name"];
       const evidence_image_size = json_req["evidence_image_size"];
       const evidence_image_blob = json_req["evidence_image_blob"];
       const evidence_image_last_updated_on_caa =
         json_req["evidence_image_last_updated_on_caa"];
       if (
+        typeof evidence_what_for !== "string" ||
+        evidence_what_for === "" ||
         typeof evidence_image_name !== "string" ||
         evidence_image_name === "" ||
         isNaN(parseInt(evidence_image_size)) ||
@@ -104,6 +112,7 @@ export async function POST(req: NextRequest) {
       }
       const evidenceImagesCreateInput: Prisma.evidence_imagesCreateInput = {
         caa_user_id: userAuthenticatedID,
+        evidence_what_for: evidence_what_for,
         evidence_image_name: evidence_image_name,
         evidence_image_size: evidence_image_size,
         evidence_image_blob: Buffer.from(evidence_image_blob, "base64"),

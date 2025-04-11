@@ -51,6 +51,11 @@ export default function MobileMenu() {
                 </Link>
               </DrawerDescription>
               <DrawerDescription>
+                <Link href="/dashboard/security-controls/evidence-images">
+                  <DrawerClose>Evidence Images</DrawerClose>
+                </Link>
+              </DrawerDescription>
+              <DrawerDescription>
                 <Link href="/dashboard/security-controls/caa-logs">
                   <DrawerClose>caa Logs</DrawerClose>
                 </Link>

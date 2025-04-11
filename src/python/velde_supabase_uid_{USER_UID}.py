@@ -353,9 +353,7 @@ def test_supabase_action_flow_core():
     function to run Playwright with.
     """
     print_warning(f'[WARNING] AUTHORIZED USERS ONLY')
-    print_warning(f"[WARNING] This program is intended for '{USER_EMAIL}'")
-    print_warning(
-        f"[WARNING] If you're not the intended user, please do not access, transmit, or store this program.")
+    print_warning(f"[WARNING] This program is intended for '{USER_EMAIL}' only.")
     print_info(f'[INFO] Requesting for the warning prompt...')
 
     is_yes = messagebox.askyesno(
@@ -494,6 +492,10 @@ def test_supabase_action_flow_core():
     print_debug(
         f'[DEBUG] Looking up the list of {APP_NAME} users...')
 
+    request_delete_api(params={'delete_all': True},
+                       db_table_name='evidence_images',
+                       route_url='api/v1/evidence-images')
+
     list_user_email = []
     list_user_is_mfa_enabled = []
     list_org_member_org_id_fk = []
@@ -511,6 +513,7 @@ def test_supabase_action_flow_core():
         page.get_by_role('row').first.wait_for(state='visible')
 
         # This is localtime.
+        evidence_what_for = 'MFA'
         evidence_image_name = f'{strftime("%Y-%m-%d %H%M%S")} {NAME_MFA} {org_name}.png'
         evidence_image_name = sanitize_file_name(evidence_image_name)
         evidence_image_blob = page.screenshot(full_page=True)
@@ -524,6 +527,7 @@ def test_supabase_action_flow_core():
         list_payload = []
         list_payload.append({
             'org_id': org_id,
+            'evidence_what_for': evidence_what_for,
             'evidence_image_name': evidence_image_name,
             'evidence_image_size': evidence_image_size,
             'evidence_image_blob': evidence_image_blob,
@@ -659,6 +663,7 @@ def test_supabase_action_flow_core():
             except:
                 continue
 
+        evidence_what_for = 'PITR'
         evidence_image_name = f'{strftime("%Y-%m-%d %H%M%S")} {NAME_PITR} {project_name}.png'
         evidence_image_name = sanitize_file_name(evidence_image_name)
         evidence_image_blob = page.screenshot(full_page=True)
@@ -673,6 +678,7 @@ def test_supabase_action_flow_core():
         list_payload.append({
             'org_id': org_id_fk,
             'project_id': project_id,
+            'evidence_what_for': evidence_what_for,
             'evidence_image_name': evidence_image_name,
             'evidence_image_size': evidence_image_size,
             'evidence_image_blob': evidence_image_blob,
@@ -744,6 +750,7 @@ def test_supabase_action_flow_core():
             f'{APP_URL_BASE}/dashboard/project/{project_id}/auth/policies')
         wait_for_all_loading(page, HIGHLIGHT_DURATION)
 
+        evidence_what_for = 'RLS'
         evidence_image_name = f'{strftime("%Y-%m-%d %H%M%S")} {NAME_RLS} {project_name}.png'
         evidence_image_name = sanitize_file_name(evidence_image_name)
         evidence_image_blob = page.screenshot(full_page=True)
@@ -757,6 +764,7 @@ def test_supabase_action_flow_core():
         list_payload = []
         list_payload.append({
             'project_id': project_id,
+            'evidence_what_for': evidence_what_for,
             'evidence_image_name': evidence_image_name,
             'evidence_image_size': evidence_image_size,
             'evidence_image_blob': evidence_image_blob,

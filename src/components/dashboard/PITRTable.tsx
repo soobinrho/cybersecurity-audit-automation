@@ -1,7 +1,6 @@
 "use client";
 
 import { useProjectsQuery } from "@/hooks/useProjectsQuery";
-import { useSession } from "next-auth/react";
 import type { projects } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
 import DataTable from "@/components/ui/data-table";
@@ -82,10 +81,8 @@ export const columns: ColumnDef<projects>[] = [
   },
 ];
 
-export default function MFATable() {
-  const { data: session } = useSession();
-  const userAuthenticatedID = session?.user?.id as string;
-  const { data, isLoading } = useProjectsQuery(userAuthenticatedID);
+export default function PITRTable() {
+  const { data, isLoading } = useProjectsQuery();
 
   const filteredData = useMemo(() => data ?? [], [data]);
 
@@ -95,8 +92,7 @@ export default function MFATable() {
     <>
       {isLoading ? (
         <div>
-          <Skeleton className="w-full h-[400px] rounded-md" />
-          <Skeleton className="h-10 w-full mt-4 rounded-md" />
+          <Skeleton className="w-full h-full rounded-4xl" />
         </div>
       ) : (
         <DataTable

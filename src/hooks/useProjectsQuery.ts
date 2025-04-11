@@ -1,9 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
-import { getProjects } from "@/lib/getProjects";
 
-export const useProjectsQuery = (authentiactedUserId: string | undefined) => {
+export const useProjectsQuery = () => {
   return useQuery({
     queryKey: ["projects"],
-    queryFn: () => getProjects(authentiactedUserId),
+    queryFn: () =>
+      fetch(`/api/v1/projects`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }).then((res) => res.json()),
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+    refetchOnReconnect: true,
+    refetchInterval: 1000,
   });
 };

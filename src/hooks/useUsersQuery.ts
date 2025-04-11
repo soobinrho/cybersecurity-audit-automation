@@ -1,9 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
-import { getUsers } from "@/lib/getUsers";
 
-export const useUsersQuery = (authentiactedUserId: string | undefined) => {
+export const useUsersQuery = () => {
   return useQuery({
     queryKey: ["users"],
-    queryFn: () => getUsers(authentiactedUserId),
+    queryFn: () =>
+      fetch(`/api/v1/users`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }).then((res) => res.json()),
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+    refetchOnReconnect: true,
+    refetchInterval: 1000,
   });
 };

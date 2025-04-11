@@ -1,7 +1,6 @@
 "use client";
 
 import { useTablesQuery } from "@/hooks/useTablesQuery";
-import { useSession } from "next-auth/react";
 import type { tables } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
 import DataTable from "@/components/ui/data-table";
@@ -83,9 +82,7 @@ export const columns: ColumnDef<tables>[] = [
 ];
 
 export default function RLSTable() {
-  const { data: session } = useSession();
-  const userAuthenticatedID = session?.user?.id as string;
-  const { data, isLoading } = useTablesQuery(userAuthenticatedID);
+  const { data, isLoading } = useTablesQuery();
 
   const filteredData = useMemo(() => data ?? [], [data]);
 
@@ -95,8 +92,7 @@ export default function RLSTable() {
     <>
       {isLoading ? (
         <div>
-          <Skeleton className="w-full h-[400px] rounded-md" />
-          <Skeleton className="h-10 w-full mt-4 rounded-md" />
+          <Skeleton className="w-full h-full rounded-4xl" />
         </div>
       ) : (
         <DataTable

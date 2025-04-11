@@ -1,17 +1,38 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useLogsQuery } from "@/hooks/useLogsQuery";
-import { useSession } from "next-auth/react";
 import type { logs } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
 import DataTable from "@/components/ui/data-table";
-import { useMemo } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getFormattedTimeFromTimestamp } from "@/lib/getFormattedTimeFromEpoch";
 import { VisibilityState } from "@tanstack/react-table";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export const columns: ColumnDef<logs>[] = [
+  {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
   {
     accessorKey: "log_id",
     header: ({ column }) => {
@@ -170,7 +191,9 @@ export const columns: ColumnDef<logs>[] = [
           className="hover:text-foreground/40 active:text-foreground/60 transition-all duration-75"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          TIMESTAMP (Browser Local Time)
+          TIMESTAMP
+          <br />
+          (Browser Local Time)
         </button>
       );
     },
@@ -229,9 +252,7 @@ export const columns: ColumnDef<logs>[] = [
 ];
 
 export default function LogsTable() {
-  const { data: session } = useSession();
-  const userAuthenticatedID = session?.user?.id || "";
-  const { data, isLoading } = useLogsQuery(userAuthenticatedID);
+  const { data, error, isLoading } = useLogsQuery();
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
     log_id: false,
     org_id_fk: false,
@@ -248,8 +269,10 @@ export default function LogsTable() {
     PROCID: false,
     MSG: true,
   });
-
   const filteredData = useMemo(() => data ?? [], [data]);
+  if (error) {
+    return <h2>{error.message}</h2>;
+  }
   return (
     <>
       {isLoading ? (
@@ -263,6 +286,7 @@ export default function LogsTable() {
           data={filteredData || []}
           filterColumnName="MSG"
           filterDisplayText="message"
+          isSelectable={true}
           columnVisibility={columnVisibility}
           setColumnVisibility={setColumnVisibility}
         />

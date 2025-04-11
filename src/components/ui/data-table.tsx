@@ -29,8 +29,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { mkConfig, generateCsv, download } from "export-to-csv";
 
-interface DataTableProps<TData, TValue> {
+interface DataTableProps<TData extends Record<string, any>, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   filterColumnName?: string;
@@ -40,7 +41,12 @@ interface DataTableProps<TData, TValue> {
   setColumnVisibility: OnChangeFn<VisibilityState>;
 }
 
-export default function DataTable<TData, TValue>({
+const csvConfig = mkConfig({
+  useKeysAsHeaders: true,
+  filename: `${new Date().toISOString().split("T")[0]}`,
+});
+
+export default function DataTable<TData extends Record<string, any>, TValue>({
   columns,
   data,
   filterColumnName,
@@ -72,6 +78,19 @@ export default function DataTable<TData, TValue>({
       rowSelection,
     },
   });
+
+  const handleExportSelectedRows = () => {
+    const selectedRows = table.getFilteredSelectedRowModel().rows;
+    const selectedData = selectedRows.map((row) => row.original);
+    const csv = generateCsv(csvConfig)(selectedData);
+    download(csvConfig)(csv);
+  };
+
+  const handleExportAll = () => {
+    const csv = generateCsv(csvConfig)(data);
+    download(csvConfig)(csv);
+  };
+
   return (
     <div>
       {filterColumnName && filterDisplayText && (
@@ -167,9 +186,19 @@ export default function DataTable<TData, TValue>({
         </Table>
       </div>
       {isSelectable && (
-        <div className="flex-1 text-sm text-muted-foreground pt-3">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+        <div className="flex justify-between items-center py-1">
+          <div className="text-sm text-muted-foreground">
+            {table.getFilteredSelectedRowModel().rows.length} of{" "}
+            {table.getFilteredRowModel().rows.length} row(s) selected.
+          </div>
+          <div className="flex gap-1">
+            <Button variant="outline" onClick={handleExportSelectedRows}>
+              Export Selected Rows
+            </Button>
+            <Button variant="outline" onClick={handleExportAll}>
+              Export All
+            </Button>
+          </div>
         </div>
       )}
     </div>

@@ -1,11 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
-import { getOrganizationMembers } from "@/lib/getOrganizationMembers";
 
-export const useOrganizationMembersQuery = (
-  authentiactedUserId: string | undefined
-) => {
+export const useOrganizationMembersQuery = () => {
   return useQuery({
     queryKey: ["organization_members"],
-    queryFn: () => getOrganizationMembers(authentiactedUserId),
+    queryFn: () =>
+      fetch(`/api/v1/organization-members`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }).then((res) => res.json()),
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+    refetchOnReconnect: true,
+    refetchInterval: 1000,
   });
 };
