@@ -105,9 +105,7 @@ sudo ln -s /home/soobinrho/git/caa-supabase/docker/certbot_runner /etc/cron.dail
 
 ## Useful workflows
 
-
 ### How I redeploy whenever a new change has been made
-
 
 ```bash
 # First, ssh into the server.
@@ -130,6 +128,9 @@ sudo docker compose exec -it caa sh
 
 # How to run a shell inside the nginx container.
 sudo docker compose exec -it nginx sh
+
+# How to read the Nginx and Next.js logs.
+sudo docker compose logs | ccze -m ansi -o nolookups | less -R
 ```
 
 <br>

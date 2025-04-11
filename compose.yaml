@@ -4,6 +4,17 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('caa:3000/login').then((res) => {if (res.status !== 200) throw new Error(res.status)})"
+        ]
+      timeout: 10s
+      interval: 5s
+      retries: 3
     restart: unless-stopped
     expose:
       - 3000 # used by Node (pnpm)
