@@ -57,9 +57,12 @@ try:
     import pytest
     from playwright.sync_api import sync_playwright
 except ImportError:
-    subprocess.check_call([sys.executable, '-m', 'pip', 'install', '-U', 'pytest'])
-    subprocess.check_call([sys.executable, '-m', 'pip', 'install', '-U', 'pytest-playwright'])
-    subprocess.check_call([sys.executable, '-m', 'playwright', 'install', '--with-deps', 'chromium'])
+    subprocess.check_call(
+        [sys.executable, '-m', 'pip', 'install', '-U', 'pytest'])
+    subprocess.check_call([sys.executable, '-m', 'pip',
+                          'install', '-U', 'pytest-playwright'])
+    subprocess.check_call(
+        [sys.executable, '-m', 'playwright', 'install', '--with-deps', 'chromium'])
 finally:
     import pytest
     from playwright.sync_api import sync_playwright
@@ -71,12 +74,12 @@ finally:
 # access rights to the API routs of each specific user's dashboard on caa.
 VELDE_REST_API_USER = 'UID4.0_this_is_a_test_value'
 VELDE_REST_API_KEY = 'RANDOM_API_KEY_this_is_a_test_value'
-VELDE_URL_BASE = 'http://localhost:3000/'
+VELDE_URL_BASE = 'http://localhost:3000'
 VELDE_EMAIL = ''
 USER_EMAIL = ''
 USER_UID = ''
 USER_DASHBOARD_URL = ''
-APP_URL_BASE = 'https://supabase.com/'
+APP_URL_BASE = 'https://supabase.com'
 APP_NAME = 'Supabase'
 # -----------------------------------------------------------------------------
 
@@ -134,6 +137,7 @@ def get_findings_summary_string(list_findings):
         str_findings_summary += f'\n{i+1}. {list_findings[i]}.'
     return str_findings_summary
 
+
 def get_log_template(
         PRI,
         VER,
@@ -150,6 +154,7 @@ def get_log_template(
                 'PROCID': PROCID,
                 'MSG': MSG}
     return dict_log
+
 
 def print_info(str_info, org_id='', user_email='', project_id=''):
     if not is_quiet_on:
@@ -177,7 +182,7 @@ def print_debug(str_debug, *args):
         print(str_debug, *args)
 
 
-def print_error(str_error, org_id='', user_email='', project_id=''):
+def print_error(str_error, org_id='', user_email='', project_id='', do_not_send_api_request=False):
     if not is_quiet_on:
         # Yellow background color.
         print('\x1b[6;30;43m' + str_error + '\x1b[0m')
@@ -193,9 +198,10 @@ def print_error(str_error, org_id='', user_email='', project_id=''):
         payload['project_id'] = project_id
 
     payload = json.dumps(payload)
-    request_post_api(json_payload=payload,
-                     db_table_name='logs',
-                     route_url='api/v1/logs')
+    if not do_not_send_api_request:
+        request_post_api(json_payload=payload,
+                         db_table_name='logs',
+                         route_url='api/v1/logs')
 
 
 def print_finding(str_finding, org_id='', user_email='', project_id=''):
@@ -230,7 +236,7 @@ def request_post_api(json_payload, db_table_name, route_url):
     # Also, the HTTPBasicAuth object doesn't encrypt the data on its own.
     # Thus, make sure HTTPS/SSL is set up correctly.
     api_auth = HTTPBasicAuth(VELDE_REST_API_USER, VELDE_REST_API_KEY)
-    api_url = f'{VELDE_URL_BASE}{route_url}'
+    api_url = f'{VELDE_URL_BASE}/{route_url}'
 
     try:
         req = requests.post(api_url,
@@ -240,33 +246,38 @@ def request_post_api(json_payload, db_table_name, route_url):
             print_debug(
                 f"[DEBUG] Successful HTTP POST request for the '{db_table_name}' table.")
         else:
-            print_debug(
-                f'[DEBUG] {req.status_code} "{req.reason}" error on HTTP PUT request for updating {db_table_name} via {route_url}.')
-            print_debug(f'[DEBUG] {req.json()}')
-    
-    except:
-        print_debug(
-            f'[DEBUG] Error on HTTP POST request for updating {db_table_name} via {route_url}.')
+            print_error(
+                f'[ERROR] {req.status_code} "{req.reason}" error on HTTP PUT request for updating {db_table_name} via {route_url}.', do_not_send_api_request=True)
+            print_error(f'[ERROR] {req.json()}', do_not_send_api_request=True)
+
+    except Exception as e:
+        print_error(
+            f'[ERROR] Failed HTTP POST request for updating the {db_table_name} table.', do_not_send_api_request=True)
+        print_error(
+            f'[ERROR] Message: {e}', do_not_send_api_request=True)
+
 
 def request_delete_api(params, db_table_name, route_url):
     api_auth = HTTPBasicAuth(VELDE_REST_API_USER, VELDE_REST_API_KEY)
-    api_url = f'{VELDE_URL_BASE}{route_url}'
+    api_url = f'{VELDE_URL_BASE}/{route_url}'
 
     try:
         req = requests.delete(api_url,
                               params=params,
                               auth=api_auth)
         if req.status_code == 204:  # HTTP status code 204 (No Content).
-            print_debug(
-                f"[DEBUG] Successful HTTP DELETE request for the '{db_table_name}' table.")
+            print_error(
+                f"[ERROR] Successful HTTP DELETE request for the '{db_table_name}' table.")
         else:
-            print_debug(
-                f'[DEBUG] {req.status_code} "{req.reason}" error on HTTP PUT request for updating {db_table_name} via {route_url}.')
-            print_debug(f'[DEBUG] {req.json()}')
-    
-    except:
-        print_debug(
-            f'[DEBUG] Error on HTTP DELETE request for {db_table_name} via {route_url}.')
+            print_error(
+                f'[ERROR] {req.status_code} "{req.reason}" error on HTTP PUT request for updating {db_table_name} via {route_url}.')
+            print_error(f'[ERROR] {req.json()}')
+
+    except Exception as e:
+        print_error(
+            f'[ERROR] Failed HTTP DELETE request for the {db_table_name} table.', do_not_send_api_request=True)
+        print_error(
+            f'[ERROR] Message: {e}', do_not_send_api_request=True)
 
 
 def wait_for_all_loading(page, HIGHLIGHT_DURATION):
@@ -347,7 +358,7 @@ def test_supabase_action_flow_core():
         no_viewport=True, storage_state=path_test_login_session)
 
     page = context.new_page()
-    url_dashboard = f'{APP_URL_BASE}dashboard/'
+    url_dashboard = f'{APP_URL_BASE}/dashboard/'
     page.goto(url_dashboard)
     wait_for_all_loading(page, HIGHLIGHT_DURATION)
 
@@ -439,7 +450,7 @@ def test_supabase_action_flow_core():
                    'org_name': list_org_name[i],
                    'org_last_updated_on_caa': int(time.time())}
         list_json_payload.append(payload)
-    
+
     json_payload = json.dumps(list_json_payload)
     request_post_api(json_payload=json_payload,
                      db_table_name='organizations',
@@ -466,7 +477,7 @@ def test_supabase_action_flow_core():
         org_name = list_org_name[i]
         org_url = list_org_url[i]
 
-        team_url = (APP_URL_BASE + org_url).replace('general', 'team')
+        team_url = f'{APP_URL_BASE}/{org_url}'.replace('general', 'team')
         page.goto(team_url)
         page.wait_for_load_state('domcontentloaded')
         page.get_by_role('row').first.wait_for(state='visible')
@@ -532,7 +543,7 @@ def test_supabase_action_flow_core():
                    'user_is_mfa_enabled': user_is_mfa_enabled,
                    'user_last_updated_on_caa': int(time.time())}
         list_json_payload.append(payload)
-    
+
     json_payload = json.dumps(list_json_payload)
     request_post_api(json_payload=json_payload,
                      db_table_name='users',
@@ -556,7 +567,7 @@ def test_supabase_action_flow_core():
     print_debug(
         f'[DEBUG] Looking up the list of {APP_NAME} projects...')
 
-    page.goto(f'{APP_URL_BASE}dashboard/projects')
+    page.goto(f'{APP_URL_BASE}/dashboard/projects')
     page.wait_for_load_state('domcontentloaded')
     page.get_by_text('New project').first.wait_for(state='visible')
 
@@ -590,7 +601,7 @@ def test_supabase_action_flow_core():
         project_name = href_project_text_content
 
         page.goto(
-            f'{APP_URL_BASE}dashboard/project/{project_id}/database/backups/pitr')
+            f'{APP_URL_BASE}/dashboard/project/{project_id}/database/backups/pitr')
         page.get_by_text('Point in time').first.wait_for(state='visible')
         wait_for_all_loading(page, HIGHLIGHT_DURATION)
         page.get_by_text('Point in time').first.highlight()
@@ -653,7 +664,7 @@ def test_supabase_action_flow_core():
                    'project_is_pitr_enabled': project_is_pitr_enabled,
                    'project_last_updated_on_caa': int(time.time())}
         list_json_payload.append(payload)
-    
+
     json_payload = json.dumps(list_json_payload)
     request_post_api(json_payload=json_payload,
                      db_table_name='projects',
@@ -672,7 +683,7 @@ def test_supabase_action_flow_core():
         project_id = list_project_id[i]
         project_name = list_project_name[i]
         page.goto(
-            f'{APP_URL_BASE}dashboard/project/{project_id}/auth/policies')
+            f'{APP_URL_BASE}/dashboard/project/{project_id}/auth/policies')
         wait_for_all_loading(page, HIGHLIGHT_DURATION)
 
         path_evidence = f'{strftime("%Y-%m-%d %H%M%S")} {NAME_RLS} {project_name}.png'
@@ -722,7 +733,7 @@ def test_supabase_action_flow_core():
                    'table_is_rls_enabled': table_is_rls_enabled,
                    'table_last_updated_on_caa': int(time.time())}
         list_json_payload.append(payload)
-    
+
     json_payload = json.dumps(list_json_payload)
     request_post_api(json_payload=json_payload,
                      db_table_name='tables',
@@ -743,7 +754,7 @@ def test_supabase_action_flow_core():
         playwright.stop()
         return
 
-    page.goto(f'{APP_URL_BASE}dashboard/projects')
+    page.goto(f'{APP_URL_BASE}/dashboard/projects')
     page.get_by_text('New project').first.wait_for(state='visible')
     wait_for_all_loading(page, HIGHLIGHT_DURATION)
 
@@ -771,7 +782,7 @@ def test_supabase_action_flow_core():
             org_name = list_org_name[i]
             org_url = list_org_url[i]
 
-            team_url = (APP_URL_BASE + org_url).replace('general', 'team')
+            team_url = f'{APP_URL_BASE}/{org_url}'.replace('general', 'team')
             page.goto(team_url)
             page.wait_for_load_state('domcontentloaded')
             page.get_by_role('row').first.wait_for(state='visible')
@@ -814,7 +825,7 @@ def test_supabase_action_flow_core():
         for i in range(len(list_projects_id_pitr_disabled)):
             project_id = list_projects_id_pitr_disabled[i]
             project_name = list_projects_name_pitr_disabled[i]
-            url_pitr = f'{APP_URL_BASE}dashboard/project/{project_id}/database/backups/pitr'
+            url_pitr = f'{APP_URL_BASE}/dashboard/project/{project_id}/database/backups/pitr'
             page.goto(url_pitr)
             wait_for_all_loading(page, HIGHLIGHT_DURATION)
 
@@ -866,24 +877,24 @@ def test_supabase_action_flow_core():
                     continue
 
                 try:
-                    url = f'{APP_URL_BASE}dashboard/project/{project_id_fk}/auth/policies'
+                    url = f'{APP_URL_BASE}/dashboard/project/{project_id_fk}/auth/policies'
                     page.goto(url)
                     wait_for_all_loading(page, HIGHLIGHT_DURATION)
                     anchors = page.locator('a').all()
-    
+
                     rls_status_button_outer_element = ''
                     for anchor in anchors:
                         try:
                             href = anchor.get_attribute('href')
                         except:
                             pass
-                        
+
                         if href and re.match(r"/dashboard/project/[^/]+/editor/[^/]+$", href):
                             if anchor.text_content() == table_name:
                                 rls_status_button_outer_element = anchor.locator(
-                                                            '..').locator('..')
+                                    '..').locator('..')
                                 break
-    
+
                     rls_button = rls_status_button_outer_element.get_by_text(
                         'Enable RLS').first
                     anchor.first.highlight()
@@ -892,7 +903,7 @@ def test_supabase_action_flow_core():
                     page.wait_for_timeout(HIGHLIGHT_DURATION * 2)
                     rls_button.click()
                     wait_for_all_loading(page, HIGHLIGHT_DURATION)
-    
+
                     page.get_by_role(
                         'button', name='Confirm').first.highlight()
                     page.wait_for_timeout(HIGHLIGHT_DURATION * 2)
@@ -916,11 +927,11 @@ def test_supabase_action_flow_core():
                     is_all_rls_remediated = False
 
         if is_all_rls_remediated:
-            message=f"{NAME_RLS} has successfully been enabled for all tables."
+            message = f"{NAME_RLS} has successfully been enabled for all tables."
             print_info(f"[INFO] {message}")
             list_findings_remediated.append(NAME_RLS)
         else:
-            message=f"{NAME_RLS} remediation process has failed. Please check the logs and contact us <{VELDE_EMAIL}>."
+            message = f"{NAME_RLS} remediation process has failed. Please check the logs and contact us <{VELDE_EMAIL}>."
             print_error(f"[ERROR] {message}")
             list_findings_not_remediated.append(NAME_RLS)
             messagebox.showinfo(
@@ -933,7 +944,7 @@ def test_supabase_action_flow_core():
                        'table_name': list_updated_table_name[i],
                        'table_is_rls_enabled': table_is_rls_enabled}
             list_json_payload.append(payload)
-        
+
         json_payload = json.dumps(list_json_payload)
         request_post_api(json_payload=json_payload,
                          db_table_name='tables',
