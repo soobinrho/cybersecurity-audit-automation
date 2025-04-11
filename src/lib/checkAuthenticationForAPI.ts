@@ -19,7 +19,7 @@ export default async function checkAuthenticationForAPI(
         },
       });
       // Example:
-      //                      caa_user_id = 4138798a-b55e-44d4-8cd8-8181182eb856
+      //                        caa_user_id = 4138798a-b55e-44d4-8cd8-8181182eb856
       //             client_side_api_key_id = 1
       //   client_side_api_key_hashed_value = $2b$10$nS.fSmLibN8cw5hqgdy82.GcK18XmPdo3lNXa2EfSUvwuDJJ2W.YW
       //      client_side_api_key_is_active = 1

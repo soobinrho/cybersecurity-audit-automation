@@ -41,7 +41,7 @@ export default function Footer(props: props) {
         href="https://github.com/soobinrho/cybersecurity-audit-automation"
         target="_blank"
       >
-        © 2025 caa, Soobin Rho.
+        © 2025 Soobin Rho.
       </a>
     </div>
   );

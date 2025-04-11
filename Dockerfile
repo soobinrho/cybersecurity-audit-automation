@@ -1,7 +1,7 @@
 FROM node AS base
 
-LABEL com.caa.description="https://github.com/soobinrho/caa-supabase"
-LABEL com.caa.maintainer="Soobin Rho <soobin@nsustain.com>"
+LABEL com.cybersecurity-audit-automation.description="https://github.com/soobinrho/cybersecurity-audit-automation"
+LABEL com.cybersecurity-audit-automation.maintainer="Soobin Rho <soobin@nsustain.com>"
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"

@@ -1,12 +1,10 @@
 <br>
 
-![screenshot](https://github.com/user-attachments/assets/a606ba77-e699-49b5-a810-518017e36287)
+<!-- ![screenshot]() -->
 
-# caa
+# Cybersecurity Audit Automation
 
-The purpose of this project is to help you with compliance and regulations by using technology we have available today, and to do so in a way that does not access, transmit, or store any of your sensitive information, such as your API keys, GLB data (customer data), or PCI data (card numbers).
-
-I am in a unique position where I can create a web app that understands the everyday needs of CyberGRC teams (Cybersecurity Governance, Risk, and Compliance) because I'm in one of them.
+The purpose of this project is to help you automate your own cybersecurity compliance posture by using technology we have available today, and to do so in a way that does not access, transmit, or store any of your sensitive information, such as your API keys, GLB data (customer data), or PCI data (card numbers).
 
 <br>
 
@@ -14,8 +12,8 @@ I am in a unique position where I can create a web app that understands the ever
 
 ```bash
 # Install the dependencies.
-git clone https://github.com/soobinrho/caa-supabase.git
-cd caa-supabase
+git clone https://github.com/soobinrho/cybersecurity-audit-automation.git
+cd cybersecurity-audit-automation
 pnpm install
 
 # Fill in sensitive env variables for development and production.
@@ -35,20 +33,18 @@ pnpm dev
 
 <br>
 
-## How I deploy caa for prod
+## How I deploy for prod
 
-Run caa and Nginx using Docker Compose.
+Run the web app and Nginx using Docker Compose.
 
 ```bash
-git clone https://github.com/soobinrho/caa-supabase.git
-cd caa-supabase
+git clone https://github.com/soobinrho/cybersecurity-audit-automation.git
+cd cybersecurity-audit-automation
 
 # Fill in sensitive env variables for development and production.
-cp .env.development.local.example .env.development.local
 cp .env.production.local.example .env.production.local
 
 # Create a random string required by Auth.js for encryption.
-pnpm npx auth secret --copy >> .env.development.local
 pnpm npx auth secret --copy >> .env.production.local
 
 # Build based on `Dockerfile`, `Dockerfile.nginx`, and `compose.yaml`.
@@ -61,7 +57,7 @@ Set up an HTTPS certificate using Certbot.
 Before running in Letsencrypt's prod server, test in the staging server first like this:
 
 ```bash
-cd caa-supabase
+cd cybersecurity-audit-automation
 docker compose exec nginx certbot certonly --text --non-interactive \
   --agree-tos --verbose --keep-until-expiring --webroot \
   --webroot-path /var/www/letsencrypt/ \
@@ -75,7 +71,7 @@ docker compose exec nginx certbot certonly --text --non-interactive \
 After you pass the tests in the staging server, issue the certs in prod.
 
 ```bash
-cd caa-supabase
+cd cybersecurity-audit-automation
 docker compose exec nginx certbot certonly --text --non-interactive \
   --agree-tos --verbose --keep-until-expiring --webroot \
   --webroot-path /var/www/letsencrypt/ \
@@ -90,7 +86,7 @@ Finally, switch out the `nginx.conf`.
 The first one runs in HTTP, while the new one directs all traffic to HTTPS.
 
 ```bash
-cd caa-supabase
+cd cybersecurity-audit-automation
 cp docker/nginx.conf.afterCertbot docker/nginx.conf
 ```
 
@@ -98,12 +94,12 @@ This is not a required step, but I also prefer to set up a cron job so that the 
 
 ```bash
 # Example:
-sudo ln -s /home/soobinrho/git/caa-supabase/docker/certbot_runner /etc/cron.daily/certbot_runner
+sudo ln -s /home/soobinrho/git/cybersecurity-audit-automation/docker/certbot_runner /etc/cron.daily/certbot_runner
 
 # Also, Docker stores various temporary files, such as filesystem layers at
 # `/var/lib/docker/overlay2`, and this can grow fast -- e.g. 70GB in a week.
 # So, set up a cron job to clean this daily.
-sudo ln -s /home/soobinrho/git/caa-supabase/docker/docker_prune_runner /etc/cron.daily/docker_prune_runner
+sudo ln -s /home/soobinrho/git/cybersecurity-audit-automation/docker/docker_prune_runner /etc/cron.daily/docker_prune_runner
 ```
 
 <br>
@@ -114,8 +110,8 @@ sudo ln -s /home/soobinrho/git/caa-supabase/docker/docker_prune_runner /etc/cron
 
 ```bash
 # First, ssh into the server.
-ssh caa
-cd caa-supabase
+ssh cybersecurity-audit-automation
+cd cybersecurity-audit-automation
 git pull
 
 # Rebuild the docker image and redeploy.
@@ -128,8 +124,8 @@ sudo docker compose up -d
 ### How I debug docker images
 
 ```bash
-# How to run a shell inside the caa container.
-sudo docker compose exec -it caa sh
+# How to run a shell inside the web app container.
+sudo docker compose exec -it cybersecurity-audit-automation sh
 
 # How to run a shell inside the nginx container.
 sudo docker compose exec -it nginx sh

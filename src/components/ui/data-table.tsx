@@ -43,7 +43,7 @@ interface DataTableProps<TData extends Record<string, any>, TValue> {
 
 const csvConfig = mkConfig({
   useKeysAsHeaders: true,
-  filename: `caa_${new Date().toISOString().split("T")[0]}`,
+  filename: `audit_{new Date().toISOString().split("T")[0]}`,
 });
 
 export default function DataTable<TData extends Record<string, any>, TValue>({

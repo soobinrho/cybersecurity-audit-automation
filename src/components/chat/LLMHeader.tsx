@@ -17,7 +17,7 @@ export default function LLMHeader() {
   const { data: tables } = useTablesQuery();
 
   return (
-    <div className="flex flex-col self-center md:flex-row md:justify-between pt-2 md:pt-0 md:pl-4 md:pr-2 flex-nowrap gap-1 mb-2 md:mb-0">
+    <div className="flex flex-col self-center md:flex-row md:justify-between pt-2 md:pt-0 md:pl-4 md:pr-2 flex-nowrap gap-1 mb-2 md:mb-0 z-10">
       <div className="grow-7">
         <h2 className="text-2xl font-bold">Claude 3.7 Sonnet</h2>
         <p className="text-[0.7rem] text-muted-foreground">

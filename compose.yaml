@@ -1,6 +1,6 @@
 services:
-  caa:
-    container_name: caa
+  cybersecurity-audit-automation:
+    container_name: cybersecurity-audit-automation
     build:
       context: .
       dockerfile: Dockerfile
@@ -10,7 +10,7 @@ services:
           "CMD",
           "node",
           "-e",
-          "fetch('caa:3000/login').then((res) => {if (res.status !== 200) throw new Error(res.status)})"
+          "fetch('cybersecurity-audit-automation:3000/login').then((res) => {if (res.status !== 200) throw new Error(res.status)})"
         ]
       timeout: 10s
       interval: 5s
@@ -21,7 +21,7 @@ services:
     networks:
       - back-end
     volumes:
-      - caa-database:/app/src/database
+      - cybersecurity-audit-automation-database:/app/src/database
 
   nginx:
     image: nsustain/nginx:latest
@@ -30,7 +30,7 @@ services:
       context: .
       dockerfile: Dockerfile.nginx
     depends_on:
-      - caa
+      - cybersecurity-audit-automation
     restart: unless-stopped
     pull_policy: never
     ports:
@@ -57,9 +57,9 @@ services:
       - daemon off;
 
 volumes:
-  caa-database:
+  cybersecurity-audit-automation-database:
     # external: true
-    name: caa-database
+    name: cybersecurity-audit-automation-database
   letsencrypt-data:
     # external: true
     name: letsencrypt-data

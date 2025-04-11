@@ -40,8 +40,8 @@ export function ClientSideScriptDownload() {
             API keys in all of your previously downloaded Python scripts will be
             revoked every time you click download, and only the
             latest-downloaded version will retain its access rights to your own
-            caa Dashboard. This is a security measure (we do not store any of
-            your sensitive information and that includes your caa Dashboard
+            dashboard right here. This is a security measure (we do not store any of
+            your sensitive information and that includes your dashboard
             API key).
           </p>
         </label>
@@ -70,7 +70,7 @@ export function ClientSideScriptDownload() {
                       type: "text/x-python",
                     })
                   );
-                  a.download = `caa_supabase.py`;
+                  a.download = process.env.NEXT_PUBLIC_SUPABASE_PY || "";
                   a.click();
                 });
               } else {

@@ -2,7 +2,7 @@
 
 # Make sure it's not relative path.
 # Change it to where you store it.
-cd /home/soobinrho/git/caa-supabase
+cd /home/soobinrho/git/cybersecurity-audit-automation
 docker compose exec nginx certbot certonly --text --non-interactive \
   --agree-tos --verbose --keep-until-expiring --webroot \
   --webroot-path /var/www/letsencrypt/ \

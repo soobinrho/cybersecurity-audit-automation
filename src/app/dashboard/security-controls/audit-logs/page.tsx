@@ -35,7 +35,7 @@ export default async function MFAPage() {
         <HydrationBoundary state={dehydrate(queryClient)}>
           <SessionProvider>
             <section>
-              <h2 className="text-2xl font-bold pb-4">caa Logs</h2>
+              <h2 className="text-2xl font-bold pb-4">Audit Logs</h2>
               <LogsTable />
             </section>
           </SessionProvider>

@@ -57,8 +57,8 @@ export default function MobileMenu() {
                 </Link>
               </DrawerDescription>
               <DrawerDescription>
-                <Link href="/dashboard/security-controls/caa-logs">
-                  <DrawerClose>caa Logs</DrawerClose>
+                <Link href="/dashboard/security-controls/audit-logs">
+                  <DrawerClose>Audit Logs</DrawerClose>
                 </Link>
               </DrawerDescription>
             </div>

@@ -19,7 +19,7 @@ export default function ChatDataCopyButton(props: ChatDataCopyButtonProps) {
         }, 300);
         btn.removeAttribute("disabled");
       }}
-      className="px-1 py-1 leading-4 font-extralight text-xs md:font-light text-foreground border rounded hover:bg-muted disabled:cursor-pointer disabled:pointer-events-none tracking-tighter"
+      className="px-1 py-1 leading-4 font-extralight text-xs md:font-light text-foreground border rounded hover:bg-muted cursor-pointer tracking-tighter select-none"
     >
       {label}
     </button>

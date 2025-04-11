@@ -12,7 +12,7 @@
 --   https://www.prisma.io/docs/orm/prisma-schema/introspection
 -- 
 -- How I created schema.prisma:
---     >> cd caa-supabase
+--     >> cd cybersecurity-audit-automation
 --     >> sqlite3 ./src/database/main.db < ./src/database/create_main_db.sql
 --
 --     >> cat > ./src/database/prisma/schema.prisma <<EOL
@@ -38,7 +38,7 @@
 --   https://www.prisma.io/docs/orm/prisma-client/setup-and-configuration/introduction#5-evolving-your-application
 
 -- TODO: There's high likelihood of collision because of user_email being the id.
--- If two or more caa users encounter a single person in both organizations,
+-- If two or more users encounter a single person in both organizations,
 -- my web app will crash. Gotta change the primary key of users to its default integer auto increment.
 -- For now, that likelihood is extremely low as it's just a prototype.
 CREATE TABLE organizations (

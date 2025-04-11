@@ -10,6 +10,8 @@ export const metadata: Metadata = {
   title: "Dashboard",
 };
 
+const SUPABASE_PY = process.env.NEXT_PUBLIC_SUPABASE_PY || "";
+
 export default async function DashboardPage() {
   const session = await auth();
   if (!session) {
@@ -32,7 +34,7 @@ export default async function DashboardPage() {
             unique to you, automatically evaluates whether your MFA, PITR, and
             RLS security controls are in place, identifies and performs
             remediation action flows, and updates your{" "}
-            <Link href="/dashboard/security-controls/caa-logs">
+            <Link href="/dashboard/security-controls/audit-logs">
               <InlineCode>/dashboard</InlineCode>
             </Link>{" "}
             in real time.
@@ -44,7 +46,7 @@ export default async function DashboardPage() {
           <p>Open a terminal and run your Python script.</p>
           <div className="my-4 p-4 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-x-auto">
             <pre className="font-mono text-sm text-gray-800 dark:text-gray-200">
-              <p>python caa_supabase.py</p>
+              <p>python ./{SUPABASE_PY}</p>
             </pre>
           </div>
         </section>
@@ -52,7 +54,7 @@ export default async function DashboardPage() {
           <h3 className="font-semibold pb-2">3. Results 🎉</h3>
           Now, all your security controls status, remediation action flow
           results, and logs are available in your dashboard, updated in real
-          time (refetch every 1 second).
+          time (fetched every 1 second).
           <div className="flex flex-col md:flex-row gap-2 flex-wrap pt-4">
             <Link href="/dashboard/security-controls/mfa">
               <Button className="active:bg-foreground/10" variant={"default"}>
@@ -74,9 +76,9 @@ export default async function DashboardPage() {
                 Evidence Images
               </Button>
             </Link>
-            <Link href="/dashboard/security-controls/caa-logs">
+            <Link href="/dashboard/security-controls/audit-logs">
               <Button className="active:bg-foreground/10" variant={"default"}>
-                Logs
+                Audit Logs
               </Button>
             </Link>
           </div>

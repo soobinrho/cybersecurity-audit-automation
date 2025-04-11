@@ -62,8 +62,9 @@ export async function POST() {
       client_side_api_key_create,
     ]);
 
+    const SUPABASE_PY = process.env.NEXT_PUBLIC_SUPABASE_PY || "";
     const file = await fs.readFile(
-      process.cwd() + "/src/python/caa_supabase.py",
+      process.cwd() + "/src/python/" + SUPABASE_PY,
       "utf8"
     );
     let fileGenerated = file.replaceAll(
@@ -79,20 +80,20 @@ export async function POST() {
       `# Generated at: ${new Date().toISOString()}`
     );
     fileGenerated = fileGenerated.replace(
-      "VELDE_REST_API_USER = '#REPLACE#'",
-      `VELDE_REST_API_USER = '${userAuthenticatedID}'`
+      "CAA_REST_API_USER = '#REPLACE#'",
+      `CAA_REST_API_USER = '${userAuthenticatedID}'`
     );
     fileGenerated = fileGenerated.replace(
-      "VELDE_REST_API_KEY = '#REPLACE#'",
-      `VELDE_REST_API_KEY = '${client_side_api_key}'`
+      "CAA_REST_API_KEY = '#REPLACE#'",
+      `CAA_REST_API_KEY = '${client_side_api_key}'`
     );
     fileGenerated = fileGenerated.replace(
-      "VELDE_URL_BASE = '#REPLACE#'",
-      `VELDE_URL_BASE = '${URL}'`
+      "CAA_URL_BASE = '#REPLACE#'",
+      `CAA_URL_BASE = '${URL}'`
     );
     fileGenerated = fileGenerated.replace(
-      "VELDE_EMAIL = '#REPLACE#'",
-      `VELDE_EMAIL = '${CONTACT_EMAIL}'`
+      "CAA_EMAIL = '#REPLACE#'",
+      `CAA_EMAIL = '${CONTACT_EMAIL}'`
     );
     fileGenerated = fileGenerated.replace(
       "USER_EMAIL = '#REPLACE#'",

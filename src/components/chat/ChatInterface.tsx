@@ -164,7 +164,7 @@ export function ChatInterface() {
         <button
           type="submit"
           disabled={isLoading || input.trim() === ""}
-          className="absolute right-8 top-[50%] translate-y-[-50%] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          className="absolute right-8 top-[50%] translate-y-[-50%] disabled:opacity-50 cursor-pointer"
         >
           <SendIcon />
         </button>
