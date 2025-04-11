@@ -12,8 +12,15 @@ import {
 } from "@tanstack/react-query";
 import { SessionProvider } from "next-auth/react";
 
+const title = "PITR";
 export const metadata: Metadata = {
-  title: "PITR",
+  title: title,
+  openGraph: {
+    title: title,
+  },
+  twitter: {
+    title: title,
+  },
 };
 
 export default async function PITRPage() {

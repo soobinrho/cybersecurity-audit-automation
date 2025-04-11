@@ -4,6 +4,7 @@ import Sidebar from "@/components/dashboard/Sidebar";
 import React, { Suspense } from "react";
 import ReactQueryProvider from "@/components/dashboard/reactQueryProviders";
 import MainContentSkeleton from "@/components/dashboard/MainContentSkeleton";
+
 export default function Layout({
   children,
 }: Readonly<{

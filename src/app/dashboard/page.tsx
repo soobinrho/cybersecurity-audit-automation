@@ -6,8 +6,16 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ClientSideScriptDownload } from "@/components/dashboard/ClientSideScriptDownload";
 import InlineCode from "@/components/dashboard/InlineCode";
+
+const title = "Dashboard";
 export const metadata: Metadata = {
-  title: "Dashboard",
+  title: title,
+  openGraph: {
+    title: title,
+  },
+  twitter: {
+    title: title,
+  },
 };
 
 const SUPABASE_PY = process.env.NEXT_PUBLIC_SUPABASE_PY || "";

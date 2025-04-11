@@ -11,8 +11,15 @@ import {
 import { SessionProvider } from "next-auth/react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
+const title = "Evidence Images";
 export const metadata: Metadata = {
-  title: "Evidence Images",
+  title: title,
+  openGraph: {
+    title: title,
+  },
+  twitter: {
+    title: title,
+  },
 };
 
 export default async function EvidenceImagesPage() {

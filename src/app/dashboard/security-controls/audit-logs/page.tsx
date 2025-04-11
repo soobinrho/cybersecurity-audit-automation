@@ -11,8 +11,15 @@ import {
 import { SessionProvider } from "next-auth/react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
+const title = "Audit Logs";
 export const metadata: Metadata = {
-  title: "Logs",
+  title: title,
+  openGraph: {
+    title: title,
+  },
+  twitter: {
+    title: title,
+  },
 };
 
 export default async function MFAPage() {

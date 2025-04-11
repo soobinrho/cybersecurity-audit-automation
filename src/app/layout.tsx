@@ -3,7 +3,9 @@ import "@/app/globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Suspense } from "react";
 import Loading from "@/app/loading";
+
 const title = process.env.NEXT_PUBLIC_TITLE || "";
+const titleFull = process.env.NEXT_PUBLIC_TITLE_FULL || "";
 const description = process.env.NEXT_PUBLIC_DESCRIPTION || "";
 const url = process.env.NEXT_PUBLIC_URL || "";
 
@@ -11,7 +13,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(url),
   title: {
     template: `%s - ${title}`,
-    default: title,
+    default: titleFull,
   },
   description: description,
   category: "technology",
@@ -30,14 +32,20 @@ export const metadata: Metadata = {
   ],
   creator: "Soobin Rho",
   openGraph: {
-    title: title,
+    title: {
+      template: `%s - ${title}`,
+      default: titleFull,
+    },
     description: description,
     url: url,
-    siteName: title,
+    siteName: titleFull,
     type: "website",
   },
   twitter: {
-    title: title,
+    title: {
+      template: `%s - ${title}`,
+      default: titleFull,
+    },
     description: description,
     card: "summary",
     creator: "Soobin Rho",
