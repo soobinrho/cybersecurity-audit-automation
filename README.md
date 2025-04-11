@@ -117,8 +117,8 @@ cd cybersecurity-audit-automation
 git pull
 
 # Rebuild the docker image and redeploy.
-sudo docker compose build --no-cache
-sudo docker compose up -d
+sudo docker compose build
+sudo docker compose down; sudo docker compose up -d
 ```
 
 <br>
