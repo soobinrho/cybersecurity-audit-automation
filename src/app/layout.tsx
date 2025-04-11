@@ -14,10 +14,10 @@ const geistMono = Geist_Mono({
 
 const title = 'caa';
 const description = 'Get compliant and get secure.';
-const url = 'https://caa.nsustain.com/'
-const image = '/caa_card.png'
+const url = process.env.NODE_ENV === 'development' ? 'http://localhost:3000/' : 'https://caa.Nsustain.com/'
 
 export const metadata: Metadata = {
+  metadataBase: new URL(url),
   title: title,
   description: description,
   category: 'technology',
@@ -30,14 +30,27 @@ export const metadata: Metadata = {
     description: description,
     url: url,
     siteName: title,
-    images: image,
     type: 'website',
   },
   twitter: {
     title: title,
     card: 'summary_large_image',
     description: description,
-    images: image,
+  },
+  robots: {
+    index: false,
+    follow: false,
+    googleBot: {
+      index: false,
+      follow: false,
+      noimageindex: true,
+    },
+  },
+  manifest: '/resources/site.webmanifest',
+  icons: {
+    icon: '/resources/icon.svg',
+    shortcut: '/resources/icon.png',
+    apple: '/resources/icon.png',
   },
 };
 
