@@ -26,8 +26,8 @@ cp .env.development.local.example .env.development.local
 cp .env.production.local.example .env.production.local
 
 # Create a random string required by Auth.js for encryption.
-pnpm npx auth secret --copy >> .env.development.local
-pnpm npx auth secret --copy >> .env.production.local
+pnpm npx auth secret --copy | tail -n 1 >> ./.env.development.local
+pnpm npx auth secret --copy | tail -n 1 >> ./.env.production.local
 
 # Initialize Prisma objects for the database.
 pnpm npx prisma db push --schema ./src/database/prisma/schema.prisma
@@ -50,7 +50,7 @@ cd cybersecurity-audit-automation
 cp .env.production.local.example .env.production.local
 
 # Create a random string required by Auth.js for encryption.
-pnpm npx auth secret --copy >> .env.production.local
+pnpm npx auth secret --copy | tail -n 1 >> ./.env.production.local
 
 # Build based on `Dockerfile`, `Dockerfile.nginx`, and `compose.yaml`.
 cp docker/nginx.conf.beforeCertbot docker/nginx.conf
