@@ -68,3 +68,6 @@ src/python/**/*.jpg
 
 # Production nginx.conf
 nginx.conf
+
+# Database individual tables backup files
+*.csv

@@ -10,9 +10,9 @@ export default function useEvidenceImagesQuery() {
           "Content-Type": "application/json",
         },
       }).then((res) => res.json()),
-    refetchOnWindowFocus: true,
-    refetchOnMount: true,
-    refetchOnReconnect: true,
-    refetchInterval: 1000 * 60 * 60 * 24,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    refetchInterval: Infinity,
   });
 }
