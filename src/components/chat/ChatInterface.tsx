@@ -58,6 +58,11 @@ export function ChatInterface() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input || isLoading) return;
+    if (input === "/clear") {
+      clearChat();
+      setInput("");
+      return;
+    }
 
     const userMessage: Message = {
       role: "user",
@@ -144,16 +149,9 @@ export function ChatInterface() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => {
-            if (!isLoading && e.key === "Enter" && !e.shiftKey) {
-              const target = e.target as HTMLTextAreaElement;
-              if (target.value === "/clear") {
-                e.preventDefault();
-                clearChat();
-              } else {
-                e.preventDefault();
-                handleSubmit(e);
-              }
-              setInput("");
+            const value = (e.target as HTMLTextAreaElement).value.trim();
+            if (e.key === "Enter" && !e.shiftKey && value !== "") {
+              handleSubmit(e);
             }
           }}
           placeholder={
@@ -165,7 +163,7 @@ export function ChatInterface() {
         ></textarea>
         <button
           type="submit"
-          disabled={isLoading || !input}
+          disabled={isLoading || input.trim() === ""}
           className="absolute right-8 top-[50%] translate-y-[-50%] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
           <SendIcon />

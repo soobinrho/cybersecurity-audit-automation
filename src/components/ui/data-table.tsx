@@ -94,7 +94,7 @@ export default function DataTable<TData extends Record<string, any>, TValue>({
   return (
     <div>
       {filterColumnName && filterDisplayText && (
-        <div className="flex items-center py-4">
+        <div className="flex items-center py-4 gap-2">
           <Input
             placeholder={`Filter ${filterDisplayText}...`}
             value={

@@ -89,7 +89,7 @@ This is not a required step, but I also prefer to set up a cron job so that the 
 
 ```bash
 # Example:
-sudo ln -s /home/soobinrho/git/caa-supabase/cron/certbot_runner /etc/cron.daily/certbot_runner
+sudo ln -s /home/soobinrho/git/caa-supabase/docker/certbot_runner /etc/cron.daily/certbot_runner
 ```
 
 <br>
