@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/drawer";
 import { Menu } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 
 export default function MobileMenu() {
   return (
@@ -49,6 +48,11 @@ export default function MobileMenu() {
               <DrawerDescription>
                 <Link href="/dashboard/security-controls/rls">
                   <DrawerClose>RLS</DrawerClose>
+                </Link>
+              </DrawerDescription>
+              <DrawerDescription>
+                <Link href="/dashboard/security-controls/caa-logs">
+                  <DrawerClose>caa Logs</DrawerClose>
                 </Link>
               </DrawerDescription>
             </div>

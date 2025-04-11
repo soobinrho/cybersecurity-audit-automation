@@ -4,17 +4,18 @@ import prisma from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import checkAuthenticationForAPI from "@/lib/checkAuthenticationForAPI";
 import { auth } from "@/auth";
+import { getProjects } from "@/lib/getProjects";
 
 export async function GET(req: NextRequest) {
   try {
     // Check authentication.
     const oAuthSession = await auth();
-    const clientSideAuthForAPI = req.headers.get("authorization");
-    const userAuthenticatedID = await checkAuthenticationForAPI(
+    const clientSideAuthForAPI = req.headers.get("authorization") as string;
+    const authResults = await checkAuthenticationForAPI(
       oAuthSession,
       clientSideAuthForAPI
     );
-    if (!userAuthenticatedID || userAuthenticatedID === "") {
+    if (!authResults) {
       return NextResponse.json(
         {
           message: "Authentication failed.",
@@ -24,11 +25,8 @@ export async function GET(req: NextRequest) {
     }
 
     // Proceed if authenticated.
-    const results = await prisma.projects.findMany({
-      where: {
-        caa_user_id: userAuthenticatedID,
-      },
-    });
+    const userAuthenticatedID = authResults.userAuthenticatedID;
+    const results = await getProjects(userAuthenticatedID);
     if (results.length > 0) {
       return NextResponse.json(results, {
         status: 200,
@@ -41,25 +39,28 @@ export async function GET(req: NextRequest) {
     }
   } catch (err) {
     console.log(err);
-    return NextResponse.json("Error occurred.", {
-      status: 500,
-      statusText: "Internal Server Error",
-    });
+    return NextResponse.json(
+      {
+        message: "Error occurred.",
+      },
+      {
+        status: 500,
+        statusText: "Internal Server Error",
+      }
+    );
   }
 }
 
 export async function POST(req: NextRequest) {
-  const array_projects: Array<Prisma.projectsCreateInput> = [];
-  let userAuthenticatedID = "";
   try {
     // Check authentication.
     const oAuthSession = await auth();
-    const clientSideAuthForAPI = req.headers.get("authorization");
-    userAuthenticatedID = await checkAuthenticationForAPI(
+    const clientSideAuthForAPI = req.headers.get("authorization") as string;
+    const authResults = await checkAuthenticationForAPI(
       oAuthSession,
       clientSideAuthForAPI
     );
-    if (!userAuthenticatedID) {
+    if (!authResults) {
       return NextResponse.json(
         {
           message: "Authentication failed.",
@@ -69,54 +70,141 @@ export async function POST(req: NextRequest) {
     }
 
     // Proceed if authenticated.
+    const userAuthenticatedID = authResults.userAuthenticatedID;
     const req_payload = await req.json();
-    for (const json_req of req_payload) {
-      const project: Prisma.projectsCreateInput = {
-        project_id: json_req["project_id"],
-        caa_user_id: userAuthenticatedID,
-        organizations: json_req["org_id_fk"],
-        project_name: json_req["project_name"],
-        project_is_pitr_enabled: json_req["project_is_pitr_enabled"],
-        project_last_updated_on_caa:
-          json_req["project_last_updated_on_caa"],
-      };
-      array_projects.push(project);
-    }
-  } catch (err) {
-    console.log(err);
-    return NextResponse.json("Error occurred.", {
-      status: 400,
-      statusText: "Bad Request",
-    });
-  }
-
-  try {
-    const array_upsertProjects = [];
-    for (const project of array_projects) {
-      array_upsertProjects.push(
-        prisma.projects.upsert({
-          where: {
-            project_id: project["project_id"],
-            caa_user_id: userAuthenticatedID,
-          },
-          update: {
-            org_id_fk: String(project["organizations"]),
-            project_name: project["project_name"],
-            project_is_pitr_enabled: project["project_is_pitr_enabled"],
-            project_last_updated_on_caa:
-              project["project_last_updated_on_caa"],
-          },
-          create: {
-            project_id: project["project_id"],
-            caa_user_id: userAuthenticatedID,
-            org_id_fk: String(project["organizations"]),
-            project_name: project["project_name"],
-            project_is_pitr_enabled: project["project_is_pitr_enabled"],
-            project_last_updated_on_caa:
-              project["project_last_updated_on_caa"],
-          },
-        })
+    if (!Array.isArray(req_payload)) {
+      return NextResponse.json(
+        {
+          message:
+            'The request payload must be an array. It can even be an array with only one member such as "[{...}]"',
+        },
+        { status: 400, statusText: "Bad Request" }
       );
+    }
+
+    const array_projectsCreateInput = [];
+    for (const json_req of req_payload) {
+      const project_id = json_req["project_id"];
+      const project_name = json_req["project_name"];
+      const project_is_pitr_enabled = json_req["project_is_pitr_enabled"];
+      const project_last_updated_on_caa =
+        json_req["project_last_updated_on_caa"];
+      if (
+        typeof project_id !== "string" ||
+        project_id === "" ||
+        typeof project_name !== "string" ||
+        project_name === "" ||
+        isNaN(parseInt(project_is_pitr_enabled)) ||
+        (parseInt(project_is_pitr_enabled) !== 0 &&
+          parseInt(project_is_pitr_enabled) !== 1) ||
+        isNaN(parseInt(project_last_updated_on_caa))
+      ) {
+        return NextResponse.json(
+          { message: "Missing required fields." },
+          { status: 400, statusText: "Bad Request" }
+        );
+      }
+      const projectsCreateInput: Prisma.projectsCreateInput = {
+        caa_user_id: userAuthenticatedID,
+        project_id: project_id,
+        project_name: project_name,
+        project_is_pitr_enabled: project_is_pitr_enabled,
+        project_last_updated_on_caa: project_last_updated_on_caa,
+      };
+      const org_id = json_req["org_id"];
+      if (typeof org_id === "string" && org_id !== "") {
+        projectsCreateInput.organizations = {
+          connectOrCreate: {
+            where: { org_id: org_id },
+            create: {
+              caa_user_id: userAuthenticatedID,
+              org_id: org_id,
+              org_name: "",
+              org_last_updated_on_caa: Math.floor(Date.now() / 1000),
+            },
+          },
+        };
+      }
+      array_projectsCreateInput.push(projectsCreateInput);
+    }
+
+    const array_upsertProjects = [];
+    for (const project of array_projectsCreateInput) {
+      if (project.organizations?.connectOrCreate) {
+        const org_id = project.organizations.connectOrCreate.where
+          .org_id as string;
+        array_upsertProjects.push(
+          prisma.projects.upsert({
+            where: {
+              caa_user_id: userAuthenticatedID,
+              project_id: project.project_id,
+            },
+            update: {
+              organizations: {
+                connectOrCreate: {
+                  where: {
+                    org_id: org_id,
+                  },
+                  create: {
+                    caa_user_id: userAuthenticatedID,
+                    org_id: org_id,
+                    org_name: "",
+                    org_last_updated_on_caa: Math.floor(Date.now() / 1000),
+                  },
+                },
+              },
+              project_name: project.project_name,
+              project_is_pitr_enabled: project.project_is_pitr_enabled,
+              project_last_updated_on_caa:
+                project.project_last_updated_on_caa,
+            },
+            create: {
+              caa_user_id: userAuthenticatedID,
+              organizations: {
+                connectOrCreate: {
+                  where: {
+                    org_id: org_id,
+                  },
+                  create: {
+                    caa_user_id: userAuthenticatedID,
+                    org_id: org_id,
+                    org_name: "",
+                    org_last_updated_on_caa: Math.floor(Date.now() / 1000),
+                  },
+                },
+              },
+              project_id: project.project_id,
+              project_name: project.project_name,
+              project_is_pitr_enabled: project.project_is_pitr_enabled,
+              project_last_updated_on_caa:
+                project.project_last_updated_on_caa,
+            },
+          })
+        );
+      } else {
+        array_upsertProjects.push(
+          prisma.projects.upsert({
+            where: {
+              caa_user_id: userAuthenticatedID,
+              project_id: project.project_id,
+            },
+            update: {
+              project_name: project.project_name,
+              project_is_pitr_enabled: project.project_is_pitr_enabled,
+              project_last_updated_on_caa:
+                project.project_last_updated_on_caa,
+            },
+            create: {
+              caa_user_id: userAuthenticatedID,
+              project_id: project.project_id,
+              project_name: project.project_name,
+              project_is_pitr_enabled: project.project_is_pitr_enabled,
+              project_last_updated_on_caa:
+                project.project_last_updated_on_caa,
+            },
+          })
+        );
+      }
     }
 
     const transaction = await prisma.$transaction(array_upsertProjects);
@@ -125,31 +213,35 @@ export async function POST(req: NextRequest) {
       console.log(transaction);
     }
 
-    return NextResponse.json(array_projects, {
+    return NextResponse.json(transaction, {
       status: 201,
       statusText: "Created",
     });
   } catch (err) {
     console.log(err);
-    return NextResponse.json("Error occurred.", {
-      status: 500,
-      statusText: "Internal Server Error",
-    });
+    return NextResponse.json(
+      {
+        message: "Error occurred.",
+      },
+      {
+        status: 500,
+        statusText: "Internal Server Error",
+      }
+    );
   }
 }
 
 export async function DELETE(req: NextRequest) {
   const params = req.nextUrl.searchParams;
-  let userAuthenticatedID = "";
   try {
     // Check authentication.
     const oAuthSession = await auth();
-    const clientSideAuthForAPI = req.headers.get("authorization");
-    userAuthenticatedID = await checkAuthenticationForAPI(
+    const clientSideAuthForAPI = req.headers.get("authorization") as string;
+    const authResults = await checkAuthenticationForAPI(
       oAuthSession,
       clientSideAuthForAPI
     );
-    if (!userAuthenticatedID) {
+    if (!authResults) {
       return NextResponse.json(
         {
           message: "Authentication failed.",
@@ -159,6 +251,7 @@ export async function DELETE(req: NextRequest) {
     }
 
     // Proceed if authenticated.
+    const userAuthenticatedID = authResults.userAuthenticatedID;
     const delete_all = params.get("delete_all")?.toLowerCase();
     if (delete_all === "true") {
       const deleteProjects = await prisma.projects.deleteMany({
@@ -178,17 +271,17 @@ export async function DELETE(req: NextRequest) {
       });
     } else {
       const project_id = params.get("project_id");
-      if (!project_id || project_id === "") {
-        return NextResponse.json(
-          "Please use correct URL params to specify which organization_member you'd like to delete.",
-          { status: 404, statusText: "Not Found" }
-        );
+      if (typeof project_id !== "string" || project_id === "") {
+        return NextResponse.json("Please use correct URL params.", {
+          status: 404,
+          statusText: "Not Found",
+        });
       }
 
       const deleteProject = await prisma.projects.delete({
         where: {
-          project_id: project_id,
           caa_user_id: userAuthenticatedID,
+          project_id: project_id,
         },
       });
 
@@ -203,8 +296,13 @@ export async function DELETE(req: NextRequest) {
   } catch (err) {
     console.log(err);
     return NextResponse.json(
-      "Please use correct URL params to specify which organization_member you'd like to delete.",
-      { status: 404, statusText: "Not Found" }
+      {
+        message: "Error occurred.",
+      },
+      {
+        status: 500,
+        statusText: "Internal Server Error",
+      }
     );
   }
 }

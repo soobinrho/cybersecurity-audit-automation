@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import SidebarHeaderTwo from "@/components/SidebarHeaderTwo";
-import SidebarItem from "@/components/SidebarItem";
+import SidebarHeaderTwo from "@/components/dashboard/SidebarHeaderTwo";
+import SidebarItem from "@/components/dashboard/SidebarItem";
 import { usePathname } from "next/navigation";
 
 interface props {
@@ -15,9 +15,7 @@ export default function Sidebar(props: props) {
   const isChat = pathname === "/dashboard/chat";
   const isDashboard = !isChat && pathname.startsWith("/dashboard");
   return (
-    <div
-      className={`${className}` + " " + "hidden md:block h-svh py-4 md:py-4"}
-    >
+    <div className={`${className}` + " " + "hidden md:block py-4 md:py-4"}>
       {isDashboard ? (
         <div>
           <SidebarHeaderTwo href="/dashboard">Dashboard</SidebarHeaderTwo>
@@ -31,6 +29,9 @@ export default function Sidebar(props: props) {
             </SidebarItem>
             <SidebarItem href="/dashboard/security-controls/rls">
               RLS
+            </SidebarItem>
+            <SidebarItem href="/dashboard/security-controls/caa-logs">
+              caa Logs
             </SidebarItem>
           </div>
           <div className="pb-4"></div>

@@ -7,41 +7,53 @@ datasource db {
   url      = "file:../main.db"
 }
 
-model client_side_program_api_keys {
-  api_key_id               Int    @id @default(autoincrement())
-  caa_user_id            String
-  api_key_hashed_value     String
-  api_key_is_active        Int
-  api_key_time_generated   Int
-  api_key_time_deactivated Int?
+model client_side_api_keys {
+  caa_user_id                      String
+  client_side_api_key_id             Int    @id @default(autoincrement())
+  client_side_api_key_hashed_value   String
+  client_side_api_key_is_active      Int
+  client_side_api_key_time_generated Int
+}
+
+model evidence_images {
+  caa_user_id                        String
+  evidence_image_id                    Int            @id @default(autoincrement())
+  org_id_fk                            String?
+  user_email_fk                        String?
+  project_id_fk                        String?
+  table_name_fk                        String?
+  evidence_image_name                  String
+  evidence_image_size                  Int
+  evidence_image_blob                  Bytes
+  evidence_image_last_updated_on_caa Int
+  projects                             projects?      @relation(fields: [project_id_fk], references: [project_id], onDelete: Cascade, onUpdate: Cascade)
+  users                                users?         @relation(fields: [user_email_fk], references: [user_email], onDelete: Cascade, onUpdate: Cascade)
+  organizations                        organizations? @relation(fields: [org_id_fk], references: [org_id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model logs {
-  log_id              Int            @id @default(autoincrement())
-  caa_user_id       String
-  org_id_fk           String?
-  user_email_fk       String?
-  project_id_fk       String?
-  table_project_id_fk String?
-  table_name          String?
-  PRI_FACILITY        Int
-  PRI_SEVERITY        Int
-  VER                 Int
-  TIMESTAMP           String
-  HOSTNAME            String
-  APPNAME             String
-  PROCID              String
-  MSG                 String
-  tables              tables?        @relation(fields: [table_project_id_fk, table_name], references: [project_id_fk, table_name], onDelete: SetNull, onUpdate: Cascade)
-  projects            projects?      @relation(fields: [project_id_fk], references: [project_id], onDelete: SetNull, onUpdate: Cascade)
-  users               users?         @relation(fields: [user_email_fk], references: [user_email], onDelete: SetNull, onUpdate: Cascade)
-  organizations       organizations? @relation(fields: [org_id_fk], references: [org_id], onDelete: SetNull, onUpdate: Cascade)
+  caa_user_id             String
+  client_side_api_key_id_fk Int?
+  log_id                    Int     @id @default(autoincrement())
+  org_id_fk                 String?
+  user_email_fk             String?
+  project_id_fk             String?
+  table_name_fk             String?
+  evidence_image_id_fk      String?
+  PRI_FACILITY              Int
+  PRI_SEVERITY              Int
+  VER                       Int
+  TIMESTAMP                 String
+  HOSTNAME                  String
+  APPNAME                   String
+  PROCID                    String
+  MSG                       String
 }
 
 model organization_members {
+  caa_user_id   String
   org_id_fk       String
   user_email_fk   String
-  caa_user_id   String
   org_member_role String
   users           users         @relation(fields: [user_email_fk], references: [user_email], onDelete: Cascade, onUpdate: Cascade)
   organizations   organizations @relation(fields: [org_id_fk], references: [org_id], onDelete: Cascade, onUpdate: Cascade)
@@ -50,44 +62,43 @@ model organization_members {
 }
 
 model organizations {
-  org_id                    String                 @id
   caa_user_id             String
+  org_id                    String                 @id
   org_name                  String
   org_last_updated_on_caa Int
-  logs                      logs[]
+  evidence_images           evidence_images[]
   organization_members      organization_members[]
   projects                  projects[]
 }
 
 model projects {
-  project_id                    String         @id
   caa_user_id                 String
+  project_id                    String            @id
   org_id_fk                     String?
   project_name                  String
   project_is_pitr_enabled       Int
   project_last_updated_on_caa Int
-  logs                          logs[]
-  organizations                 organizations? @relation(fields: [org_id_fk], references: [org_id], onDelete: Cascade, onUpdate: Cascade)
+  evidence_images               evidence_images[]
+  organizations                 organizations?    @relation(fields: [org_id_fk], references: [org_id], onDelete: Cascade, onUpdate: Cascade)
   tables                        tables[]
 }
 
 model tables {
-  project_id_fk               String
   caa_user_id               String
+  project_id_fk               String
   table_name                  String
   table_is_rls_enabled        Int
   table_last_updated_on_caa Int
-  logs                        logs[]
   projects                    projects @relation(fields: [project_id_fk], references: [project_id], onDelete: Cascade, onUpdate: Cascade)
 
   @@id([project_id_fk, table_name])
 }
 
 model users {
-  user_email                 String                 @id
   caa_user_id              String
+  user_email                 String                 @id
   user_is_mfa_enabled        Int
   user_last_updated_on_caa Int
-  logs                       logs[]
+  evidence_images            evidence_images[]
   organization_members       organization_members[]
 }

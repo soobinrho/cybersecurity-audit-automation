@@ -4,24 +4,66 @@ import { Session } from "next-auth";
 
 export default async function checkAuthenticationForAPI(
   oAuthSession: Session | null,
-  clientSideAuthForAPI: string | null
+  authFromAPI: string
 ) {
-  let userAuthenticatedID = "";
-  if (oAuthSession) {
-    userAuthenticatedID = oAuthSession.user?.id || "";
-  } else if (clientSideAuthForAPI && clientSideAuthForAPI !== "") {
-    const authValue = clientSideAuthForAPI.split(" ")[1];
-    const [user, pass] = atob(authValue).split(":");
-    const findKeyHashed = await prisma.client_side_program_api_keys.findFirst({
-      where: {
-        caa_user_id: user,
-        api_key_is_active: 1,
-      },
-    });
-    const keyHashedAnswer = findKeyHashed?.api_key_hashed_value || "";
-    if (await bcrypt.compare(pass, keyHashedAnswer)) {
-      userAuthenticatedID = user;
+  if (oAuthSession && oAuthSession.user) {
+    const userAuthenticatedID = oAuthSession.user.id;
+    try {
+      const clientSideApiKeys = await prisma.client_side_api_keys.findFirst({
+        where: {
+          caa_user_id: userAuthenticatedID,
+          client_side_api_key_is_active: 1,
+        },
+      });
+      // Example:
+      //                      caa_user_id = 4138798a-b55e-44d4-8cd8-8181182eb856
+      //             client_side_api_key_id = 1
+      //   client_side_api_key_hashed_value = $2b$10$nS.fSmLibN8cw5hqgdy82.GcK18XmPdo3lNXa2EfSUvwuDJJ2W.YW
+      //      client_side_api_key_is_active = 1
+      // client_side_api_key_time_generated = 1648193962
+      const clientSideApiKeyID = Number(
+        clientSideApiKeys?.client_side_api_key_id
+      );
+      return {
+        userAuthenticatedID: userAuthenticatedID as string,
+        clientSideApiKeyID: clientSideApiKeyID as number,
+      };
+    } catch (err) {
+      console.log(err);
+    }
+  } else {
+    if (authFromAPI !== "") {
+      const auth = authFromAPI.split(" ")[1];
+      const [user, pass] = atob(auth).split(":");
+
+      if (user && user !== "" && pass && pass !== "") {
+        try {
+          const clientSideApiKeys = await prisma.client_side_api_keys.findFirst(
+            {
+              where: {
+                caa_user_id: user,
+                client_side_api_key_is_active: 1,
+              },
+            }
+          );
+          if (clientSideApiKeys && clientSideApiKeys.client_side_api_key_id) {
+            const keyHashedAnswer =
+              clientSideApiKeys?.client_side_api_key_hashed_value;
+            if (await bcrypt.compare(pass, keyHashedAnswer)) {
+              const userAuthenticatedID = user;
+              const clientSideApiKeyID =
+                clientSideApiKeys?.client_side_api_key_id;
+              return {
+                userAuthenticatedID: userAuthenticatedID as string,
+                clientSideApiKeyID: clientSideApiKeyID as number,
+              };
+            }
+          }
+        } catch (err) {
+          console.log(err);
+        }
+      }
     }
   }
-  return userAuthenticatedID;
+  return null;
 }

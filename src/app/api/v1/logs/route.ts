@@ -2,19 +2,21 @@ import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
-import checkAuthenticationForAPI from "@/lib/checkAuthenticationForAPI";
 import { auth } from "@/auth";
+import checkAuthenticationForAPI from "@/lib/checkAuthenticationForAPI";
+import { getLogs } from "@/lib/getLogs";
 
 export async function GET(req: NextRequest) {
   try {
     // Check authentication.
     const oAuthSession = await auth();
-    const clientSideAuthForAPI = req.headers.get("authorization");
-    const userAuthenticatedID = await checkAuthenticationForAPI(
+    const clientSideAuthForAPI = req.headers.get("authorization") as string;
+    const authResults = await checkAuthenticationForAPI(
       oAuthSession,
       clientSideAuthForAPI
     );
-    if (!userAuthenticatedID || userAuthenticatedID === "") {
+
+    if (!authResults) {
       return NextResponse.json(
         {
           message: "Authentication failed.",
@@ -24,11 +26,8 @@ export async function GET(req: NextRequest) {
     }
 
     // Proceed if authenticated.
-    const results = await prisma.logs.findMany({
-      where: {
-        caa_user_id: userAuthenticatedID,
-      },
-    });
+    const userAuthenticatedID = authResults.userAuthenticatedID;
+    const results = await getLogs(userAuthenticatedID);
     if (results.length > 0) {
       return NextResponse.json(results, {
         status: 200,
@@ -41,25 +40,28 @@ export async function GET(req: NextRequest) {
     }
   } catch (err) {
     console.log(err);
-    return NextResponse.json("Error occurred.", {
-      status: 500,
-      statusText: "Internal Server Error",
-    });
+    return NextResponse.json(
+      {
+        message: "Error occurred.",
+      },
+      {
+        status: 500,
+        statusText: "Internal Server Error",
+      }
+    );
   }
 }
 
 export async function POST(req: NextRequest) {
-  let log: Prisma.logsCreateInput;
-  let userAuthenticatedID = "";
   try {
     // Check authentication.
     const oAuthSession = await auth();
-    const clientSideAuthForAPI = req.headers.get("authorization");
-    userAuthenticatedID = await checkAuthenticationForAPI(
+    const clientSideAuthForAPI = req.headers.get("authorization") as string;
+    const authResults = await checkAuthenticationForAPI(
       oAuthSession,
       clientSideAuthForAPI
     );
-    if (!userAuthenticatedID) {
+    if (!authResults) {
       return NextResponse.json(
         {
           message: "Authentication failed.",
@@ -69,121 +71,115 @@ export async function POST(req: NextRequest) {
     }
 
     // Proceed if authenticated.
+    const userAuthenticatedID = authResults.userAuthenticatedID;
+    const clientSideApiKeyID = authResults.clientSideApiKeyID;
     const req_payload = await req.json();
-    const org_id = req_payload["org_id"];
-    const user_email = req_payload["user_email"];
-    const project_id = req_payload["project_id"];
-    const table_project_id = req_payload["table_project_id"];
-    const table_name = req_payload["table_name"];
-    log = {
-      caa_user_id: userAuthenticatedID,
-      PRI_FACILITY: req_payload["PRI_FACILITY"],
-      PRI_SEVERITY: req_payload["PRI_SEVERITY"],
-      VER: req_payload["VER"],
-      TIMESTAMP: req_payload["TIMESTAMP"],
-      HOSTNAME: req_payload["HOSTNAME"],
-      APPNAME: req_payload["APPNAME"],
-      PROCID: req_payload["PROCID"],
-      MSG: req_payload["MSG"],
-    };
-    if (org_id && org_id !== "") {
-      log.organizations = {
-        connectOrCreate: {
-          where: {
-            org_id: org_id,
-          },
-          create: {
-            org_id: org_id,
-            org_name:
-              "POST request to the logs table generated this record because there was no pre-existing record for this org_id.",
-            caa_user_id: userAuthenticatedID,
-            org_last_updated_on_caa: Math.floor(new Date().getTime() / 1000),
-          },
+    if (!Array.isArray(req_payload)) {
+      return NextResponse.json(
+        {
+          message:
+            'The request payload must be an array. It can even be an array with only one member such as "[{...}]"',
         },
-      };
+        { status: 400, statusText: "Bad Request" }
+      );
     }
-    if (user_email && user_email !== "") {
-      log.users = {
-        connectOrCreate: {
-          where: {
-            user_email: user_email,
-          },
-          create: {
-            user_email: user_email,
-            caa_user_id: userAuthenticatedID,
-            user_is_mfa_enabled: 0,
-            user_last_updated_on_caa: Math.floor(new Date().getTime() / 1000),
-          },
-        },
-      };
-    }
-    if (project_id && project_id !== "") {
-      log.projects = {
-        connectOrCreate: {
-          where: {
-            project_id: project_id,
-          },
-          create: {
-            project_id: project_id,
-            caa_user_id: userAuthenticatedID,
-            project_is_pitr_enabled: 0,
-            project_name: "",
-            project_last_updated_on_caa: Math.floor(
-              new Date().getTime() / 1000
-            ),
-          },
-        },
-      };
-    }
-    if (
-      table_project_id &&
-      table_project_id !== "" &&
-      table_name &&
-      table_name !== ""
-    ) {
-      log.tables = {
-        connectOrCreate: {
-          where: {
-            project_id_fk_table_name: {
-              project_id_fk: table_project_id,
-              table_name: table_name,
-            },
-          },
-          create: {
-            project_id_fk: table_project_id,
-            table_name: table_name,
-            caa_user_id: userAuthenticatedID,
-            table_is_rls_enabled: 0,
-            table_last_updated_on_caa: Math.floor(
-              new Date().getTime() / 1000
-            ),
-          },
-        },
-      };
-    }
-  } catch (err) {
-    console.log(err);
-    return NextResponse.json("Error occurred.", {
-      status: 400,
-      statusText: "Bad Request",
-    });
-  }
 
-  try {
-    const createLog = await prisma.logs.create({
-      data: log,
-    });
+    const array_logsCreateInput = [];
+    for (const json_req of req_payload) {
+      const PRI_FACILITY = json_req["PRI_FACILITY"];
+      const PRI_SEVERITY = json_req["PRI_SEVERITY"];
+      const VER = json_req["VER"];
+      const TIMESTAMP = json_req["TIMESTAMP"];
+      const HOSTNAME = json_req["HOSTNAME"];
+      const APPNAME = json_req["APPNAME"];
+      const PROCID = json_req["PROCID"];
+      const MSG = json_req["MSG"];
+      if (
+        isNaN(parseInt(PRI_FACILITY)) ||
+        isNaN(parseInt(PRI_SEVERITY)) ||
+        isNaN(parseInt(VER)) ||
+        typeof TIMESTAMP !== "string" ||
+        TIMESTAMP === "" ||
+        typeof HOSTNAME !== "string" ||
+        HOSTNAME === "" ||
+        typeof APPNAME !== "string" ||
+        APPNAME === "" ||
+        typeof PROCID !== "string" ||
+        PROCID === "" ||
+        typeof MSG !== "string" ||
+        MSG === ""
+      ) {
+        return NextResponse.json(
+          { message: "Missing required fields." },
+          { status: 400, statusText: "Bad Request" }
+        );
+      }
+      const logsCreateInput: Prisma.logsCreateInput = {
+        caa_user_id: userAuthenticatedID,
+        client_side_api_key_id_fk: clientSideApiKeyID,
+        PRI_FACILITY: PRI_FACILITY,
+        PRI_SEVERITY: PRI_SEVERITY,
+        VER: VER,
+        TIMESTAMP: TIMESTAMP,
+        HOSTNAME: HOSTNAME,
+        APPNAME: APPNAME,
+        PROCID: PROCID,
+        MSG: MSG,
+      };
+      const org_id_fk = json_req["org_id"];
+      const user_email_fk = json_req["user_email"];
+      const project_id_fk = json_req["project_id"];
+      const table_name_fk = json_req["table_name"];
+      const evidence_image_id_fk = json_req["evidence_image_id"];
+      if (typeof org_id_fk === "string" && org_id_fk !== "") {
+        logsCreateInput.org_id_fk = org_id_fk;
+      }
+      if (typeof user_email_fk === "string" && user_email_fk !== "") {
+        logsCreateInput.user_email_fk = user_email_fk;
+      }
+      if (typeof project_id_fk === "string" && project_id_fk !== "") {
+        logsCreateInput.project_id_fk = project_id_fk;
+      }
+      if (typeof table_name_fk === "string" && table_name_fk !== "") {
+        logsCreateInput.table_name_fk = table_name_fk;
+      }
+      if (
+        typeof evidence_image_id_fk === "string" &&
+        evidence_image_id_fk !== ""
+      ) {
+        logsCreateInput.evidence_image_id_fk = evidence_image_id_fk;
+      }
+      array_logsCreateInput.push(logsCreateInput);
+    }
+
+    const array_createLogs = [];
+    for (const log of array_logsCreateInput) {
+      const createLog = prisma.logs.create({
+        data: log,
+      });
+      array_createLogs.push(createLog);
+    }
+
+    const transaction = await prisma.$transaction(array_createLogs);
 
     if (process.env.NODE_ENV === "development") {
-      console.log(createLog);
+      console.log(transaction);
     }
 
-    return NextResponse.json(createLog, { status: 201, statusText: "Created" });
+    return NextResponse.json(transaction, {
+      status: 201,
+      statusText: "Created",
+    });
   } catch (err) {
     console.log(err);
-    return NextResponse.json("Error occurred.", {
-      status: 500,
-      statusText: "Internal Server Error",
-    });
+    return NextResponse.json(
+      {
+        message: "Error occurred.",
+      },
+      {
+        status: 500,
+        statusText: "Internal Server Error",
+      }
+    );
   }
 }

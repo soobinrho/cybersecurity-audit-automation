@@ -2,9 +2,9 @@ import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
-import checkAuthenticationForAPI from "@/lib/checkAuthenticationForAPI";
 import { auth } from "@/auth";
-import { getUsers } from "@/lib/getUsers";
+import checkAuthenticationForAPI from "@/lib/checkAuthenticationForAPI";
+import { getEvidenceImages } from "@/lib/getEvidenceImages";
 
 export async function GET(req: NextRequest) {
   try {
@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
 
     // Proceed if authenticated.
     const userAuthenticatedID = authResults.userAuthenticatedID;
-    const results = await getUsers(userAuthenticatedID);
+    const results = await getEvidenceImages(userAuthenticatedID);
     if (results.length > 0) {
       return NextResponse.json(results, {
         status: 200,
@@ -76,69 +76,105 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           message:
-            "The request payload must be an array. It can even be an array with only one member such as '[{...}]'",
+            'The request payload must be an array. It can even be an array with only one member such as "[{...}]"',
         },
         { status: 400, statusText: "Bad Request" }
       );
     }
 
-    const array_usersCreateInput = [];
+    const array_evidenceImagesCreateInput = [];
     for (const json_req of req_payload) {
-      const user_email = json_req["user_email"];
-      const user_is_mfa_enabled = json_req["user_is_mfa_enabled"];
-      const user_last_updated_on_caa = json_req["user_last_updated_on_caa"];
+      const evidence_image_name = json_req["evidence_image_name"];
+      const evidence_image_size = json_req["evidence_image_size"];
+      const evidence_image_blob = json_req["evidence_image_blob"];
+      const evidence_image_last_updated_on_caa =
+        json_req["evidence_image_last_updated_on_caa"];
       if (
-        typeof user_email !== "string" ||
-        user_email === "" ||
-        isNaN(parseInt(user_is_mfa_enabled)) ||
-        (parseInt(user_is_mfa_enabled) !== 0 &&
-          parseInt(user_is_mfa_enabled) !== 1) ||
-        isNaN(parseInt(user_last_updated_on_caa))
+        typeof evidence_image_name !== "string" ||
+        evidence_image_name === "" ||
+        isNaN(parseInt(evidence_image_size)) ||
+        typeof evidence_image_blob !== "string" ||
+        evidence_image_blob === "" ||
+        isNaN(parseInt(evidence_image_last_updated_on_caa))
       ) {
         return NextResponse.json(
           { message: "Missing required fields." },
           { status: 400, statusText: "Bad Request" }
         );
       }
-
-      const usersCreateInput: Prisma.usersCreateInput = {
+      const evidenceImagesCreateInput: Prisma.evidence_imagesCreateInput = {
         caa_user_id: userAuthenticatedID,
-        user_email: user_email,
-        user_is_mfa_enabled: user_is_mfa_enabled,
-        user_last_updated_on_caa: user_last_updated_on_caa,
+        evidence_image_name: evidence_image_name,
+        evidence_image_size: evidence_image_size,
+        evidence_image_blob: Buffer.from(evidence_image_blob, "base64"),
+        evidence_image_last_updated_on_caa:
+          evidence_image_last_updated_on_caa,
       };
-      array_usersCreateInput.push(usersCreateInput);
+      const org_id_fk = json_req["org_id"];
+      const user_email_fk = json_req["user_email"];
+      const project_id_fk = json_req["project_id"];
+      const table_name_fk = json_req["table_name"];
+      if (typeof org_id_fk === "string" && org_id_fk !== "") {
+        evidenceImagesCreateInput.organizations = {
+          connectOrCreate: {
+            where: { org_id: org_id_fk },
+            create: {
+              caa_user_id: userAuthenticatedID,
+              org_id: org_id_fk,
+              org_name: "",
+              org_last_updated_on_caa: Math.floor(Date.now() / 1000),
+            },
+          },
+        };
+      }
+      if (typeof user_email_fk === "string" && user_email_fk !== "") {
+        evidenceImagesCreateInput.users = {
+          connectOrCreate: {
+            where: { user_email: user_email_fk },
+            create: {
+              caa_user_id: userAuthenticatedID,
+              user_email: user_email_fk,
+              user_is_mfa_enabled: 0,
+              user_last_updated_on_caa: Math.floor(Date.now() / 1000),
+            },
+          },
+        };
+      }
+      if (typeof project_id_fk === "string" && project_id_fk !== "") {
+        evidenceImagesCreateInput.projects = {
+          connectOrCreate: {
+            where: { project_id: project_id_fk },
+            create: {
+              caa_user_id: userAuthenticatedID,
+              project_id: project_id_fk,
+              project_name: "",
+              project_is_pitr_enabled: 0,
+              project_last_updated_on_caa: Math.floor(Date.now() / 1000),
+            },
+          },
+        };
+      }
+      if (typeof table_name_fk === "string" && table_name_fk !== "") {
+        evidenceImagesCreateInput.table_name_fk = table_name_fk;
+      }
+      array_evidenceImagesCreateInput.push(evidenceImagesCreateInput);
     }
 
-    const array_upsertUsers = [];
-    for (const user of array_usersCreateInput) {
-      array_upsertUsers.push(
-        prisma.users.upsert({
-          where: {
-            caa_user_id: userAuthenticatedID,
-            user_email: user.user_email,
-          },
-          update: {
-            user_is_mfa_enabled: user.user_is_mfa_enabled,
-            user_last_updated_on_caa: user.user_last_updated_on_caa,
-          },
-          create: {
-            caa_user_id: userAuthenticatedID,
-            user_email: user.user_email,
-            user_is_mfa_enabled: user.user_is_mfa_enabled,
-            user_last_updated_on_caa: user.user_last_updated_on_caa,
-          },
-        })
-      );
+    const array_createEvidenceImages = [];
+    for (const evidenceImage of array_evidenceImagesCreateInput) {
+      const createEvidenceImage = prisma.evidence_images.create({
+        data: evidenceImage,
+      });
+      array_createEvidenceImages.push(createEvidenceImage);
     }
 
-    const transaction = await prisma.$transaction(array_upsertUsers);
+    const transaction = await prisma.$transaction(array_createEvidenceImages);
 
     if (process.env.NODE_ENV === "development") {
       console.log(transaction);
     }
 
-    return NextResponse.json(transaction, {
+    return NextResponse.json(array_createEvidenceImages, {
       status: 201,
       statusText: "Created",
     });
@@ -149,8 +185,8 @@ export async function POST(req: NextRequest) {
         message: "Error occurred.",
       },
       {
-        status: 500,
-        statusText: "Internal Server Error",
+        status: 400,
+        statusText: "Bad Request",
       }
     );
   }
@@ -179,14 +215,14 @@ export async function DELETE(req: NextRequest) {
     const params = req.nextUrl.searchParams;
     const delete_all = params.get("delete_all")?.toLowerCase();
     if (delete_all === "true") {
-      const deleteUsers = await prisma.users.deleteMany({
+      const deleteEvidenceImages = await prisma.evidence_images.deleteMany({
         where: {
           caa_user_id: userAuthenticatedID,
         },
       });
 
       if (process.env.NODE_ENV === "development") {
-        console.log(deleteUsers);
+        console.log(deleteEvidenceImages);
       }
 
       // By convention, HTTP 204 code must not contain any body, and must
@@ -195,25 +231,32 @@ export async function DELETE(req: NextRequest) {
         status: 204,
       });
     } else {
-      const user_email = params.get("user_email");
-      if (typeof user_email !== "string" || user_email === "") {
+      const evidence_image_id = params.get("evidence_image_id");
+      if (
+        typeof evidence_image_id !== "string" ||
+        evidence_image_id === "" ||
+        isNaN(parseInt(evidence_image_id))
+      ) {
         return NextResponse.json(
           {
             message: "Please use correct URL params.",
           },
-          { status: 404, statusText: "Not Found" }
+          {
+            status: 404,
+            statusText: "Not Found",
+          }
         );
       }
 
-      const deleteUser = await prisma.users.delete({
+      const deleteEvidenceImage = await prisma.evidence_images.delete({
         where: {
           caa_user_id: userAuthenticatedID,
-          user_email: user_email,
+          evidence_image_id: parseInt(evidence_image_id),
         },
       });
 
       if (process.env.NODE_ENV === "development") {
-        console.log(deleteUser);
+        console.log(deleteEvidenceImage);
       }
 
       return new Response(null, {

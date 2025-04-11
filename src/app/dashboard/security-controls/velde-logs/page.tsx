@@ -1,8 +1,8 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { Metadata } from "next";
-import { getUsers } from "@/lib/getUsers";
-import MFATable from "@/components/dashboard/MFATable";
+import { getLogs } from "@/lib/getLogs";
+import LogsTable from "@/components/dashboard/LogsTable";
 import {
   HydrationBoundary,
   QueryClient,
@@ -11,7 +11,7 @@ import {
 import { SessionProvider } from "next-auth/react";
 
 export const metadata: Metadata = {
-  title: "MFA",
+  title: "Logs",
 };
 
 export default async function MFAPage() {
@@ -19,21 +19,22 @@ export default async function MFAPage() {
   if (!session) {
     redirect("/login");
   }
+
   const authentiactedUserId = session.user?.id as string;
+
   const queryClient = new QueryClient();
   await queryClient.prefetchQuery({
-    queryKey: ["users"],
-    queryFn: () => getUsers(authentiactedUserId),
+    queryKey: ["logs"],
+    queryFn: () => getLogs(authentiactedUserId),
   });
+
   return (
     <div>
       <HydrationBoundary state={dehydrate(queryClient)}>
         <SessionProvider>
           <section>
-            <h2 className="text-2xl font-bold pb-4">
-              MFA (Multi Factor Authentication)
-            </h2>
-            <MFATable />
+            <h2 className="text-2xl font-bold pb-4">caa Logs</h2>
+            <LogsTable />
           </section>
         </SessionProvider>
       </HydrationBoundary>

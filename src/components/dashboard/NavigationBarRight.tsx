@@ -1,6 +1,6 @@
-import SignOutButton from "@/components/SignOutButton";
-import DarkModeButton from "@/components/DarkModeButton";
-import MobileMenu from "@/components/MobileMenu";
+import SignOutButton from "@/components/dashboard/SignOutButton";
+import DarkModeButton from "@/components/dashboard/DarkModeButton";
+import MobileMenu from "@/components/dashboard/MobileMenu";
 
 export default function NavigationBarRight() {
   return (

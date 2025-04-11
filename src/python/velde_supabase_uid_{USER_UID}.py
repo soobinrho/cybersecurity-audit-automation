@@ -40,7 +40,10 @@ import re
 import time
 import datetime
 import urllib.parse
+import base64
 from time import strftime
+
+sys.tracebacklimit = 0
 
 try:
     # Python 3
@@ -183,8 +186,9 @@ def print_info(str_info, org_id='', user_email='', project_id='', table_project_
     if table_name != '':
         payload['table_name'] = table_name
 
-    payload = json.dumps(payload)
-    request_post_api(json_payload=payload,
+    list_json_payload = [payload]
+    list_json_payload = json.dumps(list_json_payload)
+    request_post_api(list_json_payload=list_json_payload,
                      db_table_name='logs',
                      route_url='api/v1/logs')
 
@@ -213,9 +217,10 @@ def print_error(str_error, org_id='', user_email='', project_id='', table_projec
     if table_name != '':
         payload['table_name'] = table_name
 
-    payload = json.dumps(payload)
+    list_json_payload = [payload]
+    list_json_payload = json.dumps(list_json_payload)
     if not do_not_send_api_request:
-        request_post_api(json_payload=payload,
+        request_post_api(list_json_payload=list_json_payload,
                          db_table_name='logs',
                          route_url='api/v1/logs')
 
@@ -239,8 +244,9 @@ def print_finding(str_finding, org_id='', user_email='', project_id='', table_pr
     if table_name != '':
         payload['table_name'] = table_name
 
-    payload = json.dumps(payload)
-    request_post_api(json_payload=payload,
+    list_json_payload = [payload]
+    list_json_payload = json.dumps(list_json_payload)
+    request_post_api(list_json_payload=list_json_payload,
                      db_table_name='logs',
                      route_url='api/v1/logs')
 
@@ -250,7 +256,7 @@ def print_warning(str_warning):
     print('\x1b[6;30;43m' + str_warning + '\x1b[0m')
 
 
-def request_post_api(json_payload, db_table_name, route_url):
+def request_post_api(list_json_payload, db_table_name, route_url):
     # The API key in this file only allows you to call POST and PUT methods.
     # GET can only be called internally via the dashboard.
     # Also, the HTTPBasicAuth object doesn't encrypt the data on its own.
@@ -260,11 +266,11 @@ def request_post_api(json_payload, db_table_name, route_url):
 
     try:
         req = requests.post(api_url,
-                            data=json_payload,
+                            data=list_json_payload,
                             auth=api_auth)
         if req.status_code == 201:  # HTTP status code 201 (Created).
             print_debug(
-                f"[DEBUG] Successful HTTP POST request for the '{db_table_name}' table.")
+                f'[DEBUG] Successful HTTP POST request for the "{db_table_name}" table.')
         else:
             print_error(
                 f'[ERROR] {req.status_code} "{req.reason}" error on HTTP PUT request for updating {db_table_name} via {route_url}.', do_not_send_api_request=True)
@@ -287,10 +293,10 @@ def request_delete_api(params, db_table_name, route_url):
                               auth=api_auth)
         if req.status_code == 204:  # HTTP status code 204 (No Content).
             print_debug(
-                f"[DEBUG] Successful HTTP DELETE request for the '{db_table_name}' table.")
+                f'[DEBUG] Successful HTTP DELETE request for the "{db_table_name}" table.')
         else:
             print_error(
-                f'[ERROR] {req.status_code} "{req.reason}" error on HTTP PUT request for updating {db_table_name} via {route_url}.', do_not_send_api_request=True)
+                f'[ERROR] {req.status_code} "{req.reason}" error on HTTP DELETE request for the "{db_table_name}" table via {route_url}.', do_not_send_api_request=True)
             print_error(f'[ERROR] {req.json()}', do_not_send_api_request=True)
 
     except Exception as e:
@@ -473,8 +479,8 @@ def test_supabase_action_flow_core():
                    'org_last_updated_on_caa': int(time.time())}
         list_json_payload.append(payload)
 
-    json_payload = json.dumps(list_json_payload)
-    request_post_api(json_payload=json_payload,
+    list_json_payload = json.dumps(list_json_payload)
+    request_post_api(list_json_payload=list_json_payload,
                      db_table_name='organizations',
                      route_url='api/v1/organizations')
 
@@ -504,19 +510,29 @@ def test_supabase_action_flow_core():
         page.wait_for_load_state('domcontentloaded')
         page.get_by_role('row').first.wait_for(state='visible')
 
-        path_folder_evidence_collected = os.path.join(os.path.dirname(
-            os.path.realpath(__file__)), f'{APP_NAME}_controls_evidence')
-        if not os.path.exists(path_folder_evidence_collected):
-            os.makedirs(path_folder_evidence_collected)
-
         # This is localtime.
-        path_evidence = f'{strftime("%Y-%m-%d %H%M%S")} {NAME_MFA} {org_name}.png'
-        path_evidence = sanitize_file_name(path_evidence)
-        path_evidence = os.path.join(
-            path_folder_evidence_collected, path_evidence)
-        page.screenshot(path=path_evidence, full_page=True)
+        evidence_image_name = f'{strftime("%Y-%m-%d %H%M%S")} {NAME_MFA} {org_name}.png'
+        evidence_image_name = sanitize_file_name(evidence_image_name)
+        evidence_image_blob = page.screenshot(full_page=True)
+        evidence_image_blob = base64.b64encode(evidence_image_blob).decode('utf-8')
+        evidence_image_size = len(evidence_image_blob)
+        print_debug(
+            f'[DEBUG] evidence_image_name, evidence_image_size')
+        print_debug(f"{evidence_image_size / 1024 / 1024:.2f}MB " + evidence_image_name)
         print_info(
-            f"[INFO] Evidence collected: '{path_evidence}'", org_id=org_id)
+            f'[INFO] Collected evidence for {NAME_MFA} for "{org_name}"', org_id=org_id)
+        list_payload = []
+        list_payload.append({
+            'org_id': org_id,
+            'evidence_image_name': evidence_image_name,
+            'evidence_image_size': evidence_image_size,
+            'evidence_image_blob': evidence_image_blob,
+            'evidence_image_last_updated_on_caa': int(time.time())
+        })
+        list_json_payload = json.dumps(list_payload)
+        request_post_api(list_json_payload=list_json_payload,
+                         db_table_name='evidence_images',
+                         route_url='api/v1/evidence-images')
 
         # rows[0] = the row with the headers.
         # rows[-1] = the row containing total number of users.
@@ -539,7 +555,7 @@ def test_supabase_action_flow_core():
                     list_findings_discovered.append(NAME_MFA)
                 if not user_email in dict_user_email_is_finding_printed:
                     print_finding(
-                        f"[FINDING] The user '{user_email}' does not have {NAME_MFA} enabled.",
+                        f'[FINDING] {NAME_MFA} for "{user_email}" is disabled.',
                         org_id=org_id,
                         user_email=user_email)
                     dict_user_email_is_finding_printed[user_email] = True
@@ -568,8 +584,8 @@ def test_supabase_action_flow_core():
                    'user_last_updated_on_caa': int(time.time())}
         list_json_payload.append(payload)
 
-    json_payload = json.dumps(list_json_payload)
-    request_post_api(json_payload=json_payload,
+    list_json_payload = json.dumps(list_json_payload)
+    request_post_api(list_json_payload=list_json_payload,
                      db_table_name='users',
                      route_url='api/v1/users')
 
@@ -580,8 +596,8 @@ def test_supabase_action_flow_core():
                    'org_member_role': list_org_member_role[i]}
         list_json_payload.append(payload)
 
-    json_payload = json.dumps(list_json_payload)
-    request_post_api(json_payload=json_payload,
+    list_json_payload = json.dumps(list_json_payload)
+    request_post_api(list_json_payload=list_json_payload,
                      db_table_name='organization_members',
                      route_url='api/v1/organization-members')
 
@@ -643,13 +659,29 @@ def test_supabase_action_flow_core():
             except:
                 continue
 
-        path_evidence = f'{strftime("%Y-%m-%d %H%M%S")} {NAME_PITR} {project_name}.png'
-        path_evidence = sanitize_file_name(path_evidence)
-        path_evidence = os.path.join(
-            path_folder_evidence_collected, path_evidence)
-        page.screenshot(path=path_evidence, full_page=True)
+        evidence_image_name = f'{strftime("%Y-%m-%d %H%M%S")} {NAME_PITR} {project_name}.png'
+        evidence_image_name = sanitize_file_name(evidence_image_name)
+        evidence_image_blob = page.screenshot(full_page=True)
+        evidence_image_blob = base64.b64encode(evidence_image_blob).decode('utf-8')
+        evidence_image_size = len(evidence_image_blob)
+        print_debug(
+            f'[DEBUG] evidence_image_name, evidence_image_size')
+        print_debug(f"{evidence_image_size / 1024 / 1024:.2f}MB " + evidence_image_name)
         print_info(
-            f"[INFO] Evidence collected: '{path_evidence}'", org_id=org_id_fk, project_id=project_id)
+            f'[INFO] Collected evidence for {NAME_PITR} for "{project_name}"', org_id=org_id_fk, project_id=project_id)
+        list_payload = []
+        list_payload.append({
+            'org_id': org_id_fk,
+            'project_id': project_id,
+            'evidence_image_name': evidence_image_name,
+            'evidence_image_size': evidence_image_size,
+            'evidence_image_blob': evidence_image_blob,
+            'evidence_image_last_updated_on_caa': int(time.time())
+        })
+        list_json_payload = json.dumps(list_payload)
+        request_post_api(list_json_payload=list_json_payload,
+                         db_table_name='evidence_images',
+                         route_url='api/v1/evidence-images')
 
         # I don't have pro subscription, so I had to guess using:
         #   https://github.com/supabase/supabase/blob/master/apps/studio/pages/project/%5Bref%5D/database/backups/pitr.tsx
@@ -667,7 +699,7 @@ def test_supabase_action_flow_core():
 
         if not project_is_pitr_enabled:
             print_finding(
-                f"[FINDING] The project '{project_name}' does not have {NAME_PITR} enabled.",
+                f'[FINDING] {NAME_PITR} for "{project_name}" is disabled.',
                 org_id=org_id_fk,
                 project_id=project_id)
             if not NAME_PITR in list_findings_discovered:
@@ -691,8 +723,8 @@ def test_supabase_action_flow_core():
                    'project_last_updated_on_caa': int(time.time())}
         list_json_payload.append(payload)
 
-    json_payload = json.dumps(list_json_payload)
-    request_post_api(json_payload=json_payload,
+    list_json_payload = json.dumps(list_json_payload)
+    request_post_api(list_json_payload=list_json_payload,
                      db_table_name='projects',
                      route_url='api/v1/projects')
 
@@ -712,13 +744,28 @@ def test_supabase_action_flow_core():
             f'{APP_URL_BASE}/dashboard/project/{project_id}/auth/policies')
         wait_for_all_loading(page, HIGHLIGHT_DURATION)
 
-        path_evidence = f'{strftime("%Y-%m-%d %H%M%S")} {NAME_RLS} {project_name}.png'
-        path_evidence = sanitize_file_name(path_evidence)
-        path_evidence = os.path.join(
-            path_folder_evidence_collected, path_evidence)
-        page.screenshot(path=path_evidence, full_page=True)
+        evidence_image_name = f'{strftime("%Y-%m-%d %H%M%S")} {NAME_RLS} {project_name}.png'
+        evidence_image_name = sanitize_file_name(evidence_image_name)
+        evidence_image_blob = page.screenshot(full_page=True)
+        evidence_image_blob = base64.b64encode(evidence_image_blob).decode('utf-8')
+        evidence_image_size = len(evidence_image_blob)
+        print_debug(
+            f'[DEBUG] evidence_image_name, evidence_image_size')
+        print_debug(f"{evidence_image_size / 1024 / 1024:.2f}MB " + evidence_image_name)
         print_info(
-            f"[INFO] Evidence collected: '{path_evidence}'", project_id=project_id)
+            f'[INFO] Collected evidence for {NAME_RLS} for "{project_name}"', project_id=project_id)
+        list_payload = []
+        list_payload.append({
+            'project_id': project_id,
+            'evidence_image_name': evidence_image_name,
+            'evidence_image_size': evidence_image_size,
+            'evidence_image_blob': evidence_image_blob,
+            'evidence_image_last_updated_on_caa': int(time.time())
+        })
+        list_json_payload = json.dumps(list_payload)
+        request_post_api(list_json_payload=list_json_payload,
+                         db_table_name='evidence_images',
+                         route_url='api/v1/evidence-images')
 
         anchors = page.locator('a').all()
         for anchor in anchors:
@@ -741,7 +788,7 @@ def test_supabase_action_flow_core():
                 if not table_is_rls_enabled and not NAME_RLS in list_findings_discovered:
                     list_findings_discovered.append(NAME_RLS)
                     print_finding(
-                        f"[FINDING] The table '{table_name}' ({project_name}) does not have {NAME_RLS} enabled.",
+                        f'[FINDING] {NAME_RLS} for "{table_name}" ({project_name}) is disabled.',
                         project_id=project_id,
                         table_project_id=project_id,
                         table_name=table_name)
@@ -763,13 +810,13 @@ def test_supabase_action_flow_core():
                    'table_last_updated_on_caa': int(time.time())}
         list_json_payload.append(payload)
 
-    json_payload = json.dumps(list_json_payload)
-    request_post_api(json_payload=json_payload,
+    list_json_payload = json.dumps(list_json_payload)
+    request_post_api(list_json_payload=list_json_payload,
                      db_table_name='tables',
                      route_url='api/v1/tables')
 
     print_info(
-        f'[INFO] Your dashboard is now updated at {VELDE_URL_BASE + '/dashboard'}')
+        f'[INFO] Your dashboard is now updated at {VELDE_URL_BASE + "/dashboard"}')
 
     list_findings_remediated = []
     list_findings_not_remediated = []
@@ -834,8 +881,6 @@ def test_supabase_action_flow_core():
             messagebox.showinfo(
                 title='caa', message=f"Every highlighted user should enable {NAME_MFA} at https://supabase.com/dashboard/account/security")
 
-        print_info(
-            f'[INFO] Users should enable {NAME_MFA} at https://supabase.com/dashboard/account/security')
         list_findings_remediated.append(NAME_MFA)
 
     # ----------------------------------------------------------------------- #
@@ -865,8 +910,6 @@ def test_supabase_action_flow_core():
             messagebox.showinfo(
                 title='caa', message=f"{NAME_PITR} must be enabled for the project '{project_name}' at {url_pitr}")
 
-        print_info(
-            f"[INFO] {NAME_PITR} must be enabled for all projects at {url_pitr}.")
         list_findings_remediated.append(NAME_PITR)
 
     # ----------------------------------------------------------------------- #
@@ -942,7 +985,7 @@ def test_supabase_action_flow_core():
 
                     rls_button = rls_status_button_outer_element.get_by_text(
                         'Disable RLS').first
-                    print_info(f"[INFO] {NAME_RLS} has successfully been enabled for the table {table_name}.",
+                    print_info(f'[INFO] Successful {NAME_RLS} remediation for the table "{table_name}".',
                                project_id=table_project_id_fk,
                                table_project_id=table_project_id_fk,
                                table_name=table_name)
@@ -960,8 +1003,8 @@ def test_supabase_action_flow_core():
                     is_all_rls_remediated = False
 
         if is_all_rls_remediated:
-            message = f"{NAME_RLS} has successfully been enabled for all tables."
-            print_info(f"[INFO] {message}")
+            message = f'Successful {NAME_RLS} remediation for all tables.'
+            print_info(f'[INFO] {message}')
             list_findings_remediated.append(NAME_RLS)
         else:
             message = f"{NAME_RLS} remediation process has failed. Please check the logs and contact us <{VELDE_EMAIL}>."
@@ -979,8 +1022,8 @@ def test_supabase_action_flow_core():
                        'table_last_updated_on_caa': int(time.time())}
             list_json_payload.append(payload)
 
-        json_payload = json.dumps(list_json_payload)
-        request_post_api(json_payload=json_payload,
+        list_json_payload = json.dumps(list_json_payload)
+        request_post_api(list_json_payload=list_json_payload,
                          db_table_name='tables',
                          route_url='api/v1/tables')
 
