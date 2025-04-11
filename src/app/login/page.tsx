@@ -16,6 +16,11 @@ export default async function SignInPage(props: {
   const params = await props.searchParams;
   const SIGNIN_ERROR_URL = "/api/auth/error";
   return (
+    // TODO: Once the dashboard is done, put that main components
+    // here to the login page and the error page and use opacity
+    // and maybe blur. Showing a glimpse of how the dashboard looks like
+    // will improve the user experience. Also, the dark mode / light mode button
+    // will actually work even in skeleton.
     <div className="min-h-svh min-w-svw flex items-center justify-center">
       <div className="flex items-center flex-col w-xs rounded-lg border border-gray-200 bg-white p-6 text-center shadow dark:border-gray-600 dark:bg-dark-mode-menu dark:hover:border-gray-500">
         <div className="flex items-center justify-center w-full gap-2">

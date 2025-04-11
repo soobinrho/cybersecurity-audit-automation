@@ -63,16 +63,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className="min-h-svh min-w-svw text-light-mode-text-main dark:text-dark-mode-text-main bg-light-mode-main dark:bg-dark-mode-main dark:stroke-dark-mode-svg-main stroke-light-mode-svg-main overflow-x-auto">
           <ThemeProvider
             attribute="class"
-            defaultTheme="dark"
+            defaultTheme="light"
             enableSystem
             disableTransitionOnChange
           >
             <Suspense >{children}</Suspense>
           </ThemeProvider>
-        </div>
       </body>
     </html>
   );
