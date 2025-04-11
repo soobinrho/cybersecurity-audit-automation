@@ -89,6 +89,7 @@ export async function POST(req: NextRequest) {
               project_id_fk: String(table["projects"]),
               table_name: String(table["table_name"]),
             },
+            caa_user_id: userAuthenticatedID,
           },
           update: {
             table_is_rls_enabled: table["table_is_rls_enabled"],

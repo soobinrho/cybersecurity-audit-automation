@@ -92,6 +92,7 @@ export async function POST(req: NextRequest) {
               org_id_fk: String(organizationMember["organizations"]),
               user_email_fk: String(organizationMember["users"]),
             },
+            caa_user_id: userAuthenticatedID,
           },
           update: {
             org_member_role: organizationMember["org_member_role"],

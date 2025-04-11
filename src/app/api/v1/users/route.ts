@@ -85,6 +85,7 @@ export async function POST(req: NextRequest) {
         prisma.users.upsert({
           where: {
             user_email: user["user_email"],
+            caa_user_id: userAuthenticatedID,
           },
           update: {
             user_is_mfa_enabled: user["user_is_mfa_enabled"],

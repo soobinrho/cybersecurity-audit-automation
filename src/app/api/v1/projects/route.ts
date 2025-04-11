@@ -88,6 +88,7 @@ export async function POST(req: NextRequest) {
         prisma.projects.upsert({
           where: {
             project_id: project["project_id"],
+            caa_user_id: userAuthenticatedID,
           },
           update: {
             org_id_fk: String(project["organizations"]),
