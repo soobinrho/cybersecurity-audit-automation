@@ -3,13 +3,7 @@ import { useUsersQuery } from "@/hooks/useUsersQuery";
 import { useProjectsQuery } from "@/hooks/useProjectsQuery";
 import { useTablesQuery } from "@/hooks/useTablesQuery";
 
-interface props {
-  userAuthenticatedID: string;
-}
-
-export default function LLMHeader(props: props) {
-  const { userAuthenticatedID } = props;
-
+export default function LLMHeader() {
   const copyDataToClipboard = (dataToBeCopied: string) => {
     const plain = new Blob([dataToBeCopied], { type: "text/plain" });
     const data = new ClipboardItem({
@@ -18,9 +12,9 @@ export default function LLMHeader(props: props) {
     navigator.clipboard.write([data]);
   };
 
-  const { data: users } = useUsersQuery(userAuthenticatedID);
-  const { data: projects } = useProjectsQuery(userAuthenticatedID);
-  const { data: tables } = useTablesQuery(userAuthenticatedID);
+  const { data: users } = useUsersQuery();
+  const { data: projects } = useProjectsQuery();
+  const { data: tables } = useTablesQuery();
 
   return (
     <div className="flex flex-col self-center md:flex-row md:justify-between pt-2 md:pt-0 md:pl-4 md:pr-2 flex-nowrap gap-1 mb-2 md:mb-0">

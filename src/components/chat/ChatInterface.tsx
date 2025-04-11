@@ -94,12 +94,12 @@ export function ChatInterface() {
   return (
     <article className="grid-cols-[minmax(0,1fr)] grid-rows-[minmax(0,1fr)_10%] md:grid-rows-[15%_minmax(0,1fr)_15%] grid text-xs md:text-[1rem] whitespace-pre-wrap text-pretty">
       <section className="invisible hidden md:visible md:row-start-1 md:row-end-2 grid-rows-subgrid md:grid border-b-[0.08rem] border-dashed">
-        <LLMHeader userAuthenticatedID={userAuthenticatedID} />
+        <LLMHeader />
       </section>
       <section className="row-start-1 row-end-2 md:row-start-2 md:row-end-3 grid-cols-subgrid grid-rows-subgrid grid border-b-[0.08rem] border-dashed">
         <ScrollArea className="px-5 mx-2">
           <div className="md:invisible md:hidden">
-            <LLMHeader userAuthenticatedID={userAuthenticatedID} />
+            <LLMHeader />
           </div>
           <div className="flex flex-col gap-1 justify-end">
             {messages.map((message, index) => (

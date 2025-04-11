@@ -26,12 +26,7 @@ export async function GET(req: NextRequest) {
 
     // Proceed if authenticated.
     const userAuthenticatedID = authResults.userAuthenticatedID;
-    const results = await getEvidenceImages(
-      userAuthenticatedID,
-      "mfa",
-      "org_id",
-      "project_id"
-    );
+    const results = await getEvidenceImages(userAuthenticatedID);
     if (results.length > 0) {
       return NextResponse.json(results, {
         status: 200,
