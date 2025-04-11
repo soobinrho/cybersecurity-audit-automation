@@ -6,7 +6,6 @@ import {
   DrawerContent,
   DrawerDescription,
   DrawerFooter,
-  DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
@@ -22,136 +21,134 @@ export default function MobileMenu() {
           <Menu className="stroke-[0.06rem] stroke-foreground/50" />
         </div>
       </DrawerTrigger>
-      <DrawerContent>
-        <DrawerHeader className="text-center">
-          <div className="flex flex-col gap-3">
-            <Link href="/dashboard/supabase">
-              <DrawerClose>
-                <DrawerTitle>Supabase</DrawerTitle>
-              </DrawerClose>
-            </Link>
-            <div className="flex flex-col gap-3 mb-3">
-              <DrawerDescription>
-                <Link href="/dashboard/supabase/getting-started">
-                  <DrawerClose>Getting Started</DrawerClose>
-                </Link>
-              </DrawerDescription>
-              <DrawerDescription>
-                <Link href="/dashboard/supabase/mfa">
-                  <DrawerClose>MFA</DrawerClose>
-                </Link>
-              </DrawerDescription>
-              <DrawerDescription>
-                <Link href="/dashboard/supabase/pitr">
-                  <DrawerClose>PITR</DrawerClose>
-                </Link>
-              </DrawerDescription>
-              <DrawerDescription>
-                <Link href="/dashboard/supabase/rls">
-                  <DrawerClose>RLS</DrawerClose>
-                </Link>
-              </DrawerDescription>
-              <DrawerDescription>
-                <Link href="/dashboard/supabase/evidence-images">
-                  <DrawerClose>Evidence Images</DrawerClose>
-                </Link>
-              </DrawerDescription>
-              <DrawerDescription>
-                <Link href="/dashboard/supabase/audit-logs">
-                  <DrawerClose>Audit Logs</DrawerClose>
-                </Link>
-              </DrawerDescription>
-            </div>
-
-            <Link href="/dashboard/aws">
-              <DrawerClose>
-                <DrawerTitle>AWS</DrawerTitle>
-              </DrawerClose>
-            </Link>
-            <div className="flex flex-col gap-3 mb-3">
-              <DrawerDescription>
-                <Link href="/dashboard/aws/getting-started">
-                  <DrawerClose>Getting Started</DrawerClose>
-                </Link>
-              </DrawerDescription>
-            </div>
-
-            <Link href="/dashboard/gcp">
-              <DrawerClose>
-                <DrawerTitle>GCP</DrawerTitle>
-              </DrawerClose>
-            </Link>
-            <div className="flex flex-col gap-3 mb-3">
-              <DrawerDescription>
-                <Link href="/dashboard/gcp/getting-started">
-                  <DrawerClose>Getting Started</DrawerClose>
-                </Link>
-              </DrawerDescription>
-            </div>
-
-            <Link href="/dashboard/azure">
-              <DrawerClose>
-                <DrawerTitle>Azure</DrawerTitle>
-              </DrawerClose>
-            </Link>
-            <div className="flex flex-col gap-3 mb-3">
-              <DrawerDescription>
-                <Link href="/dashboard/azure/getting-started">
-                  <DrawerClose>Getting Started</DrawerClose>
-                </Link>
-              </DrawerDescription>
-            </div>
-
-            <Link href="/dashboard/hetzner">
-              <DrawerClose>
-                <DrawerTitle>Hetzner</DrawerTitle>
-              </DrawerClose>
-            </Link>
-            <div className="flex flex-col gap-3 mb-3">
-              <DrawerDescription>
-                <Link href="/dashboard/hetzner/getting-started">
-                  <DrawerClose>Getting Started</DrawerClose>
-                </Link>
-              </DrawerDescription>
-            </div>
-
-            <Link href="/dashboard/vercel">
-              <DrawerClose>
-                <DrawerTitle>Vercel</DrawerTitle>
-              </DrawerClose>
-            </Link>
-            <div className="flex flex-col gap-3 mb-3">
-              <DrawerDescription>
-                <Link href="/dashboard/vercel/getting-started">
-                  <DrawerClose>Getting Started</DrawerClose>
-                </Link>
-              </DrawerDescription>
-            </div>
-
-            <Link href="/dashboard/chat">
-              <DrawerClose>
-                <DrawerTitle>LLM for Security</DrawerTitle>
-              </DrawerClose>
-            </Link>
-            <div className="flex flex-col gap-3 mb-3">
-              <DrawerDescription>
-                <Link href="/dashboard/chat">
-                  <DrawerClose>Chat</DrawerClose>
-                </Link>
-              </DrawerDescription>
-            </div>
-
-            <a
-              target="_blank"
-              href="https://github.com/soobinrho/cybersecurity-audit-automation"
-            >
-              <DrawerClose>
-                <DrawerTitle>Documentation</DrawerTitle>
-              </DrawerClose>
-            </a>
+      <DrawerContent className="text-center">
+        <div className="flex flex-col gap-3 overflow-y-auto pt-4 pb-6">
+          <Link href="/dashboard/supabase">
+            <DrawerClose>
+              <DrawerTitle>Supabase</DrawerTitle>
+            </DrawerClose>
+          </Link>
+          <div className="flex flex-col gap-3 mb-3">
+            <DrawerDescription>
+              <Link href="/dashboard/supabase/getting-started">
+                <DrawerClose>Getting Started</DrawerClose>
+              </Link>
+            </DrawerDescription>
+            <DrawerDescription>
+              <Link href="/dashboard/supabase/mfa">
+                <DrawerClose>MFA</DrawerClose>
+              </Link>
+            </DrawerDescription>
+            <DrawerDescription>
+              <Link href="/dashboard/supabase/pitr">
+                <DrawerClose>PITR</DrawerClose>
+              </Link>
+            </DrawerDescription>
+            <DrawerDescription>
+              <Link href="/dashboard/supabase/rls">
+                <DrawerClose>RLS</DrawerClose>
+              </Link>
+            </DrawerDescription>
+            <DrawerDescription>
+              <Link href="/dashboard/supabase/evidence-images">
+                <DrawerClose>Evidence Images</DrawerClose>
+              </Link>
+            </DrawerDescription>
+            <DrawerDescription>
+              <Link href="/dashboard/supabase/audit-logs">
+                <DrawerClose>Audit Logs</DrawerClose>
+              </Link>
+            </DrawerDescription>
           </div>
-        </DrawerHeader>
-        <DrawerFooter>
+
+          <Link href="/dashboard/aws">
+            <DrawerClose>
+              <DrawerTitle>AWS</DrawerTitle>
+            </DrawerClose>
+          </Link>
+          <div className="flex flex-col gap-3 mb-3">
+            <DrawerDescription>
+              <Link href="/dashboard/aws/getting-started">
+                <DrawerClose>Getting Started</DrawerClose>
+              </Link>
+            </DrawerDescription>
+          </div>
+
+          <Link href="/dashboard/gcp">
+            <DrawerClose>
+              <DrawerTitle>GCP</DrawerTitle>
+            </DrawerClose>
+          </Link>
+          <div className="flex flex-col gap-3 mb-3">
+            <DrawerDescription>
+              <Link href="/dashboard/gcp/getting-started">
+                <DrawerClose>Getting Started</DrawerClose>
+              </Link>
+            </DrawerDescription>
+          </div>
+
+          <Link href="/dashboard/azure">
+            <DrawerClose>
+              <DrawerTitle>Azure</DrawerTitle>
+            </DrawerClose>
+          </Link>
+          <div className="flex flex-col gap-3 mb-3">
+            <DrawerDescription>
+              <Link href="/dashboard/azure/getting-started">
+                <DrawerClose>Getting Started</DrawerClose>
+              </Link>
+            </DrawerDescription>
+          </div>
+
+          <Link href="/dashboard/hetzner">
+            <DrawerClose>
+              <DrawerTitle>Hetzner</DrawerTitle>
+            </DrawerClose>
+          </Link>
+          <div className="flex flex-col gap-3 mb-3">
+            <DrawerDescription>
+              <Link href="/dashboard/hetzner/getting-started">
+                <DrawerClose>Getting Started</DrawerClose>
+              </Link>
+            </DrawerDescription>
+          </div>
+
+          <Link href="/dashboard/vercel">
+            <DrawerClose>
+              <DrawerTitle>Vercel</DrawerTitle>
+            </DrawerClose>
+          </Link>
+          <div className="flex flex-col gap-3 mb-3">
+            <DrawerDescription>
+              <Link href="/dashboard/vercel/getting-started">
+                <DrawerClose>Getting Started</DrawerClose>
+              </Link>
+            </DrawerDescription>
+          </div>
+
+          <Link href="/dashboard/chat">
+            <DrawerClose>
+              <DrawerTitle>LLM for Security</DrawerTitle>
+            </DrawerClose>
+          </Link>
+          <div className="flex flex-col gap-3 mb-3">
+            <DrawerDescription>
+              <Link href="/dashboard/chat">
+                <DrawerClose>Chat</DrawerClose>
+              </Link>
+            </DrawerDescription>
+          </div>
+
+          <a
+            target="_blank"
+            href="https://github.com/soobinrho/cybersecurity-audit-automation"
+          >
+            <DrawerClose>
+              <DrawerTitle>Documentation</DrawerTitle>
+            </DrawerClose>
+          </a>
+        </div>
+        <DrawerFooter className="border-t-[0.08rem] border-dashed">
           <Footer />
         </DrawerFooter>
       </DrawerContent>
