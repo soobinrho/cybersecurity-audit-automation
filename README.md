@@ -6,7 +6,10 @@
 
 # Cybersecurity Audit Automation
 
-The purpose of this project is to help you automate your own cybersecurity compliance posture by using technology we have available today, and to do so in a way that does not access, transmit, or store any of your sensitive information, such as your API keys, GLB data (customer data), or PCI data (card numbers).
+The purpose of this project is to help you with your cybersecurity compliance and regulation posture using open-source technology we have available today, and to do so in a way that does not access, transmit, or store any of your sensitive data, such as your API keys, GLB data (customer data), or PCI data (card numbers).
+
+Open-sourced with the MIT License, this project is designed to be helpful for anyone and any organization who needs it.
+Any member of the open-source community is welcome to contribute their code pull requests, code reviews, suggestions, or ideas.
 
 <br>
 
@@ -143,11 +146,11 @@ sudo docker compose logs -f  # Listen in real time.
 
 | **_Stack_**    | **_Description_**                                                          |
 | -------------- | -------------------------------------------------------------------------- |
-| **_Server_**   | Hetzner CPX11: Ubuntu, 2 vCPU, 2GB RAM, 40GB SSD                           |
+| **_Server_**   | Hetzner CPX21: Ubuntu, 3 vCPU, 4GB RAM, 80GB SSD                           |
 | **_Database_** | SQLite, Prisma                                                             |
 | **_Backend_**  | Next.js, Python (used client side for collecting security controls status) |
 | **_Frontend_** | Next.js, Tailwind CSS, TypeScript                                          |
-| **_CDN_**      | Cloudflare (CDN & web application fire wall)                               |
+| **_CDN_**      | Cloudflare (CDN & web application firewall)                               |
 
 <br>
 
