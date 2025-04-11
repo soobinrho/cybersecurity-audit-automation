@@ -3,16 +3,18 @@ import { redirect } from "next/navigation";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "LLM for Security",
+  title: "RLS",
 };
 
-export default async function App() {
+export default async function RLSPage() {
   const session = await auth();
   if (!session) {
     redirect("/login");
   }
-  // TODO: Remove redirect after completing Chat component.
-  redirect("/dashboard");
 
-  return <div></div>;
+  return (
+    <article>
+      <h2>RLS (Row Level Security)</h2>
+    </article>
+  );
 }

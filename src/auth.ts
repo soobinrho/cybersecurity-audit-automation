@@ -24,13 +24,19 @@ if (TEST_LOGIN_PASS && TEST_LOGIN_PASS !== "") {
             return null;
           }
         }
-        return {
-          // This is a random value just for testing.
-          id: "4138798a-b55e-44d4-8cd8-8181182eb856",
-          name: "Soobin",
-          email: String(inputCredential.email),
-          image: "https://github.com/soobinrho.png",
-        };
+        const testCredential =
+          process.env.NODE_ENV === "production"
+            ? {
+                id: "eb9f6e29-3862-470c-b5de-bd430b07c9b4",
+                name: "Soobin",
+                email: String(inputCredential.email),
+              }
+            : {
+                id: "4138798a-b55e-44d4-8cd8-8181182eb856",
+                name: "Soobin",
+                email: String(inputCredential.email),
+              };
+        return testCredential;
       },
     })
   );
@@ -50,7 +56,7 @@ export const providerMap = providers
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers,
   pages: {
-    error: "/api/auth/error",
+    error: "/error",
     signIn: "/login",
   },
   callbacks: {
@@ -65,6 +71,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return true;
     },
     // This code explicity makes the user's id included in the session object.
+    // Commented out until prototyping period is complete.
     // Source:
     //   https://authjs.dev/guides/extending-the-session
     jwt({ token, user }) {
@@ -80,10 +87,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   logger: {
     error(code, ...message) {
-      console.log(code, message);
+      console.log("[Auth.js ERROR] ", code, message);
     },
     warn(code, ...message) {
-      console.log(code, message);
+      console.log("[Auth.js WARN] ", code, message);
+    },
+    debug(code, ...message) {
+      console.log("[Auth.js DEBUG] ", code, message);
     },
   },
 });

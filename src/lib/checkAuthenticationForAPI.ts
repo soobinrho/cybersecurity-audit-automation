@@ -4,7 +4,7 @@ import { Session } from "next-auth";
 
 export default async function checkAuthenticationForAPI(
   oAuthSession: Session | null,
-  clientSideAuthForAPI: String | null
+  clientSideAuthForAPI: string | null
 ) {
   let userAuthenticatedID = "";
   if (oAuthSession) {

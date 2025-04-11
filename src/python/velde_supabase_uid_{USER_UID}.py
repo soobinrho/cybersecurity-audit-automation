@@ -86,7 +86,6 @@ VELDE_URL_BASE = 'http://localhost:3000'
 VELDE_EMAIL = ''
 USER_EMAIL = ''
 USER_UID = ''
-USER_DASHBOARD_URL = ''
 APP_URL_BASE = 'https://supabase.com'
 APP_NAME = 'Supabase'
 # -----------------------------------------------------------------------------
@@ -357,7 +356,8 @@ def test_supabase_action_flow_core():
         title='CONFIDENTIAL', message=f"AUTHORIZED USERS ONLY\n\nThis program is intended for '{USER_EMAIL}' only. This program evaluates your compliance status and executes action flows to make your system more secure.\n\nTo start, please click Yes.")
 
     if not is_yes:
-        print_error('[ERROR] Received No.')
+        print_info(
+            '[INFO] User decline the initial prompt. Exiting the program.')
         exit_program()
 
     # Milliseconds.
@@ -426,7 +426,8 @@ def test_supabase_action_flow_core():
                 message="SECURE LOGIN REQUIRED\n\nAlthough the rest of the process has been automated, we ask you to sign-in manually so that your credentials never leave your environment.\n\nAt caa, we prioritize your security and privacy as best as absolutely can. After you're logged in, please click OK."
             )
             if not is_ok:
-                print_error('[ERROR] Received No.')
+                print_info(
+                    '[INFO] User opted to exit before signing in to Supabase. Exiting the program.')
                 exit_program()
 
     wait_for_all_loading(page, HIGHLIGHT_DURATION)
@@ -768,7 +769,7 @@ def test_supabase_action_flow_core():
                      route_url='api/v1/tables')
 
     print_info(
-        f'[INFO] Your dashboard is now updated at {USER_DASHBOARD_URL}')
+        f'[INFO] Your dashboard is now updated at {VELDE_URL_BASE + '/dashboard'}')
 
     list_findings_remediated = []
     list_findings_not_remediated = []
@@ -996,7 +997,7 @@ def test_supabase_action_flow_core():
         str_findings_remediated = get_findings_summary_string(
             list_findings_remediated)
         messagebox.showinfo(
-            title='caa', message=f'Successful Remediations:{str_findings_remediated}\n\nYour dashboard is now updated at {USER_DASHBOARD_URL}')
+            title='caa', message=f'Successful Remediations:{str_findings_remediated}\n\nYour dashboard is now updated at {VELDE_URL_BASE + '/dashboard'}')
 
     elif is_none_remediated:
         str_findings_not_remediated = get_findings_summary_string(

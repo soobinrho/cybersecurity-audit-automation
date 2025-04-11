@@ -5,16 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export default async function SignInPage(props: {
+export default async function LoginPage(props: {
   searchParams: Promise<{ callbackUrl: string | undefined }>;
 }) {
   const session = await auth();
   if (session) {
-    redirect("/");
+    redirect("/dashboard");
   }
 
   const params = await props.searchParams;
-  const SIGNIN_ERROR_URL = "/api/auth/error";
   return (
     // TODO: Once the dashboard is done, put that main components
     // here to the login page and the error page and use opacity
@@ -48,8 +47,13 @@ export default async function SignInPage(props: {
               await signIn("credentials", formData);
             } catch (error) {
               if (error instanceof AuthError) {
-                return redirect(`${SIGNIN_ERROR_URL}?error=${error.type}`);
+                return redirect(`/error?error=${error.type}`);
               }
+
+              // Otherwise if a redirects happens Next.js can handle it
+              // so you can just re-thrown the error and let Next.js handle it.
+              // Docs:
+              // https://nextjs.org/docs/app/api-reference/functions/redirect#server-component
               throw error;
             }
           }}
@@ -75,7 +79,7 @@ export default async function SignInPage(props: {
             required
           />
           <Button
-            className="w-full hover:text-purple-300 ring-purple-400 dark:ring-none hover:shadow-xl hover:ring-2 hover:ring-bg-purple-500  shadow-cyan-700 dark:shadow-none shadow-lg hover:bg-gray-800 dark:hover:bg-white dark:hover:shadow-lg dark:hover:text-purple-800 duration-75"
+            className="w-full hover:text-purple-300 ring-purple-400 dark:ring-none hover:shadow-xl hover:ring-2 hover:ring-bg-purple-500  shadow-cyan-700 dark:shadow-none shadow-lg hover:bg-gray-800 dark:hover:bg-white dark:hover:shadow-lg dark:hover:text-purple-800 duration-75 hover:font-bold"
             type="submit"
           >
             Sign in
@@ -91,9 +95,7 @@ export default async function SignInPage(props: {
               try {
                 // During prototyping period, I'll allow only test accounts.
                 if (true) {
-                  return redirect(
-                    `${SIGNIN_ERROR_URL}?error=PrototypingPeriod`
-                  );
+                  return redirect("/error?error=PrototypingPeriod");
                 }
                 await signIn(provider.id, {
                   redirectTo: params.callbackUrl ?? "",
@@ -103,7 +105,7 @@ export default async function SignInPage(props: {
                 // not existing, or the user not having the correct role.
                 // In some cases, you may want to redirect to a custom error
                 if (error instanceof AuthError) {
-                  return redirect(`${SIGNIN_ERROR_URL}?error=${error.type}`);
+                  return redirect(`/error?error=${error.type}`);
                 }
 
                 // Otherwise if a redirects happens Next.js can handle it
@@ -115,7 +117,7 @@ export default async function SignInPage(props: {
             }}
           >
             <Button
-              className="mt-3 w-full bg-dark-mode-main/85 hover:bg-dark-mode-main/90 dark:shadow-none shadow-cyan-600 shadow-sm dark:bg-light-mode-text-main/90 dark:text-dark-mode-text-main dark:hover:bg-white/20 duration-0"
+              className="mt-3 w-full bg-dark-mode-main/85 hover:bg-dark-mode-main/90 dark:shadow-none shadow-cyan-600 shadow-sm dark:bg-light-mode-text-main/90 dark:text-dark-mode-text-main dark:hover:bg-white/20 duration-0 hover:font-semibold"
               type="submit"
             >
               <div className="flex items-center justify-center w-full gap-2">
