@@ -1,6 +1,8 @@
 <br>
 
-<!-- ![screenshot]() -->
+![Screenshot 2025-04-04 225149](https://github.com/user-attachments/assets/5f7ae117-24ae-4864-9b1c-f029a95a6c23)
+
+<br>
 
 # Cybersecurity Audit Automation
 
