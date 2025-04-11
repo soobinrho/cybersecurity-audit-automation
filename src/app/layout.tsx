@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import { Suspense } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -12,29 +14,29 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const title = 'caa';
-const description = 'Get compliant and get secure.';
-const url = process.env.NODE_ENV === 'development' ? 'http://localhost:3000/' : 'https://caa.Nsustain.com/'
+const title = "caa";
+const description = "Get compliant and get secure.";
+const url =
+  process.env.NODE_ENV === "development"
+    ? "http://localhost:3000/"
+    : "https://caa.Nsustain.com/";
 
 export const metadata: Metadata = {
   metadataBase: new URL(url),
   title: title,
   description: description,
-  category: 'technology',
-  keywords: [
-    'compliance',
-    'security',
-  ],
+  category: "technology",
+  keywords: ["compliance", "security"],
   openGraph: {
     title: title,
     description: description,
     url: url,
     siteName: title,
-    type: 'website',
+    type: "website",
   },
   twitter: {
     title: title,
-    card: 'summary_large_image',
+    card: "summary_large_image",
     description: description,
   },
   robots: {
@@ -46,11 +48,11 @@ export const metadata: Metadata = {
       noimageindex: true,
     },
   },
-  manifest: '/resources/site.webmanifest',
+  manifest: "/resources/site.webmanifest",
   icons: {
-    icon: '/resources/icon.svg',
-    shortcut: '/resources/icon.png',
-    apple: '/resources/icon.png',
+    icon: "/resources/icon.svg",
+    shortcut: "/resources/icon.png",
+    apple: "/resources/icon.png",
   },
 };
 
@@ -60,13 +62,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"></link>
       <link rel="icon" href="/favicon.ico" type="image/x-icon"></link>
+
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <div className="min-h-svh w-full text-light-mode-text-main dark:text-dark-mode-text-main bg-light-mode-main dark:bg-dark-mode-main dark:stroke-dark-mode-svg-main stroke-light-mode-svg-main overflow-x-auto">
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <Suspense >{children}</Suspense>
+          </ThemeProvider>
+        </div>
       </body>
     </html>
   );

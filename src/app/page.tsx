@@ -1,29 +1,17 @@
-import { signIn, signOut } from "@/auth";
+import { auth } from "@/auth";
+import SignOutButton from "@/components/auth/SignOutButton";
+import DarkModeButton from "@/components/DarkModeButton";
+import { redirect } from "next/navigation";
 
-export default function Home() {
-  signIn()
+export default async function Home() {
+  const session = await auth();
+  if (!session) {
+    redirect("/login");
+  }
   return (
-    <>
-      <form
-        action={async () => {
-          "use server"
-          await signIn()
-        }}
-      >
-        <button>Sign In</button>
-      </form>
-      {/* Dashboard */}
-      <form
-        action={async () => {
-          "use server"
-          await signOut()
-        }}
-        className="w-full"
-      >
-        <button>
-          Sign Out
-        </button>
-      </form>
-    </>
+    <div className="min-h-screen w-full">
+      <DarkModeButton />
+      <SignOutButton />
+    </div>
   );
 }
