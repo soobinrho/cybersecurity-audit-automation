@@ -38,6 +38,7 @@ cp .env.local.example .env.local
 pnpm npx auth secret
 
 # Initialize Prisma objects for the database.
+pnpm npx prisma db push --schema ./src/database/prisma/schema.prisma
 pnpm npx prisma generate --schema src/database/prisma/schema.prisma
 
 # Run a dev server.

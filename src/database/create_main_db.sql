@@ -34,7 +34,6 @@ CREATE TABLE organizations (
   org_id TEXT PRIMARY KEY NOT NULL,
   org_name TEXT NOT NULL COLLATE NOCASE,
   org_last_updated_on_caa INTEGER NOT NULL
-                            DEFAULT (unixepoch('now','subsec'))
 );
 
 CREATE TABLE users (
@@ -42,7 +41,6 @@ CREATE TABLE users (
   user_is_mfa_enabled INTEGER NOT NULL
                       CHECK (user_is_mfa_enabled BETWEEN 0 and 1),
   user_last_updated_on_caa INTEGER NOT NULL
-                             DEFAULT (unixepoch('now','subsec'))
 );
 
 CREATE TABLE projects (
@@ -51,8 +49,7 @@ CREATE TABLE projects (
   project_name TEXT NOT NULL COLLATE NOCASE,
   project_is_pitr_enabled INTEGER NOT NULL
                           CHECK (project_is_pitr_enabled BETWEEN 0 and 1),
-  project_last_updated_on_caa INTEGER NOT NULL
-                                DEFAULT (unixepoch('now','subsec')),
+  project_last_updated_on_caa INTEGER NOT NULL,
   FOREIGN KEY(org_id_fk) REFERENCES organizations(org_id)
 );
 
@@ -61,8 +58,7 @@ CREATE TABLE tables (
   table_name TEXT NOT NULL COLLATE NOCASE,
   table_is_rls_enabled INTEGER NOT NULL
                        CHECK (table_is_rls_enabled BETWEEN 0 and 1),
-  table_last_updated_on_caa INTEGER NOT NULL
-                              DEFAULT (unixepoch('now','subsec')),
+  table_last_updated_on_caa INTEGER NOT NULL,
   PRIMARY KEY (project_id_fk, table_name),
   FOREIGN KEY(project_id_fk) REFERENCES projects(project_id)
 );
@@ -81,7 +77,8 @@ CREATE TABLE logs (
   org_id_fk TEXT,
   user_email_fk TEXT,
   project_id_fk TEXT,
-  PRI TEXT NOT NULL,
+  PRI_FACILITY INTEGER NOT NULL,
+  PRI_SEVERITY INTEGER NOT NULL,
   VER INTEGER NOT NULL,
   TIMESTAMP TEXT NOT NULL,
   HOSTNAME TEXT NOT NULL COLLATE NOCASE,
@@ -93,3 +90,12 @@ CREATE TABLE logs (
   FOREIGN KEY(project_id_fk) REFERENCES projects(project_id)
 );
 
+CREATE TABLE client_side_program_api_keys (
+  api_key_id INTEGER PRIMARY KEY NOT NULL,
+  caa_user_id TEXT NOT NULL COLLATE NOCASE,
+  api_key_hashed_value TEXT NOT NULL,
+  api_key_is_active INTEGER NOT NULL
+                    CHECK (api_key_is_active BETWEEN 0 and 1),
+  api_key_time_generated INTEGER NOT NULL,
+  api_key_time_deactivated INTEGER
+);

@@ -7,12 +7,22 @@ datasource db {
   url      = "file:../main.db"
 }
 
+model client_side_program_api_keys {
+  api_key_id               Int    @id @default(autoincrement())
+  caa_user_id            String
+  api_key_hashed_value     String
+  api_key_is_active        Int
+  api_key_time_generated   Int
+  api_key_time_deactivated Int?
+}
+
 model logs {
   log_id        Int            @id @default(autoincrement())
   org_id_fk     String?
   user_email_fk String?
   project_id_fk String?
-  PRI           String
+  PRI_FACILITY  Int
+  PRI_SEVERITY  Int
   VER           Int
   TIMESTAMP     String
   HOSTNAME      String
@@ -37,7 +47,7 @@ model organization_members {
 model organizations {
   org_id                    String                 @id
   org_name                  String
-  org_last_updated_on_caa Int                    @default(dbgenerated("unixepoch('now','subsec')"))
+  org_last_updated_on_caa Int
   logs                      logs[]
   organization_members      organization_members[]
   projects                  projects[]
@@ -48,7 +58,7 @@ model projects {
   org_id_fk                     String?
   project_name                  String
   project_is_pitr_enabled       Int
-  project_last_updated_on_caa Int            @default(dbgenerated("unixepoch('now','subsec')"))
+  project_last_updated_on_caa Int
   logs                          logs[]
   organizations                 organizations? @relation(fields: [org_id_fk], references: [org_id], onDelete: NoAction, onUpdate: NoAction)
   tables                        tables[]
@@ -58,7 +68,7 @@ model tables {
   project_id_fk               String
   table_name                  String
   table_is_rls_enabled        Int
-  table_last_updated_on_caa Int      @default(dbgenerated("unixepoch('now','subsec')"))
+  table_last_updated_on_caa Int
   projects                    projects @relation(fields: [project_id_fk], references: [project_id], onDelete: NoAction, onUpdate: NoAction)
 
   @@id([project_id_fk, table_name])
@@ -67,7 +77,7 @@ model tables {
 model users {
   user_email                 String                 @id
   user_is_mfa_enabled        Int
-  user_last_updated_on_caa Int                    @default(dbgenerated("unixepoch('now','subsec')"))
+  user_last_updated_on_caa Int
   logs                       logs[]
   organization_members       organization_members[]
 }
