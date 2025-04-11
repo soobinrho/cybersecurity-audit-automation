@@ -47,7 +47,7 @@ CREATE TABLE users (
 
 CREATE TABLE projects (
   project_id TEXT PRIMARY KEY NOT NULL,
-  org_id_fk TEXT NOT NULL,
+  org_id_fk TEXT,
   project_name TEXT NOT NULL COLLATE NOCASE,
   project_is_pitr_enabled INTEGER NOT NULL
                           CHECK (project_is_pitr_enabled BETWEEN 0 and 1),
