@@ -24,18 +24,11 @@ if (TEST_LOGIN_PASS && TEST_LOGIN_PASS !== "") {
             return null;
           }
         }
-        const testCredential =
-          process.env.NODE_ENV === "production"
-            ? {
-                id: "eb9f6e29-3862-470c-b5de-bd430b07c9b4",
-                name: "Soobin",
-                email: String(inputCredential.email),
-              }
-            : {
-                id: "4138798a-b55e-44d4-8cd8-8181182eb856",
-                name: "Soobin",
-                email: String(inputCredential.email),
-              };
+        const testCredential = {
+          id: "eb9f6e29-3862-470c-b5de-bd430b07c9b4",
+          name: "Soobin",
+          email: String(inputCredential.email),
+        };
         return testCredential;
       },
     })

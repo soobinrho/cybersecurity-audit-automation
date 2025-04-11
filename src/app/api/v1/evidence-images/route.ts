@@ -189,8 +189,8 @@ export async function POST(req: NextRequest) {
         message: "Error occurred.",
       },
       {
-        status: 400,
-        statusText: "Bad Request",
+        status: 500,
+        statusText: "Internal Server Error",
       }
     );
   }

@@ -15,7 +15,7 @@ export default function NavigationBarLeft() {
     <span className="flex gap-3 md:gap-4 justify-center md:justify-start items-center text-nowrap text-sm md:text-base tracking-tighter md:tracking-tight">
       <Link href="/dashboard" className="flex gap-2 items-center pr-0 md:pr-1">
         <svg
-          className="hidden md:block h-6 **:fill-light-mode-text-main **:dark:fill-gray-400 **:stroke-0 **:opacity-80 **:hover:opacity-100 **:dark:hover:fill-white **:transition-all **:duration-200"
+          className="hidden md:block h-6 **:fill-light-mode-text-main **:dark:fill-gray-400 **:stroke-0 **:opacity-80 **:hover:opacity-100 **:dark:hover:fill-white **:transition-all **:duration-200 active:h-7 transition-all"
           viewBox="0 0 25 26"
           xmlns="http://www.w3.org/2000/svg"
         >
@@ -24,7 +24,7 @@ export default function NavigationBarLeft() {
             fill="#000000"
           />
         </svg>
-        <label className="hidden md:block text-xl font-bold tracking-tight text-light-mode-text-main dark:text-gray-400 opacity-80 hover:opacity-100 dark:hover:drop-shadow-[0_0.2em_1em_rgba(255,255,255,1)] hover:drop-shadow-[0_0.2em_1em_rgba(0,0,0,1)] transition-all duration-200 dark:hover:text-white cursor-pointer">
+        <label className="hidden md:block text-xl font-bold tracking-tight text-light-mode-text-main dark:text-gray-400 opacity-80 hover:opacity-100 dark:hover:drop-shadow-[0_0.2em_1em_rgba(255,255,255,1)] hover:drop-shadow-[0_0.2em_1em_rgba(0,0,0,1)] transition-all duration-200 dark:hover:text-white cursor-pointer active:text-lg">
           caa
         </label>
       </Link>

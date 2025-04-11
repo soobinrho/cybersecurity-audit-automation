@@ -2,6 +2,9 @@ import bcrypt from "bcryptjs";
 import prisma from "./prisma";
 import { Session } from "next-auth";
 
+const API_KEY_IDENTIFICATION_PREFIX = process.env
+  .NEXT_PUBLIC_API_KEY_IDENTIFICATION_PREFIX as string;
+
 export default async function checkAuthenticationForAPI(
   oAuthSession: Session | null,
   authFromAPI: string
@@ -48,7 +51,9 @@ export default async function checkAuthenticationForAPI(
           );
           if (clientSideApiKeys && clientSideApiKeys.client_side_api_key_id) {
             const keyHashedAnswer =
-              clientSideApiKeys?.client_side_api_key_hashed_value;
+              clientSideApiKeys?.client_side_api_key_hashed_value.substring(
+                API_KEY_IDENTIFICATION_PREFIX.length
+              );
             if (await bcrypt.compare(pass, keyHashedAnswer)) {
               const userAuthenticatedID = user;
               const clientSideApiKeyID =

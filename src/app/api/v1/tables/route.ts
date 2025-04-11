@@ -250,10 +250,12 @@ export async function DELETE(req: NextRequest) {
     console.log(err);
     return NextResponse.json(
       {
-        message:
-          "Please use correct URL params to specify which organization_member you'd like to delete.",
+        message: "Error occurred.",
       },
-      { status: 404, statusText: "Not Found" }
+      {
+        status: 500,
+        statusText: "Internal Server Error",
+      }
     );
   }
 }

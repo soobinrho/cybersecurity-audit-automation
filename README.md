@@ -1,25 +1,10 @@
+<br>
+
+![screenshot](https://github.com/user-attachments/assets/a606ba77-e699-49b5-a810-518017e36287)
+
 # caa
 
-TODO: Add a screenshot of the dashboard using https://screenbean.brunnerliv.io/
-
-TODO:
-
-```py
-# Ubuntu
-cd caa-supabase
-sudo apt install python3-full python3-pip
-python -m venv .venv
-.venv/bin/python src/python/caa_supabase_uid_\{USER_UID\}.py
-
-
-# Windows
-# Download:
-#   https://www.python.org/downloads/windows/
-
-# TODO: On Windows, I need to remove Python and test if everything works.
-```
-
-This project's purpose is to help you with compliance and regulations by using various automation technologies, and to do so in a way that does not access, transmit, or store any of your sensitive information, such as your API tokens, GLB data (customer data), or PCI data (card numbers).
+The purpose of this project is to help you with compliance and regulations by using technology we have available today, and to do so in a way that does not access, transmit, or store any of your sensitive information, such as your API tokens, GLB data (customer data), or PCI data (card numbers).
 
 I am in a unique position where I can create a web app that understands the everyday needs of CyberGRC teams (Cybersecurity Governance, Risk, and Compliance) because I'm in one of them.
 
@@ -57,8 +42,6 @@ cd caa-supabase
 # TODO: ...
 ```
 
-[TODO] how I deploy: WAF (Web Application Firewall) in front of the server with url whitelisting so that all packets to non-whitelisted routes are dropped.
-
 <br>
 
 ## Architecture
@@ -66,12 +49,27 @@ cd caa-supabase
 | **_Stack_**    | **_Description_**                                                          |
 | -------------- | -------------------------------------------------------------------------- |
 | **_Server_**   | Hetzner CPX21: Ubuntu, 3 vCPU, 4GB RAM, 80GB SSD                           |
-| **_Database_** | libSQL (SQLite)                                                            |
+| **_Database_** | SQLite, Prisma                                                            |
 | **_Backend_**  | Next.js, Python (used client side for collecting security controls status) |
 | **_Frontend_** | Next.js, Tailwind CSS, TypeScript                                          |
 | **_CDN_**      | Cloudflare (CDN & web application fire wall)                               |
 
 <br>
+
+## API Endpoints
+
+| **Resource**                   | **GET**                   | **POST**                      | **DELETE**                               |
+| ------------------------------ | ------------------------- | ----------------------------- | ---------------------------------------- |
+| `/api/v1/organizations`        | Retrieve all orgs.        | Create or update orgs.        | Delete one or more orgs.                 |
+| `/api/v1/users`                | Retrieve all users.       | Create or update users.       | Delete one or more users.                |
+| `/api/v1/organization_members` | Retrieve all org members. | Create or update org members. | Delete one or more org members.          |
+| `/api/v1/projects`             | Retrieve all projects.    | Create or update projects.    | Delete one or more projects.             |
+| `/api/v1/tables`               | Retrieve all tables.      | Create or update tables.      | Delete one or more tables.               |
+| `/api/v1/logs`                 | Retrieve all logs.        | Push a new record of logs.    | N/A (Logs must not be edited or deleted) |
+
+<br>
+
+<!--
 
 ## Security Controls Supported
 
@@ -102,17 +100,4 @@ cd caa-supabase
 
 It's possible to query for security controls using API's, but I decided to not go this route so that all credentials stay in the user's hands and never leave their environment.
 
-<br>
-
-## API Endpoints
-
-| **Resource**                   | **GET**                   | **POST**                      | **DELETE**                               |
-| ------------------------------ | ------------------------- | ----------------------------- | ---------------------------------------- |
-| `/api/v1/organizations`        | Retrieve all orgs.        | Create or update orgs.        | Delete one or more orgs.                 |
-| `/api/v1/users`                | Retrieve all users.       | Create or update users.       | Delete one or more users.                |
-| `/api/v1/organization_members` | Retrieve all org members. | Create or update org members. | Delete one or more org members.          |
-| `/api/v1/projects`             | Retrieve all projects.    | Create or update projects.    | Delete one or more projects.             |
-| `/api/v1/tables`               | Retrieve all tables.      | Create or update tables.      | Delete one or more tables.               |
-| `/api/v1/logs`                 | Retrieve all logs.        | Push a new record of logs.    | N/A (Logs must not be edited or deleted) |
-
-<br>
+-->

@@ -36,6 +36,11 @@
 -- Prisma code by re-running `pnpm npx prisma generate --schema=...`
 -- Source:
 --   https://www.prisma.io/docs/orm/prisma-client/setup-and-configuration/introduction#5-evolving-your-application
+
+-- TODO: There's high likelihood of collision because of user_email being the id.
+-- If two or more caa users encounter a single person in both organizations,
+-- my web app will crash. Gotta change the primary key of users to its default integer auto increment.
+-- For now, that likelihood is extremely low as it's just a prototype.
 CREATE TABLE organizations (
   caa_user_id TEXT NOT NULL COLLATE NOCASE,
   org_id TEXT PRIMARY KEY NOT NULL,
