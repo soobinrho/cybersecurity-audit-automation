@@ -18,26 +18,58 @@ export default function Sidebar(props: props) {
     <div className={`${className}` + " " + "hidden md:block py-4 md:py-4"}>
       {isDashboard ? (
         <div>
-          <SidebarHeaderTwo href="/dashboard">Dashboard</SidebarHeaderTwo>
-          <div className="flex flex-col leading-6 gap-0.5 w-full h-full px-0.5">
-            <SidebarItem href="/dashboard">Getting Started</SidebarItem>
-            <SidebarItem href="/dashboard/security-controls/mfa">
-              MFA
+          <SidebarHeaderTwo href="/dashboard/supabase">
+            Supabase
+          </SidebarHeaderTwo>
+          <div className="flex flex-col leading-6 gap-0.5 w-full h-full px-0.5 pb-4">
+            <SidebarItem href="/dashboard/supabase/getting-started">
+              Getting Started
             </SidebarItem>
-            <SidebarItem href="/dashboard/security-controls/pitr">
-              PITR
-            </SidebarItem>
-            <SidebarItem href="/dashboard/security-controls/rls">
-              RLS
-            </SidebarItem>
-            <SidebarItem href="/dashboard/security-controls/evidence-images">
+            <SidebarItem href="/dashboard/supabase/mfa">MFA</SidebarItem>
+            <SidebarItem href="/dashboard/supabase/pitr">PITR</SidebarItem>
+            <SidebarItem href="/dashboard/supabase/rls">RLS</SidebarItem>
+            <SidebarItem href="/dashboard/supabase/evidence-images">
               Evidence Images
             </SidebarItem>
-            <SidebarItem href="/dashboard/security-controls/audit-logs">
+            <SidebarItem href="/dashboard/supabase/audit-logs">
               Audit Logs
             </SidebarItem>
           </div>
-          <div className="pb-4"></div>
+
+          <SidebarHeaderTwo href="/dashboard/aws">AWS</SidebarHeaderTwo>
+          <div className="flex flex-col leading-6 gap-0.5 w-full h-full px-0.5 pb-4">
+            <SidebarItem href="/dashboard/aws/getting-started">
+              Getting Started
+            </SidebarItem>
+          </div>
+
+          <SidebarHeaderTwo href="/dashboard/gcp">GCP</SidebarHeaderTwo>
+          <div className="flex flex-col leading-6 gap-0.5 w-full h-full px-0.5 pb-4">
+            <SidebarItem href="/dashboard/gcp/getting-started">
+              Getting Started
+            </SidebarItem>
+          </div>
+
+          <SidebarHeaderTwo href="/dashboard/azure">Azure</SidebarHeaderTwo>
+          <div className="flex flex-col leading-6 gap-0.5 w-full h-full px-0.5 pb-4">
+            <SidebarItem href="/dashboard/azure/getting-started">
+              Getting Started
+            </SidebarItem>
+          </div>
+
+          <SidebarHeaderTwo href="/dashboard/hetzner">Hetzner</SidebarHeaderTwo>
+          <div className="flex flex-col leading-6 gap-0.5 w-full h-full px-0.5 pb-4">
+            <SidebarItem href="/dashboard/hetzner/getting-started">
+              Getting Started
+            </SidebarItem>
+          </div>
+
+          <SidebarHeaderTwo href="/dashboard/vercel">Vercel</SidebarHeaderTwo>
+          <div className="flex flex-col leading-6 gap-0.5 w-full h-full px-0.5 pb-4">
+            <SidebarItem href="/dashboard/vercel/getting-started">
+              Getting Started
+            </SidebarItem>
+          </div>
         </div>
       ) : (
         <></>

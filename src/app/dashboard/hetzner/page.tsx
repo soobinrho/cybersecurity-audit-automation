@@ -1,10 +1,10 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 
-export default async function App() {
+export default async function Page() {
   const session = await auth();
   if (!session) {
     redirect("/login");
   }
-  redirect("/dashboard/supabase");
+  redirect("/dashboard/hetzner/getting-started");
 }

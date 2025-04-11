@@ -6,5 +6,5 @@ export default async function App() {
   if (!session) {
     redirect("/login");
   }
-  redirect("/dashboard");
+  redirect("/dashboard/supabase/getting-started");
 }

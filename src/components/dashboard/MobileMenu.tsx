@@ -25,43 +25,109 @@ export default function MobileMenu() {
       <DrawerContent>
         <DrawerHeader className="text-center">
           <div className="flex flex-col gap-3">
-            <Link href="/dashboard">
+            <Link href="/dashboard/supabase">
               <DrawerClose>
-                <DrawerTitle>Dashboard</DrawerTitle>
+                <DrawerTitle>Supabase</DrawerTitle>
               </DrawerClose>
             </Link>
             <div className="flex flex-col gap-3 mb-3">
               <DrawerDescription>
-                <Link href="/dashboard">
+                <Link href="/dashboard/supabase/getting-started">
                   <DrawerClose>Getting Started</DrawerClose>
                 </Link>
               </DrawerDescription>
               <DrawerDescription>
-                <Link href="/dashboard/security-controls/mfa">
+                <Link href="/dashboard/supabase/mfa">
                   <DrawerClose>MFA</DrawerClose>
                 </Link>
               </DrawerDescription>
               <DrawerDescription>
-                <Link href="/dashboard/security-controls/pitr">
+                <Link href="/dashboard/supabase/pitr">
                   <DrawerClose>PITR</DrawerClose>
                 </Link>
               </DrawerDescription>
               <DrawerDescription>
-                <Link href="/dashboard/security-controls/rls">
+                <Link href="/dashboard/supabase/rls">
                   <DrawerClose>RLS</DrawerClose>
                 </Link>
               </DrawerDescription>
               <DrawerDescription>
-                <Link href="/dashboard/security-controls/evidence-images">
+                <Link href="/dashboard/supabase/evidence-images">
                   <DrawerClose>Evidence Images</DrawerClose>
                 </Link>
               </DrawerDescription>
               <DrawerDescription>
-                <Link href="/dashboard/security-controls/audit-logs">
+                <Link href="/dashboard/supabase/audit-logs">
                   <DrawerClose>Audit Logs</DrawerClose>
                 </Link>
               </DrawerDescription>
             </div>
+
+            <Link href="/dashboard/aws">
+              <DrawerClose>
+                <DrawerTitle>AWS</DrawerTitle>
+              </DrawerClose>
+            </Link>
+            <div className="flex flex-col gap-3 mb-3">
+              <DrawerDescription>
+                <Link href="/dashboard/aws/getting-started">
+                  <DrawerClose>Getting Started</DrawerClose>
+                </Link>
+              </DrawerDescription>
+            </div>
+
+            <Link href="/dashboard/gcp">
+              <DrawerClose>
+                <DrawerTitle>GCP</DrawerTitle>
+              </DrawerClose>
+            </Link>
+            <div className="flex flex-col gap-3 mb-3">
+              <DrawerDescription>
+                <Link href="/dashboard/gcp/getting-started">
+                  <DrawerClose>Getting Started</DrawerClose>
+                </Link>
+              </DrawerDescription>
+            </div>
+
+            <Link href="/dashboard/azure">
+              <DrawerClose>
+                <DrawerTitle>Azure</DrawerTitle>
+              </DrawerClose>
+            </Link>
+            <div className="flex flex-col gap-3 mb-3">
+              <DrawerDescription>
+                <Link href="/dashboard/azure/getting-started">
+                  <DrawerClose>Getting Started</DrawerClose>
+                </Link>
+              </DrawerDescription>
+            </div>
+
+            <Link href="/dashboard/hetzner">
+              <DrawerClose>
+                <DrawerTitle>Hetzner</DrawerTitle>
+              </DrawerClose>
+            </Link>
+            <div className="flex flex-col gap-3 mb-3">
+              <DrawerDescription>
+                <Link href="/dashboard/hetzner/getting-started">
+                  <DrawerClose>Getting Started</DrawerClose>
+                </Link>
+              </DrawerDescription>
+            </div>
+
+            <Link href="/dashboard/vercel">
+              <DrawerClose>
+                <DrawerTitle>Vercel</DrawerTitle>
+              </DrawerClose>
+            </Link>
+            <div className="flex flex-col gap-3 mb-3">
+              <DrawerDescription>
+                <Link href="/dashboard/vercel/getting-started">
+                  <DrawerClose>Getting Started</DrawerClose>
+                </Link>
+              </DrawerDescription>
+            </div>
+
             <Link href="/dashboard/chat">
               <DrawerClose>
                 <DrawerTitle>LLM for Security</DrawerTitle>
@@ -74,6 +140,7 @@ export default function MobileMenu() {
                 </Link>
               </DrawerDescription>
             </div>
+
             <a
               target="_blank"
               href="https://github.com/soobinrho/cybersecurity-audit-automation"
