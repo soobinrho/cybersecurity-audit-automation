@@ -2,7 +2,7 @@ import prisma from "@/lib/prisma";
 
 export async function getUsers(userAuthenticatedID: string | undefined) {
   if (!userAuthenticatedID) {
-    return [];
+    return null;
   }
   const results = await prisma.users.findMany({
     where: {

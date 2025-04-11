@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
     // Proceed if authenticated.
     const userAuthenticatedID = authResults.userAuthenticatedID;
     const results = await getTables(userAuthenticatedID);
-    if (results.length > 0) {
+    if (results) {
       return NextResponse.json(results, {
         status: 200,
         statusText: "OK",

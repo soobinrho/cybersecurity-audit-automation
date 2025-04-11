@@ -51,9 +51,8 @@ export default async function DashboardPage() {
         <section className="pb-4">
           <h3 className="font-semibold pb-2">3. Results 🎉</h3>
           Now, all your security controls status, remediation action flow
-          results, and logs are available in your dashboard. MFA, PITR, RLS, and
-          logs are updated every 1 second. The evidence images page is updated
-          only when you refresh your page.
+          results, and logs are available in your dashboard, updated in real
+          time (refetch every 1 second).
           <div className="flex flex-col md:flex-row gap-2 flex-wrap pt-4">
             <Link href="/dashboard/security-controls/mfa">
               <Button className="active:bg-foreground/10" variant={"default"}>

@@ -14,5 +14,6 @@ export const useLogsQuery = () => {
     refetchOnMount: true,
     refetchOnReconnect: "always",
     refetchInterval: 1000,
+    staleTime: 1000 * 60 * 5,
   });
 };

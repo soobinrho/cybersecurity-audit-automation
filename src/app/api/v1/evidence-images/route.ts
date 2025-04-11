@@ -4,7 +4,8 @@ import prisma from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { auth } from "@/auth";
 import checkAuthenticationForAPI from "@/lib/checkAuthenticationForAPI";
-import { getEvidenceImages } from "@/lib/getEvidenceImages";
+import { getEvidenceImagesMetadata } from "@/lib/getEvidenceImagesMetadata";
+import { getEvidenceImageBlob } from "@/lib/getEvidenceImageBlob";
 
 export async function GET(req: NextRequest) {
   try {
@@ -26,13 +27,32 @@ export async function GET(req: NextRequest) {
 
     // Proceed if authenticated.
     const userAuthenticatedID = authResults.userAuthenticatedID;
-    const results = await getEvidenceImages(userAuthenticatedID);
-    if (results.length > 0) {
-      return NextResponse.json(results, {
-        status: 200,
-        statusText: "OK",
-      });
+    const evidence_image_id = req.nextUrl.searchParams.get("evidence_image_id");
+    let results;
+    if (evidence_image_id && parseInt(evidence_image_id) > 0) {
+      results = await getEvidenceImageBlob(
+        userAuthenticatedID,
+        parseInt(evidence_image_id)
+      );
+      if (results) {
+        return new Response(results.evidence_image_blob, {
+          headers: {
+            "Content-Type": "image/png",
+          },
+          status: 200,
+          statusText: "OK",
+        });
+      }
     } else {
+      results = await getEvidenceImagesMetadata(userAuthenticatedID);
+      if (results) {
+        return NextResponse.json(results, {
+          status: 200,
+          statusText: "OK",
+        });
+      }
+    }
+    if (!results) {
       return new Response(null, {
         status: 204,
       });

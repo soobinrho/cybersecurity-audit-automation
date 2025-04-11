@@ -9,6 +9,7 @@ import { getFormattedTimeFromEpoch } from "@/lib/getFormattedTimeFromEpoch";
 import { VisibilityState } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import useEvidenceImagesQuery from "@/hooks/useEvidenceImagesQuery";
+import useEvidenceImageBlobQuery from "@/hooks/useEvidenceImageBlob";
 
 export const columns: ColumnDef<evidence_images>[] = [
   {
@@ -88,15 +89,40 @@ export const columns: ColumnDef<evidence_images>[] = [
   {
     accessorKey: "evidence_image_blob",
     header: "Image File",
-    cell: ({ cell }) => {
-      const data = new Blob([cell.getValue() as string], {
-        type: "image/png",
-      });
-      const url = URL.createObjectURL(data);
+    cell: function useEvidenceImageBlob({ cell }) {
+      const { data, error, isLoading } = useEvidenceImageBlobQuery(
+        cell.getContext().row.original.evidence_image_id as number
+      );
       return (
-        <Button variant="outline" onClick={() => window.open(url, "_blank")}>
-          View
-        </Button>
+        <>
+          {isLoading ? (
+            <Button variant="outline" disabled>
+              <div className="flex gap-1">
+                <div className="w-0.5 h-0.5 bg-primary/40 rounded-full animate-bounce" />
+                <div className="w-0.5 h-0.5 bg-primary/40 rounded-full animate-bounce [animation-delay:0.2s]" />
+                <div className="w-0.5 h-0.5 bg-primary/40 rounded-full animate-bounce [animation-delay:0.4s]" />
+              </div>
+            </Button>
+          ) : (
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (data) {
+                  const image = data;
+                  const url = URL.createObjectURL(image);
+                  window.open(url, "_blank");
+                }
+              }}
+            >
+              View
+            </Button>
+          )}
+          {error && (
+            <Button variant="outline" disabled>
+              Error
+            </Button>
+          )}
+        </>
       );
     },
     enableSorting: false,

@@ -4,7 +4,7 @@ export async function getOrganizations(
   userAuthenticatedID: string | undefined
 ) {
   if (!userAuthenticatedID) {
-    return [];
+    return null;
   }
   const results = await prisma.organizations.findMany({
     where: {

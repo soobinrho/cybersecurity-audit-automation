@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { Metadata } from "next";
-import { getEvidenceImages } from "@/lib/getEvidenceImages";
+import { getEvidenceImagesMetadata } from "@/lib/getEvidenceImagesMetadata";
 import EvidenceImagesTable from "@/components/dashboard/EvidenceImagesTable";
 import {
   HydrationBoundary,
@@ -23,8 +23,8 @@ export default async function EvidenceImagesPage() {
   const authentiactedUserId = session.user?.id as string;
   const queryClient = new QueryClient();
   await queryClient.prefetchQuery({
-    queryKey: ["evidence-images"],
-    queryFn: () => getEvidenceImages(authentiactedUserId),
+    queryKey: ["evidence-images-metadata"],
+    queryFn: () => getEvidenceImagesMetadata(authentiactedUserId),
   });
   return (
     <ScrollArea>
