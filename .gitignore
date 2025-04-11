@@ -59,3 +59,6 @@ _test*.json
 src/python/**/*.png
 src/python/**/*.jpeg
 src/python/**/*.jpg
+
+# Database files must be local and not indexed by git
+*.db

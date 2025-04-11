@@ -133,7 +133,7 @@ def get_findings_summary_string(list_findings):
     return str_findings_summary
 
 
-def print_info(str_info, org_id='', user_email='', project_id='', table_name=''):
+def print_info(str_info, org_id='', user_email='', project_id=''):
     if not is_quiet_on:
         # Green background color.
         print('\x1b[6;30;42m' + str_info + '\x1b[0m')
@@ -143,7 +143,6 @@ def print_info(str_info, org_id='', user_email='', project_id='', table_name='')
     request_rest_api(dict_payload={'org_id_fk': org_id,
                                    'user_email_fk': user_email,
                                    'project_id_fk': project_id,
-                                   'table_name_fk': table_name,
                                    'PRI': '<23.6>',
                                    'VER': '1',
                                    # This is UTC.
@@ -152,7 +151,7 @@ def print_info(str_info, org_id='', user_email='', project_id='', table_name='')
                                    'APPNAME': f'{APP_NAME}_secured_by_caa',
                                    'PROCID': f'{os.path.realpath(__file__).replace(' ', '_')}',
                                    'MSG': str_info},
-                     table_name='logs',
+                     db_table_name='logs',
                      route_url='api/v1/logs',
                      http_method='POST')
 
@@ -162,7 +161,7 @@ def print_debug(str_debug, *args):
         print(str_debug, *args)
 
 
-def print_error(str_error, org_id='', user_email='', project_id='', table_name=''):
+def print_error(str_error, org_id='', user_email='', project_id=''):
     if not is_quiet_on:
         # Yellow background color.
         print('\x1b[6;30;43m' + str_error + '\x1b[0m')
@@ -172,7 +171,6 @@ def print_error(str_error, org_id='', user_email='', project_id='', table_name='
     request_rest_api(dict_payload={'org_id_fk': org_id,
                                    'user_email_fk': user_email,
                                    'project_id_fk': project_id,
-                                   'table_name_fk': table_name,
                                    'PRI': '<23.3>',
                                    'VER': '1',
                                    # This is UTC.
@@ -181,12 +179,12 @@ def print_error(str_error, org_id='', user_email='', project_id='', table_name='
                                    'APPNAME': f'{APP_NAME}_secured_by_caa',
                                    'PROCID': f'{os.path.realpath(__file__).replace(' ', '_')}',
                                    'MSG': str_error},
-                     table_name='logs',
+                     db_table_name='logs',
                      route_url='api/v1/logs',
                      http_method='POST')
 
 
-def print_finding(str_finding, org_id='', user_email='', project_id='', table_name=''):
+def print_finding(str_finding, org_id='', user_email='', project_id=''):
     if not is_quiet_on:
         # Yellow background color.
         print('\x1b[6;30;43m' + str_finding + '\x1b[0m')
@@ -196,7 +194,6 @@ def print_finding(str_finding, org_id='', user_email='', project_id='', table_na
     request_rest_api(dict_payload={'org_id_fk': org_id,
                                    'user_email_fk': user_email,
                                    'project_id_fk': project_id,
-                                   'table_name_fk': table_name,
                                    'PRI': '<23.2>',
                                    'VER': '1',
                                    # This is UTC.
@@ -205,7 +202,7 @@ def print_finding(str_finding, org_id='', user_email='', project_id='', table_na
                                    'APPNAME': f'{APP_NAME}_secured_by_caa',
                                    'PROCID': f'{os.path.realpath(__file__).replace(' ', '_')}',
                                    'MSG': str_finding},
-                     table_name='logs',
+                     db_table_name='logs',
                      route_url='api/v1/logs',
                      http_method='POST')
 
@@ -406,7 +403,7 @@ def test_supabase_action_flow_core():
     request_rest_api(dict_payload={'org_id': list_org_id,
                                    'org_name': list_org_name,
                                    'org_last_updated_on_caa': [int(time.time())] * len(list_org_id)},
-                     table_name='organizations',
+                     db_table_name='organizations',
                      route_url='api/v1/organizations',
                      http_method='POST')
 
@@ -490,13 +487,13 @@ def test_supabase_action_flow_core():
     request_rest_api(dict_payload={'user_email': list_user_email,
                                    'user_is_mfa_enabled': list_user_is_mfa_enabled,
                                    'user_last_updated_on_caa': [int(time.time())] * len(list_user_email)},
-                     table_name='users',
+                     db_table_name='users',
                      route_url='api/v1/users',
                      http_method='POST')
     request_rest_api(dict_payload={'org_id_fk': list_org_member_org_id_fk,
                                    'user_email_fk': list_org_member_user_email_fk,
                                    'org_member_role': list_org_member_role},
-                     table_name='organization_members',
+                     db_table_name='organization_members',
                      route_url='api/v1/organization-members',
                      http_method='POST')
 
@@ -597,7 +594,7 @@ def test_supabase_action_flow_core():
                                    'project_name': list_project_name,
                                    'project_is_pitr_enalbed': list_project_is_pitr_enabled,
                                    'project_last_updated_on_caa': [int(time.time())] * len(list_project_id)},
-                     table_name='projects',
+                     db_table_name='projects',
                      route_url='api/v1/projects',
                      http_method='POST')
 
@@ -648,7 +645,7 @@ def test_supabase_action_flow_core():
                 if not table_is_rls_enabled and not NAME_RLS in list_findings_discovered:
                     list_findings_discovered.append(NAME_RLS)
                     print_finding(
-                        f"[FINDING] The table '{table_name}' ({project_name}) does not have {NAME_RLS} enabled.", project_id=project_id, table_name=table_name)
+                        f"[FINDING] The table '{table_name}' ({project_name}) does not have {NAME_RLS} enabled.", project_id=project_id)
 
                 list_table_project_id_fk.append(project_id)
                 list_table_name.append(table_name)
@@ -662,7 +659,7 @@ def test_supabase_action_flow_core():
                                    'table_name': list_table_name,
                                    'table_is_rls_enabled': list_table_is_rls_enabled,
                                    'table_last_updated_on_caa': [int(time.time())] * len(list_table_name)},
-                     table_name='tables',
+                     db_table_name='tables',
                      route_url='api/v1/tables',
                      http_method='POST')
 
@@ -840,7 +837,7 @@ def test_supabase_action_flow_core():
                                 rls_button = rls_status_button_outer_element.get_by_text(
                                     'Disable RLS').first.wait_for(state='visible')
                                 print_info(f"[INFO] {NAME_RLS} has successfully been enabled for the table {table_name}.",
-                                           project_id=table_project_id_fk, table_name=table_name)
+                                           project_id=table_project_id_fk)
                                 list_updated_table_project_id_fk.append(
                                     table_project_id_fk)
                                 list_updated_table_name.append(table_name)
@@ -848,7 +845,7 @@ def test_supabase_action_flow_core():
 
                             except:
                                 print_error(f"[ERROR] {NAME_RLS} couldn't be enabled for the table {table_name}. Please check the logs and contact us <{VELDE_EMAIL}>.",
-                                            project_id=table_project_id_fk, table_name=table_name)
+                                            project_id=table_project_id_fk)
                                 is_all_rls_remediated = False
 
         if is_all_rls_remediated:
@@ -864,7 +861,7 @@ def test_supabase_action_flow_core():
                                        'table_name': list_updated_table_name,
                                        'table_is_rls_enabled': list_updated_table_is_rls_enabled,
                                        'table_last_updated_on_caa': [int(time.time())] * len(list_updated_table_project_id_fk)},
-                         table_name='tables',
+                         db_table_name='tables',
                          route_url='api/v1/tables',
                          http_method='PUT')
 
