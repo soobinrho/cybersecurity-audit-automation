@@ -9,7 +9,7 @@ export default async function Home() {
     redirect("/login");
   }
   return (
-    <div className="min-h-screen w-full">
+    <div className="min-h-lvh w-full">
       <DarkModeButton />
       <SignOutButton />
     </div>

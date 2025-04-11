@@ -6,7 +6,7 @@ export default function AuthErrorPage() {
   const error = (useSearchParams()).get("error")
 
   return (
-    <div className="flex h-lvh w-full flex-col items-center justify-center">
+    <div className="flex min-h-lvh w-full flex-col items-center justify-center">
       <Link
         href="/"
         className="block w-xs rounded-lg border border-gray-200 bg-white p-6 text-center shadow dark:border-gray-600 dark:bg-dark-mode-menu dark:hover:bg-dark-mode-menu/30 dark:hover:border-gray-500"
