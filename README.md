@@ -62,7 +62,6 @@ Set up an HTTPS certificate using Certbot.
 Before running in Letsencrypt's prod server, test in the staging server first like this:
 
 ```bash
-cd cybersecurity-audit-automation
 docker compose exec nginx certbot certonly --text --non-interactive \
   --agree-tos --verbose --keep-until-expiring --webroot \
   --webroot-path /var/www/letsencrypt/ \
@@ -76,7 +75,6 @@ docker compose exec nginx certbot certonly --text --non-interactive \
 After you pass the tests in the staging server, issue the certs in prod.
 
 ```bash
-cd cybersecurity-audit-automation
 docker compose exec nginx certbot certonly --text --non-interactive \
   --agree-tos --verbose --keep-until-expiring --webroot \
   --webroot-path /var/www/letsencrypt/ \
@@ -91,7 +89,6 @@ Finally, switch out the `nginx.conf`.
 The first one runs in HTTP, while the new one directs all traffic to HTTPS.
 
 ```bash
-cd cybersecurity-audit-automation
 cp docker/nginx.conf.afterCertbot docker/nginx.conf
 ```
 
@@ -99,11 +96,13 @@ This is not a required step, but I also prefer to set up a cron job so that the 
 
 ```bash
 # Example:
+sudo chmod +x docker/certbot_runner
 sudo ln -s /home/soobinrho/git/cybersecurity-audit-automation/docker/certbot_runner /etc/cron.daily/certbot_runner
 
 # Also, Docker stores various temporary files, such as filesystem layers at
 # `/var/lib/docker/overlay2`, and this can grow fast -- e.g. 70GB in a week.
 # So, set up a cron job to clean this daily.
+sudo chmod +x docker/docker_prune_runner
 sudo ln -s /home/soobinrho/git/cybersecurity-audit-automation/docker/docker_prune_runner /etc/cron.daily/docker_prune_runner
 ```
 
@@ -116,7 +115,9 @@ sudo ln -s /home/soobinrho/git/cybersecurity-audit-automation/docker/docker_prun
 ```bash
 # First, ssh into the server.
 ssh cybersecurity-audit-automation
-cd cybersecurity-audit-automation
+
+# Pull the latest version of the source code.
+cd ~/git/cybersecurity-audit-automation
 git pull
 
 # Rebuild the docker image and redeploy.
