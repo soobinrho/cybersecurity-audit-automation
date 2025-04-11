@@ -2,10 +2,30 @@ import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
+import checkAuthenticationForAPI from "@/lib/checkAuthenticationForAPI";
+import { auth } from "@/auth";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    const users = await prisma.users.findMany();
+    // Check authentication.
+    const oAuthSession = await auth();
+    const clientSideAuthForAPI = req.headers.get("authorization");
+    const userAuthenticatedID = await checkAuthenticationForAPI(oAuthSession, clientSideAuthForAPI);
+    if (!userAuthenticatedID || userAuthenticatedID === '') {
+      return NextResponse.json(
+        {
+          message: "Authentication failed.",
+        },
+        { status: 401, statusText: "Unauthorized" }
+      );
+    }
+
+    // Proceed if authenticated.
+    const users = await prisma.users.findMany({
+      where: {
+        caa_user_id: userAuthenticatedID,
+      }
+    });
     return NextResponse.json(users, { status: 200, statusText: "OK" });
   } catch (err) {
     console.log(err);
@@ -18,11 +38,27 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   const array_user: Array<Prisma.usersCreateInput> = [];
+  let userAuthenticatedID = '';
   try {
+    // Check authentication.
+    const oAuthSession = await auth();
+    const clientSideAuthForAPI = req.headers.get("authorization");
+    userAuthenticatedID = await checkAuthenticationForAPI(oAuthSession, clientSideAuthForAPI);
+    if (!userAuthenticatedID) {
+      return NextResponse.json(
+        {
+          message: "Authentication failed.",
+        },
+        { status: 401, statusText: "Unauthorized" }
+      );
+    }
+ 
+    // Proceed if authenticated.
     const req_payload = await req.json();
     for (const json_req of req_payload) {
       const user: Prisma.usersCreateInput = {
         user_email: json_req["user_email"],
+        caa_user_id: userAuthenticatedID,
         user_is_mfa_enabled: json_req["user_is_mfa_enabled"],
         user_last_updated_on_caa: json_req["user_last_updated_on_caa"],
       };
@@ -48,6 +84,7 @@ export async function POST(req: NextRequest) {
         },
         create: {
           user_email: user["user_email"],
+          caa_user_id: userAuthenticatedID,
           user_is_mfa_enabled: user["user_is_mfa_enabled"],
           user_last_updated_on_caa: user["user_last_updated_on_caa"],
         },
@@ -73,14 +110,45 @@ export async function POST(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   const params = req.nextUrl.searchParams;
+  let userAuthenticatedID = '';
   try {
+    // Check authentication.
+    const oAuthSession = await auth();
+    const clientSideAuthForAPI = req.headers.get("authorization");
+    userAuthenticatedID = await checkAuthenticationForAPI(oAuthSession, clientSideAuthForAPI);
+    if (!userAuthenticatedID) {
+      return NextResponse.json(
+        {
+          message: "Authentication failed.",
+        },
+        { status: 401, statusText: "Unauthorized" }
+      );
+    }
+ 
+    // Proceed if authenticated.
     const delete_all = params.get("delete_all")?.toLowerCase();
     if (delete_all === "true") {
-      const deleteTables = prisma.tables.deleteMany();
-      const deleteProjects = prisma.projects.deleteMany();
+      const deleteTables = prisma.tables.deleteMany({
+        where: {
+          caa_user_id: userAuthenticatedID,
+        }
+      });
+      const deleteProjects = prisma.projects.deleteMany({
+        where: {
+          caa_user_id: userAuthenticatedID,
+        }
+      });
       const deleteOrganizationMembers =
-        prisma.organization_members.deleteMany();
-      const deleteUsers = prisma.users.deleteMany();
+        prisma.organization_members.deleteMany({
+        where: {
+          caa_user_id: userAuthenticatedID,
+        }
+      });
+      const deleteUsers = prisma.users.deleteMany({
+        where: {
+          caa_user_id: userAuthenticatedID,
+        }
+      });
       const transaction = await prisma.$transaction([
         deleteTables,
         deleteProjects,
@@ -109,6 +177,7 @@ export async function DELETE(req: NextRequest) {
       const deleteUser = await prisma.users.delete({
         where: {
           user_email: user_email,
+          caa_user_id: userAuthenticatedID,
         },
       });
 

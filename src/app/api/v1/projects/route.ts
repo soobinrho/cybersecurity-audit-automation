@@ -2,10 +2,30 @@ import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
+import checkAuthenticationForAPI from "@/lib/checkAuthenticationForAPI";
+import { auth } from "@/auth";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    const projects = await prisma.projects.findMany();
+    // Check authentication.
+    const oAuthSession = await auth();
+    const clientSideAuthForAPI = req.headers.get("authorization");
+    const userAuthenticatedID = await checkAuthenticationForAPI(oAuthSession, clientSideAuthForAPI);
+    if (!userAuthenticatedID || userAuthenticatedID === '') {
+      return NextResponse.json(
+        {
+          message: "Authentication failed.",
+        },
+        { status: 401, statusText: "Unauthorized" }
+      );
+    }
+
+    // Proceed if authenticated.
+    const projects = await prisma.projects.findMany({
+      where: {
+        caa_user_id: userAuthenticatedID,
+      }
+    });
     return NextResponse.json(projects, { status: 200, statusText: "OK" });
   } catch (err) {
     console.log(err);
@@ -18,11 +38,27 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   const array_projects: Array<Prisma.projectsCreateInput> = [];
+  let userAuthenticatedID = '';
   try {
+    // Check authentication.
+    const oAuthSession = await auth();
+    const clientSideAuthForAPI = req.headers.get("authorization");
+    userAuthenticatedID = await checkAuthenticationForAPI(oAuthSession, clientSideAuthForAPI);
+    if (!userAuthenticatedID) {
+      return NextResponse.json(
+        {
+          message: "Authentication failed.",
+        },
+        { status: 401, statusText: "Unauthorized" }
+      );
+    }
+ 
+    // Proceed if authenticated.
     const req_payload = await req.json();
     for (const json_req of req_payload) {
       const project: Prisma.projectsCreateInput = {
         project_id: json_req["project_id"],
+        caa_user_id: userAuthenticatedID,
         organizations: json_req["org_id_fk"],
         project_name: json_req["project_name"],
         project_is_pitr_enabled: json_req["project_is_pitr_enabled"],
@@ -54,6 +90,7 @@ export async function POST(req: NextRequest) {
         },
         create: {
           project_id: project["project_id"],
+          caa_user_id: userAuthenticatedID,
           org_id_fk: String(project["organizations"]),
           project_name: project["project_name"],
           project_is_pitr_enabled: project["project_is_pitr_enabled"],
@@ -82,11 +119,34 @@ export async function POST(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   const params = req.nextUrl.searchParams;
+  let userAuthenticatedID = '';
   try {
+    // Check authentication.
+    const oAuthSession = await auth();
+    const clientSideAuthForAPI = req.headers.get("authorization");
+    userAuthenticatedID = await checkAuthenticationForAPI(oAuthSession, clientSideAuthForAPI);
+    if (!userAuthenticatedID) {
+      return NextResponse.json(
+        {
+          message: "Authentication failed.",
+        },
+        { status: 401, statusText: "Unauthorized" }
+      );
+    }
+ 
+    // Proceed if authenticated.
     const delete_all = params.get("delete_all")?.toLowerCase();
     if (delete_all === "true") {
-      const deleteTables = prisma.tables.deleteMany();
-      const deleteProjects = prisma.projects.deleteMany();
+      const deleteTables = prisma.tables.deleteMany({
+        where: {
+          caa_user_id: userAuthenticatedID,
+        }
+      });
+      const deleteProjects = prisma.projects.deleteMany({
+        where: {
+          caa_user_id: userAuthenticatedID,
+        }
+      });
       const transaction = await prisma.$transaction([
         deleteTables,
         deleteProjects,
@@ -113,6 +173,7 @@ export async function DELETE(req: NextRequest) {
       const deleteProject = await prisma.projects.delete({
         where: {
           project_id: project_id,
+          caa_user_id: userAuthenticatedID,
         },
       });
 

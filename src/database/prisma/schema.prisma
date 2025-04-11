@@ -18,6 +18,7 @@ model client_side_program_api_keys {
 
 model logs {
   log_id        Int            @id @default(autoincrement())
+  caa_user_id String
   org_id_fk     String?
   user_email_fk String?
   project_id_fk String?
@@ -37,6 +38,7 @@ model logs {
 model organization_members {
   org_id_fk       String
   user_email_fk   String
+  caa_user_id   String
   org_member_role String
   users           users         @relation(fields: [user_email_fk], references: [user_email], onDelete: NoAction, onUpdate: NoAction)
   organizations   organizations @relation(fields: [org_id_fk], references: [org_id], onDelete: NoAction, onUpdate: NoAction)
@@ -46,6 +48,7 @@ model organization_members {
 
 model organizations {
   org_id                    String                 @id
+  caa_user_id             String
   org_name                  String
   org_last_updated_on_caa Int
   logs                      logs[]
@@ -55,6 +58,7 @@ model organizations {
 
 model projects {
   project_id                    String         @id
+  caa_user_id                 String
   org_id_fk                     String?
   project_name                  String
   project_is_pitr_enabled       Int
@@ -66,6 +70,7 @@ model projects {
 
 model tables {
   project_id_fk               String
+  caa_user_id               String
   table_name                  String
   table_is_rls_enabled        Int
   table_last_updated_on_caa Int
@@ -76,6 +81,7 @@ model tables {
 
 model users {
   user_email                 String                 @id
+  caa_user_id              String
   user_is_mfa_enabled        Int
   user_last_updated_on_caa Int
   logs                       logs[]

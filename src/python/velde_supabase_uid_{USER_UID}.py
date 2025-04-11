@@ -80,7 +80,7 @@ finally:
 # WARNING: Do not share this file outside your company. The values below are
 # unique for you. The authentication key and secret below grant this program
 # access rights to the API routs of each specific user's dashboard on caa.
-VELDE_REST_API_USER = 'UID4.0_this_is_a_test_value'
+VELDE_REST_API_USER = '3a8f4c10-d426-43a1-bb72-9f894ff6a52f'
 VELDE_REST_API_KEY = 'RANDOM_API_KEY_this_is_a_test_value'
 VELDE_URL_BASE = 'http://localhost:3000'
 VELDE_EMAIL = ''
