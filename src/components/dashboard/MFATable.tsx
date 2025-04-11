@@ -5,12 +5,12 @@ import { useSession } from "next-auth/react";
 import type { users } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
 import DataTable from "@/components/ui/data-table";
-import { useMemo } from "react";
-import { ArrowUpDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useMemo, useState } from "react";
 import { Skeleton } from "../ui/skeleton";
 import { Checkbox } from "@/components/ui/checkbox";
 import { getFormattedTimeFromEpoch } from "@/lib/getFormattedTimeFromEpoch";
+import { VisibilityState } from "@tanstack/react-table";
+
 export const columns: ColumnDef<users>[] = [
   {
     id: "select",
@@ -38,48 +38,48 @@ export const columns: ColumnDef<users>[] = [
     accessorKey: "user_email",
     header: ({ column }) => {
       return (
-        <Button
-          variant="ghost"
+        <button
+          className="hover:text-foreground/40 active:text-foreground/60 transition-all duration-75"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           User Email
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
+        </button>
       );
     },
+    sortingFn: "alphanumeric",
   },
   {
     accessorKey: "user_is_mfa_enabled",
     header: ({ column }) => {
       return (
-        <Button
-          variant="ghost"
+        <button
+          className="hover:text-foreground/40 active:text-foreground/60 transition-all duration-75"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           MFA
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
+        </button>
       );
     },
     cell: ({ cell }) => (cell.getValue() === 1 ? "Enabled" : "Disabled"),
+    sortingFn: "alphanumeric",
   },
   {
     accessorKey: "user_last_updated_on_caa",
     header: ({ column }) => {
       return (
-        <Button
-          variant="ghost"
+        <button
+          className="hover:text-foreground/40 active:text-foreground/60 transition-all duration-75"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Last Updated
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
+        </button>
       );
     },
     cell: ({ cell }) => {
       const value = cell.getValue();
       return getFormattedTimeFromEpoch(value as number);
     },
+    sortingFn: "datetime",
   },
 ];
 
@@ -88,8 +88,9 @@ export default function MFATable() {
   const userAuthenticatedID = session?.user?.id as string;
   const { data: users, isLoading } = useUsersQuery(userAuthenticatedID);
 
-  const filteredData = useMemo(() => users ?? [], [users]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
+  const filteredData = useMemo(() => users ?? [], [users]);
   return (
     <>
       {isLoading ? (
@@ -104,6 +105,8 @@ export default function MFATable() {
           filterColumnName="user_email"
           filterDisplayText="email"
           isSelectable={true}
+          columnVisibility={columnVisibility}
+          setColumnVisibility={setColumnVisibility}
         />
       )}
     </>

@@ -11,6 +11,7 @@ import {
   ColumnFiltersState,
   getFilteredRowModel,
   getSortedRowModel,
+  OnChangeFn,
 } from "@tanstack/react-table";
 import {
   Table,
@@ -28,12 +29,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   filterColumnName?: string;
   filterDisplayText?: string;
   isSelectable?: boolean;
+  columnVisibility: VisibilityState;
+  setColumnVisibility: OnChangeFn<VisibilityState>;
 }
 
 export default function DataTable<TData, TValue>({
@@ -42,13 +46,13 @@ export default function DataTable<TData, TValue>({
   filterColumnName,
   filterDisplayText,
   isSelectable,
+  columnVisibility,
+  setColumnVisibility,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({

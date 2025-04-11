@@ -5,6 +5,7 @@ import { ChatInterface } from "@/components/chat/ChatInterface";
 import { getUsers } from "@/lib/getUsers";
 import { getProjects } from "@/lib/getProjects";
 import { getTables } from "@/lib/getTables";
+
 import {
   HydrationBoundary,
   QueryClient,
@@ -40,12 +41,10 @@ export default async function ChatPage() {
   });
 
   return (
-    <div>
-      <HydrationBoundary state={dehydrate(queryClient)}>
-        <SessionProvider>
-          <ChatInterface />
-        </SessionProvider>
-      </HydrationBoundary>
-    </div>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <SessionProvider>
+        <ChatInterface />
+      </SessionProvider>
+    </HydrationBoundary>
   );
 }

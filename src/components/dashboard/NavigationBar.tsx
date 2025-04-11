@@ -12,7 +12,7 @@ export default function NavigationBar(props: props) {
       className={
         `${className}` +
         " " +
-        "h-full md:grid flex-col md:grid-cols-[70%_30%] xl:border-x-[0.08rem] border-dashed px-4 pt-4 pb-1 md:px-8 md:py-4"
+        "flex flex-col self-center md:flex-row md:justify-between pt-2 md:pt-0 md:pl-4 md:pr-2"
       }
     >
       <NavigationBarLeft />

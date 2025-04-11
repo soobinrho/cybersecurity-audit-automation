@@ -11,7 +11,7 @@ export function getFormattedTimeFromTimestamp(timestamp: string) {
 }
 
 export function getFormattedTimeFromEpoch(epoch: number) {
-  let time = new Date(0);
+  const time = new Date(0);
   time.setSeconds(epoch as number);
   const formattedTime = `${time.getFullYear()}-${String(
     time.getMonth()

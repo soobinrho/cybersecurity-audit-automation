@@ -9,6 +9,7 @@ import {
   dehydrate,
 } from "@tanstack/react-query";
 import { SessionProvider } from "next-auth/react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export const metadata: Metadata = {
   title: "MFA",
@@ -26,17 +27,19 @@ export default async function MFAPage() {
     queryFn: () => getUsers(authentiactedUserId),
   });
   return (
-    <div>
-      <HydrationBoundary state={dehydrate(queryClient)}>
-        <SessionProvider>
-          <section>
-            <h2 className="text-2xl font-bold pb-4">
-              MFA (Multi Factor Authentication)
-            </h2>
-            <MFATable />
-          </section>
-        </SessionProvider>
-      </HydrationBoundary>
-    </div>
+    <ScrollArea>
+      <article className="px-9 pb-1 pt-7 md:px-16 md:py-9 xl:px-20 xl:py-12 2xl:px-36 2xl:py-18 text-wrap">
+        <HydrationBoundary state={dehydrate(queryClient)}>
+          <SessionProvider>
+            <section>
+              <h2 className="text-2xl font-bold pb-4">
+                MFA (Multi Factor Authentication)
+              </h2>
+              <MFATable />
+            </section>
+          </SessionProvider>
+        </HydrationBoundary>
+      </article>
+    </ScrollArea>
   );
 }

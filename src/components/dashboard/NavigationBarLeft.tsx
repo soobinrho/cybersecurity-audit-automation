@@ -12,7 +12,7 @@ export default function NavigationBarLeft() {
   }
 
   return (
-    <span className="w-full h-full flex gap-3 md:gap-4 justify-center md:justify-start items-center text-nowrap text-sm md:text-base tracking-tighter md:tracking-tight">
+    <span className="flex gap-3 md:gap-4 justify-center md:justify-start items-center text-nowrap text-sm md:text-base tracking-tighter md:tracking-tight">
       <Link href="/dashboard" className="flex gap-2 items-center pr-0 md:pr-1">
         <svg
           className="hidden md:block h-6 **:fill-light-mode-text-main **:dark:fill-gray-400 **:stroke-0 **:opacity-80 **:hover:opacity-100 **:dark:hover:fill-white **:transition-all **:duration-200"

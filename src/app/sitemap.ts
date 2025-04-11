@@ -16,7 +16,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.4,
     },
     {
-      url: `${url}/chat`,
+      url: `${url}/dashboard/chat`,
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.3,

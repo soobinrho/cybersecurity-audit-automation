@@ -4,7 +4,7 @@ import MobileMenu from "@/components/dashboard/MobileMenu";
 
 export default function NavigationBarRight() {
   return (
-    <span className="flex gap-1 md:gap-4 pt-0.5 md:pt-0 justify-center md:justify-end items-center align-middle">
+    <span className="flex gap-1 md:gap-4 justify-center md:justify-end items-center align-middle">
       <span className="md:hidden flex justify-center align-middle text-nowrap mr-[0.75rem]">
         <MobileMenu />
       </span>
