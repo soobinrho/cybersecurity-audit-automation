@@ -30,6 +30,7 @@ Example:
 # Designed for:
 # -----------------------------------------------------------------------------
 import os
+import platform
 import subprocess
 import sys
 import time
@@ -138,7 +139,7 @@ def get_log_template(
         VER,
         MSG,
         TIMESTAMP=f'{datetime.datetime.now(datetime.timezone.utc).isoformat(timespec='milliseconds').replace('+00:00', 'Z')}',
-        HOSTNAME=f'{os.uname()[1].replace(' ', '_')}',
+        HOSTNAME=f'{platform.uname()[1].replace(' ', '_')}',
         APPNAME=f'Supabase_secured_by_caa',
         PROCID=f'{os.path.realpath(__file__).replace(' ', '_')}'):
     dict_log = {'PRI': PRI,
@@ -290,6 +291,13 @@ def wait_for_all_loading(page, HIGHLIGHT_DURATION):
             break
 
         page.wait_for_timeout(HIGHLIGHT_DURATION)
+
+
+def sanitize_file_name(file_name):
+    for char in ['\\', '/', ':', '*', '?', '"', '>', '<', '|', '`', '!', '$']:
+        if char in file_name:
+            file_name = file_name.replace(char, '_')
+    return file_name
 
 
 def exit_program(should_wait_for_user_enter=False):
@@ -467,12 +475,15 @@ def test_supabase_action_flow_core():
             os.path.realpath(__file__)), f'{APP_NAME}_controls_evidence')
         if not os.path.exists(path_folder_evidence_collected):
             os.makedirs(path_folder_evidence_collected)
+
+        # This is localtime.
+        path_evidence = f'{strftime("%Y-%m-%d %H%M%S")} {NAME_MFA} {org_name}.png'
+        path_evidence = sanitize_file_name(path_evidence)
         path_evidence = os.path.join(
-            # This is localtime.
-            path_folder_evidence_collected, f'{strftime("%Y-%m-%d %H%M%S")} {NAME_MFA} {org_name}.png')
+            path_folder_evidence_collected, path_evidence)
         page.screenshot(path=path_evidence, full_page=True)
         print_info(
-            f"[INFO] Evidence collected: '{path_evidence}'", org_id='org_id')
+            f"[INFO] Evidence collected: '{path_evidence}'", org_id=org_id)
 
         # rows[0] = the row with the headers.
         # rows[-1] = the row containing total number of users.
@@ -545,7 +556,7 @@ def test_supabase_action_flow_core():
     print_debug(
         f'[DEBUG] Looking up the list of {APP_NAME} projects...')
 
-    page.goto(f'{APP_URL_BASE}/dashboard/projects')
+    page.goto(f'{APP_URL_BASE}dashboard/projects')
     page.wait_for_load_state('domcontentloaded')
     page.get_by_text('New project').first.wait_for(state='visible')
 
@@ -579,7 +590,7 @@ def test_supabase_action_flow_core():
         project_name = href_project_text_content
 
         page.goto(
-            f'{APP_URL_BASE}/dashboard/project/{project_id}/database/backups/pitr')
+            f'{APP_URL_BASE}dashboard/project/{project_id}/database/backups/pitr')
         page.get_by_text('Point in time').first.wait_for(state='visible')
         wait_for_all_loading(page, HIGHLIGHT_DURATION)
         page.get_by_text('Point in time').first.highlight()
@@ -597,8 +608,10 @@ def test_supabase_action_flow_core():
             except:
                 continue
 
+        path_evidence = f'{strftime("%Y-%m-%d %H%M%S")} {NAME_PITR} {project_name}.png'
+        path_evidence = sanitize_file_name(path_evidence)
         path_evidence = os.path.join(
-            path_folder_evidence_collected, f'{strftime("%Y-%m-%d %H%M%S")} {NAME_PITR} {project_name}.png')
+            path_folder_evidence_collected, path_evidence)
         page.screenshot(path=path_evidence, full_page=True)
         print_info(
             f"[INFO] Evidence collected: '{path_evidence}'", org_id=org_id_fk, project_id=project_id)
@@ -659,11 +672,13 @@ def test_supabase_action_flow_core():
         project_id = list_project_id[i]
         project_name = list_project_name[i]
         page.goto(
-            f'{APP_URL_BASE}/dashboard/project/{project_id}/auth/policies')
+            f'{APP_URL_BASE}dashboard/project/{project_id}/auth/policies')
         wait_for_all_loading(page, HIGHLIGHT_DURATION)
 
+        path_evidence = f'{strftime("%Y-%m-%d %H%M%S")} {NAME_RLS} {project_name}.png'
+        path_evidence = sanitize_file_name(path_evidence)
         path_evidence = os.path.join(
-            path_folder_evidence_collected, f'{strftime("%Y-%m-%d %H%M%S")} {NAME_RLS} {project_name}.png')
+            path_folder_evidence_collected, path_evidence)
         page.screenshot(path=path_evidence, full_page=True)
         print_info(
             f"[INFO] Evidence collected: '{path_evidence}'", project_id=project_id)
@@ -728,7 +743,7 @@ def test_supabase_action_flow_core():
         playwright.stop()
         return
 
-    page.goto(f'{APP_URL_BASE}/dashboard/projects')
+    page.goto(f'{APP_URL_BASE}dashboard/projects')
     page.get_by_text('New project').first.wait_for(state='visible')
     wait_for_all_loading(page, HIGHLIGHT_DURATION)
 
@@ -799,7 +814,7 @@ def test_supabase_action_flow_core():
         for i in range(len(list_projects_id_pitr_disabled)):
             project_id = list_projects_id_pitr_disabled[i]
             project_name = list_projects_name_pitr_disabled[i]
-            url_pitr = f'{APP_URL_BASE}/dashboard/project/{project_id}/database/backups/pitr'
+            url_pitr = f'{APP_URL_BASE}dashboard/project/{project_id}/database/backups/pitr'
             page.goto(url_pitr)
             wait_for_all_loading(page, HIGHLIGHT_DURATION)
 
@@ -821,6 +836,7 @@ def test_supabase_action_flow_core():
         list_table_project_id_fk_rls_disabled = []
         list_table_name_rls_disabled = []
         list_table_composite_key_rls_disabled = []
+        list_table_rls_disabled_is_remediated = []
         for i in range(len(list_table_project_id_fk)):
             table_project_id_fk = list_table_project_id_fk[i]
             table_name = list_table_name[i]
@@ -831,78 +847,84 @@ def test_supabase_action_flow_core():
                 list_table_name_rls_disabled.append(table_name)
                 list_table_composite_key_rls_disabled.append(
                     table_composite_key)
+                list_table_rls_disabled_is_remediated.append(False)
 
         # Any records that change their value here will be sent as an HTTP
         # POST request later to reflect the changes in the database.
         list_updated_table_project_id_fk = []
         list_updated_table_name = []
         list_updated_table_is_rls_enabled = []
-
         is_all_rls_remediated = True
-        url_last = ''
-        for i in range(len(list_table_composite_key_rls_disabled)):
-            table_project_id_fk = list_table_project_id_fk[i]
-            table_name = list_table_name[i]
-            table_composite_key = list_table_composite_key_rls_disabled[i]
+        for project_id_fk in list_table_project_id_fk_rls_disabled:
+            for i in range(len(list_table_project_id_fk_rls_disabled)):
+                table_project_id_fk = list_table_project_id_fk_rls_disabled[i]
+                table_name = list_table_name_rls_disabled[i]
+                table_composite_key = list_table_composite_key_rls_disabled[i]
+                table_is_remediated = list_table_rls_disabled_is_remediated[i]
 
-            url_now = f'{APP_URL_BASE}/dashboard/project/{table_project_id_fk}/auth/policies'
-            if url_last != url_now:
-                url_last = url_now
-                page.goto(url_now)
-                wait_for_all_loading(page, HIGHLIGHT_DURATION)
-                anchors = page.locator('a').all()
-                for anchor in anchors:
-                    try:
-                        href_table = anchor.get_attribute('href')
-                    except:
-                        continue
+                if project_id_fk != table_project_id_fk or table_is_remediated:
+                    continue
 
-                    if href_table and re.match(r"/dashboard/project/[^/]+/editor/[^/]+$", href_table):
-                        table_name_candidate = anchor.text_content()
-                        table_composite_key_candidate = f'{table_project_id_fk}_{table_name_candidate}'
-                        if table_composite_key_candidate in list_table_composite_key_rls_disabled:
-                            table_name = table_name_candidate
-                            rls_status_button_outer_element = anchor.locator(
-                                '..').locator('..')
-                            rls_button = rls_status_button_outer_element.get_by_text(
-                                'Enable RLS').first
-                            anchor.first.highlight()
-                            page.wait_for_timeout(HIGHLIGHT_DURATION * 2)
-                            rls_button.highlight()
-                            page.wait_for_timeout(HIGHLIGHT_DURATION * 2)
-                            rls_button.click()
-                            wait_for_all_loading(page, HIGHLIGHT_DURATION)
+                try:
+                    url = f'{APP_URL_BASE}dashboard/project/{project_id_fk}/auth/policies'
+                    page.goto(url)
+                    wait_for_all_loading(page, HIGHLIGHT_DURATION)
+                    anchors = page.locator('a').all()
+    
+                    rls_status_button_outer_element = ''
+                    for anchor in anchors:
+                        try:
+                            href = anchor.get_attribute('href')
+                        except:
+                            pass
+                        
+                        if href and re.match(r"/dashboard/project/[^/]+/editor/[^/]+$", href):
+                            if anchor.text_content() == table_name:
+                                rls_status_button_outer_element = anchor.locator(
+                                                            '..').locator('..')
+                                break
+    
+                    rls_button = rls_status_button_outer_element.get_by_text(
+                        'Enable RLS').first
+                    anchor.first.highlight()
+                    page.wait_for_timeout(HIGHLIGHT_DURATION * 2)
+                    rls_button.highlight()
+                    page.wait_for_timeout(HIGHLIGHT_DURATION * 2)
+                    rls_button.click()
+                    wait_for_all_loading(page, HIGHLIGHT_DURATION)
+    
+                    page.get_by_role(
+                        'button', name='Confirm').first.highlight()
+                    page.wait_for_timeout(HIGHLIGHT_DURATION * 2)
+                    page.get_by_role(
+                        'button', name='Confirm').first.click()
+                    wait_for_all_loading(page, HIGHLIGHT_DURATION)
 
-                            page.get_by_role(
-                                'button', name='Confirm').first.highlight()
-                            page.wait_for_timeout(HIGHLIGHT_DURATION * 2)
-                            page.get_by_role(
-                                'button', name='Confirm').first.click()
-                            wait_for_all_loading(page, HIGHLIGHT_DURATION)
+                    rls_button = rls_status_button_outer_element.get_by_text(
+                        'Disable RLS').first
+                    print_info(f"[INFO] {NAME_RLS} has successfully been enabled for the table {table_name}.",
+                               project_id=table_project_id_fk)
+                    list_table_rls_disabled_is_remediated[i] = True
+                    list_updated_table_project_id_fk.append(
+                        table_project_id_fk)
+                    list_updated_table_name.append(table_name)
+                    list_updated_table_is_rls_enabled.append(True)
 
-                            try:
-                                rls_button = rls_status_button_outer_element.get_by_text(
-                                    'Disable RLS').first.wait_for(state='visible')
-                                print_info(f"[INFO] {NAME_RLS} has successfully been enabled for the table {table_name}.",
-                                           project_id=table_project_id_fk)
-                                list_updated_table_project_id_fk.append(
-                                    table_project_id_fk)
-                                list_updated_table_name.append(table_name)
-                                list_updated_table_is_rls_enabled.append(True)
-
-                            except:
-                                print_error(f"[ERROR] {NAME_RLS} couldn't be enabled for the table {table_name}. Please check the logs and contact us <{VELDE_EMAIL}>.",
-                                            project_id=table_project_id_fk)
-                                is_all_rls_remediated = False
+                except:
+                    print_error(f"[ERROR] {NAME_RLS} couldn't be enabled for the table {table_name}. Please check the logs and contact us <{VELDE_EMAIL}>.",
+                                project_id=table_project_id_fk)
+                    is_all_rls_remediated = False
 
         if is_all_rls_remediated:
-            messagebox.showinfo(
-                title='caa', message=f"{NAME_RLS} has successfully been enabled for all tables.")
+            message=f"{NAME_RLS} has successfully been enabled for all tables."
+            print_info(f"[INFO] {message}")
             list_findings_remediated.append(NAME_RLS)
         else:
+            message=f"{NAME_RLS} remediation process has failed. Please check the logs and contact us <{VELDE_EMAIL}>."
+            print_error(f"[ERROR] {message}")
             list_findings_not_remediated.append(NAME_RLS)
             messagebox.showinfo(
-                title='caa', message=f"{NAME_RLS} remediation process has failed. Please check the logs and contact us <{VELDE_EMAIL}>.")
+                title='caa', message=message)
 
         list_json_payload = []
         for i in range(len(list_updated_table_project_id_fk)):
