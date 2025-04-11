@@ -82,17 +82,23 @@ export const columns: ColumnDef<projects>[] = [
 ];
 
 export default function PITRTable() {
-  const { data, isLoading } = useProjectsQuery();
-
-  const filteredData = useMemo(() => data ?? [], [data]);
-
+  const { data, isLoading, error } = useProjectsQuery();
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-
+  const filteredData = useMemo(() => data ?? [], [data]);
+  if (error) {
+    return (
+      <div>
+        <Skeleton className="w-full h-32 rounded-md flex justify-center items-center">
+          <h2>{error.message}</h2>
+        </Skeleton>
+      </div>
+    );
+  }
   return (
     <>
       {isLoading ? (
         <div>
-          <Skeleton className="w-full h-full rounded-4xl" />
+          <Skeleton className="w-full h-32 rounded-md" />
         </div>
       ) : (
         <DataTable

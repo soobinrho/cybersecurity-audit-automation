@@ -113,16 +113,21 @@ export default function EvidenceImagesTable() {
     evidence_image_created_on_caa: true,
     evidence_image_blob: true,
   });
-
   const filteredData = useMemo(() => data ?? [], [data]);
   if (error) {
-    return <h2>{error.message}</h2>;
+    return (
+      <div>
+        <Skeleton className="w-full h-32 rounded-md flex justify-center items-center">
+          <h2>{error.message}</h2>
+        </Skeleton>
+      </div>
+    );
   }
   return (
     <>
       {isLoading ? (
         <div>
-          <Skeleton className="w-full h-full rounded-4xl" />
+          <Skeleton className="w-full h-32 rounded-md" />
         </div>
       ) : (
         <DataTable

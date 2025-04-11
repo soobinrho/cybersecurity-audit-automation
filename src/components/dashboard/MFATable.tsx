@@ -84,16 +84,21 @@ export const columns: ColumnDef<users>[] = [
 export default function MFATable() {
   const { data, error, isLoading } = useUsersQuery();
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-
   const filteredData = useMemo(() => data ?? [], [data]);
   if (error) {
-    return <h2>{error.message}</h2>;
+    return (
+      <div>
+        <Skeleton className="w-full h-32 rounded-md flex justify-center items-center">
+          <h2>{error.message}</h2>
+        </Skeleton>
+      </div>
+    );
   }
   return (
     <>
       {isLoading ? (
         <div>
-          <Skeleton className="w-full h-full rounded-4xl" />
+          <Skeleton className="w-full h-32 rounded-md" />
         </div>
       ) : (
         <DataTable

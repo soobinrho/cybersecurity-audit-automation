@@ -271,14 +271,19 @@ export default function LogsTable() {
   });
   const filteredData = useMemo(() => data ?? [], [data]);
   if (error) {
-    return <h2>{error.message}</h2>;
+    return (
+      <div>
+        <Skeleton className="w-full h-32 rounded-md flex justify-center items-center">
+          <h2>{error.message}</h2>
+        </Skeleton>
+      </div>
+    );
   }
   return (
     <>
       {isLoading ? (
         <div>
-          <Skeleton className="w-full h-[400px] rounded-md" />
-          <Skeleton className="h-10 w-full mt-4 rounded-md" />
+          <Skeleton className="w-full h-32 rounded-md" />
         </div>
       ) : (
         <DataTable
