@@ -99,6 +99,11 @@ This is not a required step, but I also prefer to set up a cron job so that the 
 ```bash
 # Example:
 sudo ln -s /home/soobinrho/git/caa-supabase/docker/certbot_runner /etc/cron.daily/certbot_runner
+
+# Also, Docker stores various temporary files, such as filesystem layers at
+# `/var/lib/docker/overlay2`, and this can grow fast -- e.g. 70GB in a week.
+# So, set up a cron job to clean this daily.
+sudo ln -s /home/soobinrho/git/caa-supabase/docker/docker_prune_runner /etc/cron.daily/docker_prune_runner
 ```
 
 <br>
