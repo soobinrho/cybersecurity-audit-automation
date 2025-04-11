@@ -62,3 +62,6 @@ src/python/**/*.jpg
 
 # Database files must be local and not indexed by git
 *.db
+
+# Python virtual environments
+.venv*

@@ -2,6 +2,23 @@
 
 TODO:  Add a screenshot of the dashboard using https://screenbean.brunnerliv.io/
 
+TODO: 
+
+```py
+# Ubuntu
+cd caa-supabase
+sudo apt install python3-full python3-pip
+python -m venv .venv
+.venv/bin/python src/python/caa_supabase_uid_\{USER_UID\}.py
+
+
+# Windows
+# Download:
+#   https://www.python.org/downloads/windows/
+
+# TODO: On Windows, I need to remove Python and test if everything works.
+```
+
 This project's purpose is to help you with compliance and regulations by using various automation technologies, and to do so in a way that does not access, transmit, or store any of your sensitive information, such as your API tokens, GLB data (customer data), or PCI data (card numbers).
 
 I am in a unique position where I can create a web app that understands the everyday needs of CyberGRC teams (Cybersecurity Governance, Risk, and Compliance) because I'm in one of them.
