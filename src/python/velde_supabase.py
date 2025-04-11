@@ -336,9 +336,7 @@ def sanitize_file_name(file_name):
     return file_name
 
 
-def exit_program(should_wait_for_user_enter=False):
-    if should_wait_for_user_enter:
-        null = input('Press enter to exit:')
+def exit_program():
     pytest.skip(allow_module_level=True)
 
 
@@ -822,9 +820,6 @@ def test_supabase_action_flow_core():
                      db_table_name='tables',
                      route_url='api/v1/tables')
 
-    print_info(
-        f'[INFO] Your dashboard is now updated at {VELDE_URL_BASE + "/dashboard"}')
-
     list_findings_remediated = []
     list_findings_not_remediated = []
     # ----------------------------------------------------------------------- #
@@ -847,7 +842,12 @@ def test_supabase_action_flow_core():
         list_findings_discovered)
     is_yes = messagebox.askyesno(
         title='caa', message=f'Findings:{str_findings_discovered}\n\nWould you like to perform the remediation action flows? To start, please click Yes.')
+
+    print_info(
+        f'[INFO] Your dashboard is now updated at {VELDE_URL_BASE + "/dashboard"}')
     if not is_yes:
+        messagebox.showinfo(
+            title='caa', message=f'Your dashboard is now updated at {VELDE_URL_BASE + "/dashboard"}')
         exit_program()
 
     # ----------------------------------------------------------------------- #
@@ -922,8 +922,6 @@ def test_supabase_action_flow_core():
                 f'[INFO] {NAME_PITR} must be enabled for the project "{project_name}" at {url_pitr}', project_id=project_id)
 
         list_findings_remediated.append(NAME_PITR)
-
-
 
     # ----------------------------------------------------------------------- #
     # Remediate RLS (Row Level Security)
@@ -1086,7 +1084,4 @@ def main():
 
 if __name__ == '__main__':
     main()
-    if is_debug_on:
-        exit_program()
-    else:
-        exit_program(should_wait_for_user_enter=True)
+    exit_program()
