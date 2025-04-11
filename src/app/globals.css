@@ -24,3 +24,19 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@theme {
+  --color-light-mode-main:  #f6f8fa;
+  --color-light-mode-main: #ffffff;
+  --color-light-mode-menu: #f6f8fa;
+  --color-light-mode-svg-main: #59636e;
+  --color-light-mode-text-main: #1f2328;
+  --color-light-mode-text-h2: #6a737d;
+  --color-light-mode-text-placeholder: #59636e;
+  --color-dark-mode-main: #0d1117;
+  --color-dark-mode-menu: #010409;
+  --color-dark-mode-svg-main: #9198a1;
+  --color-dark-mode-text-main: #f0f6fc;
+  --color-dark-mode-text-h2: #868c96;
+  --color-dark-mode-text-placeholder: #9198a1;
+}

@@ -1,134 +1,130 @@
-import { NextResponse } from 'next/server'
-import { NextRequest } from 'next/server'
-import prisma from '@/lib/prisma'
-import { Prisma } from '@prisma/client'
+import { NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import prisma from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
-    const users = await prisma.users.findMany()
-    return NextResponse.json(
-      users,
-      { status: 200, statusText: 'OK' }
-    )
+    const users = await prisma.users.findMany();
+    return NextResponse.json(users, { status: 200, statusText: "OK" });
   } catch (err) {
-    console.log(err)
-    return NextResponse.json(
-      'Error occurred.',
-      { status: 500, statusText: 'Internal Server Error' }
-    )
+    console.log(err);
+    return NextResponse.json("Error occurred.", {
+      status: 500,
+      statusText: "Internal Server Error",
+    });
   }
 }
 
 export async function POST(req: NextRequest) {
-  let array_user: Array<Prisma.usersCreateInput> = []
+  const array_user: Array<Prisma.usersCreateInput> = [];
   try {
-    const req_payload = await req.json()
+    const req_payload = await req.json();
     for (const json_req of req_payload) {
       const user: Prisma.usersCreateInput = {
-          user_email: json_req['user_email'],
-          user_is_mfa_enabled: json_req['user_is_mfa_enabled'],
-          user_last_updated_on_caa: json_req['user_last_updated_on_caa'],
-      }
-      array_user.push(user)
+        user_email: json_req["user_email"],
+        user_is_mfa_enabled: json_req["user_is_mfa_enabled"],
+        user_last_updated_on_caa: json_req["user_last_updated_on_caa"],
+      };
+      array_user.push(user);
     }
   } catch (err) {
-    console.log(err)
-    return NextResponse.json(
-      'Error occurred.',
-      { status: 400, statusText: 'Bad Request' }
-    )
+    console.log(err);
+    return NextResponse.json("Error occurred.", {
+      status: 400,
+      statusText: "Bad Request",
+    });
   }
 
   try {
     for (const user of array_user) {
-      const upsertUser = await prisma.users.upsert({
+      await prisma.users.upsert({
         where: {
-          user_email: user['user_email']
+          user_email: user["user_email"],
         },
         update: {
-          user_is_mfa_enabled: user['user_is_mfa_enabled'],
-          user_last_updated_on_caa: user['user_last_updated_on_caa'],
+          user_is_mfa_enabled: user["user_is_mfa_enabled"],
+          user_last_updated_on_caa: user["user_last_updated_on_caa"],
         },
         create: {
-          user_email: user['user_email'],
-          user_is_mfa_enabled: user['user_is_mfa_enabled'],
-          user_last_updated_on_caa: user['user_last_updated_on_caa'],
-        }
-      })
+          user_email: user["user_email"],
+          user_is_mfa_enabled: user["user_is_mfa_enabled"],
+          user_last_updated_on_caa: user["user_last_updated_on_caa"],
+        },
+      });
     }
 
-    if (process.env.NODE_ENV === 'development') {
-      console.log(array_user)
+    if (process.env.NODE_ENV === "development") {
+      console.log(array_user);
     }
 
-    return NextResponse.json(
-      array_user,
-      { status: 201, statusText: 'Created' }
-    )
+    return NextResponse.json(array_user, {
+      status: 201,
+      statusText: "Created",
+    });
   } catch (err) {
-    console.log(err)
-    return NextResponse.json(
-      'Error occurred.',
-      { status: 500, statusText: 'Internal Server Error' }
-    )
+    console.log(err);
+    return NextResponse.json("Error occurred.", {
+      status: 500,
+      statusText: "Internal Server Error",
+    });
   }
 }
 
 export async function DELETE(req: NextRequest) {
-  const params = req.nextUrl.searchParams
+  const params = req.nextUrl.searchParams;
   try {
-    const delete_all = params.get('delete_all')?.toLowerCase()
-    if (delete_all === 'true') {
-      const deleteTables = prisma.tables.deleteMany()
-      const deleteProjects = prisma.projects.deleteMany()
-      const deleteOrganizationMembers = prisma.organization_members.deleteMany()
-      const deleteUsers = prisma.users.deleteMany()
+    const delete_all = params.get("delete_all")?.toLowerCase();
+    if (delete_all === "true") {
+      const deleteTables = prisma.tables.deleteMany();
+      const deleteProjects = prisma.projects.deleteMany();
+      const deleteOrganizationMembers =
+        prisma.organization_members.deleteMany();
+      const deleteUsers = prisma.users.deleteMany();
       const transaction = await prisma.$transaction([
         deleteTables,
         deleteProjects,
         deleteOrganizationMembers,
         deleteUsers,
-      ])
+      ]);
 
-      if (process.env.NODE_ENV === 'development') {
-        console.log(transaction)
+      if (process.env.NODE_ENV === "development") {
+        console.log(transaction);
       }
 
-      // By convention, HTTP 204 code must not contain any body, and must 
+      // By convention, HTTP 204 code must not contain any body, and must
       // only contain the status code.
       return new Response(null, {
         status: 204,
-      })
-    }
-
-    else {
-      const user_email = params.get('user_email')
-      if (!user_email || user_email === '') {
+      });
+    } else {
+      const user_email = params.get("user_email");
+      if (!user_email || user_email === "") {
         return NextResponse.json(
           "Please use correct URL params to specify which organization_member you'd like to delete.",
-          { status: 404, statusText: 'Not Found' }
-        )
+          { status: 404, statusText: "Not Found" }
+        );
       }
 
       const deleteUser = await prisma.users.delete({
         where: {
-          user_email: user_email
-        }
-      })
+          user_email: user_email,
+        },
+      });
 
-      if (process.env.NODE_ENV === 'development') {
-        console.log(deleteUser)
+      if (process.env.NODE_ENV === "development") {
+        console.log(deleteUser);
       }
 
       return new Response(null, {
         status: 204,
-      })
+      });
     }
   } catch (err) {
-    console.log(err)
+    console.log(err);
     return NextResponse.json(
       "Please use correct URL params to specify which organization_member you'd like to delete.",
-      { status: 404, statusText: 'Not Found' }
-    )
+      { status: 404, statusText: "Not Found" }
+    );
   }
 }
