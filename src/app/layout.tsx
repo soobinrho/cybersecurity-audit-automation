@@ -48,12 +48,6 @@ export const metadata: Metadata = {
       noimageindex: true,
     },
   },
-  manifest: "/resources/site.webmanifest",
-  icons: {
-    icon: "/resources/icon.svg",
-    shortcut: "/resources/icon.png",
-    apple: "/resources/icon.png",
-  },
 };
 
 export default function RootLayout({
