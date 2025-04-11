@@ -248,10 +248,6 @@ def request_post_api(json_payload, db_table_name, route_url):
             f'[DEBUG] Error on HTTP POST request for updating {db_table_name} via {route_url}.')
 
 def request_delete_api(params, db_table_name, route_url):
-    # The API key in this file only allows you to call POST and PUT methods.
-    # GET can only be called internally via the dashboard.
-    # Also, the HTTPBasicAuth object doesn't encrypt the data on its own.
-    # Thus, make sure HTTPS/SSL is set up correctly.
     api_auth = HTTPBasicAuth(VELDE_REST_API_USER, VELDE_REST_API_KEY)
     api_url = f'{VELDE_URL_BASE}{route_url}'
 
@@ -656,10 +652,6 @@ def test_supabase_action_flow_core():
     print_debug(
         f'[DEBUG] Looking up the list of {APP_NAME} tables...')
 
-    # page.goto(f'{APP_URL_BASE}/dashboard/projects')
-    # page.wait_for_load_state('domcontentloaded')
-    # page.get_by_text('New project').first.wait_for(state='visible')
-
     list_table_project_id_fk = []
     list_table_name = []
     list_table_is_rls_enabled = []
@@ -839,9 +831,6 @@ def test_supabase_action_flow_core():
                 list_table_name_rls_disabled.append(table_name)
                 list_table_composite_key_rls_disabled.append(
                     table_composite_key)
-
-        # TODO: DELETE LATER
-        print_debug(list_table_name_rls_disabled)
 
         # Any records that change their value here will be sent as an HTTP
         # POST request later to reflect the changes in the database.
