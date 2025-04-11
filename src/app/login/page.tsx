@@ -110,7 +110,7 @@ export default async function SignInPage(props: {
             }}
           >
             <Button
-              className="mt-3 w-full dark:shadow-none shadow-cyan-600 shadow-sm dark:bg-light-mode-text-main/90 dark:text-dark-mode-text-main dark:hover:bg-white/20 duration-75"
+              className="mt-3 w-full bg-dark-mode-main/85 hover:bg-dark-mode-main/90 dark:shadow-none shadow-cyan-600 shadow-sm dark:bg-light-mode-text-main/90 dark:text-dark-mode-text-main dark:hover:bg-white/20 duration-0"
               type="submit"
             >
               <div className="flex items-center justify-center w-full gap-2">

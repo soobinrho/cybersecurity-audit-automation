@@ -3,7 +3,7 @@ import SignOutButton from "@/components/auth/SignOutButton";
 import DarkModeButton from "@/components/DarkModeButton";
 import { redirect } from "next/navigation";
 
-export default async function Home() {
+export default async function App() {
   const session = await auth();
   if (!session) {
     redirect("/login");
