@@ -1,11 +1,12 @@
 import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
+  const title = process.env.NEXT_PUBLIC_TITLE || '';
+  const description = process.env.NEXT_PUBLIC_DESCRIPTION || '';
   return {
-    name: "caa",
-    short_name: "caa",
-    description:
-      "We help you get compliant and we don't process, store, or transmit any of your sensitive data.",
+    name: title,
+    short_name: title,
+    description: description,
     start_url: "/",
     display: "standalone",
     background_color: "#ffffff",

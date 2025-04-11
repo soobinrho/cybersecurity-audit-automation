@@ -14,19 +14,32 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const title = "caa";
-const description = "Get compliant and get secure.";
-const url =
-  process.env.NODE_ENV === "development"
-    ? "http://localhost:3000/"
-    : "https://caa.Nsustain.com/";
+const title = process.env.NEXT_PUBLIC_TITLE || "";
+const description = process.env.NEXT_PUBLIC_DESCRIPTION || "";
+const url = process.env.NEXT_PUBLIC_URL || "";
 
 export const metadata: Metadata = {
   metadataBase: new URL(url),
-  title: title,
+  title: {
+    template: `%s - ${title}`,
+    default: title,
+  },
   description: description,
   category: "technology",
-  keywords: ["compliance", "security"],
+  keywords: [
+    "CyberGRC",
+    "Compliance",
+    "Regulation",
+    "Cybersecurity",
+    "Supabase",
+  ],
+  authors: [
+    {
+      name: "Soobin Rho",
+      url: "https://github.com/soobinrho",
+    },
+  ],
+  creator: "Soobin Rho",
   openGraph: {
     title: title,
     description: description,
@@ -36,17 +49,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     title: title,
-    card: "summary_large_image",
     description: description,
-  },
-  robots: {
-    index: false,
-    follow: false,
-    googleBot: {
-      index: false,
-      follow: false,
-      noimageindex: true,
-    },
+    card: "summary",
+    creator: "Soobin Rho",
   },
 };
 
@@ -57,20 +62,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"></link>
-      <link rel="icon" href="/favicon.ico" type="image/x-icon"></link>
-
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="light"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <Suspense >{children}</Suspense>
-          </ThemeProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Suspense>{children}</Suspense>
+        </ThemeProvider>
       </body>
     </html>
   );
