@@ -21,7 +21,7 @@ export default async function SignInPage(props: {
     // and maybe blur. Showing a glimpse of how the dashboard looks like
     // will improve the user experience. Also, the dark mode / light mode button
     // will actually work even in skeleton.
-    <div className="min-h-svh min-w-svw flex items-center justify-center">
+    <div className="min-h-svh min-w-svw flex items-center justify-center backdrop-blur-[1rem]">
       <div className="flex items-center flex-col w-xs rounded-lg border border-gray-200 bg-white p-6 text-center shadow dark:border-gray-600 dark:bg-dark-mode-menu dark:hover:border-gray-500">
         <div className="flex items-center justify-center w-full gap-2">
           <svg
