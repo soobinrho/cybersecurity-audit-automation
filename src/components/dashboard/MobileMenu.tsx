@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/drawer";
 import { Menu } from "lucide-react";
 import Link from "next/link";
+import Footer from "@/components/dashboard/Footer";
 
 export default function MobileMenu() {
   return (
@@ -83,7 +84,9 @@ export default function MobileMenu() {
             </a>
           </div>
         </DrawerHeader>
-        <DrawerFooter></DrawerFooter>
+        <DrawerFooter>
+          <Footer />
+        </DrawerFooter>
       </DrawerContent>
     </Drawer>
   );
