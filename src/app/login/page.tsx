@@ -13,6 +13,7 @@ export default async function SignInPage(props: {
     redirect("/");
   }
 
+  const params = (await props.searchParams);
   const SIGNIN_ERROR_URL = "/api/auth/error";
   return (
     <div className="flex h-lvh w-full flex-col items-center justify-center">
@@ -62,13 +63,13 @@ export default async function SignInPage(props: {
               "use server";
               try {
                 // During prototyping period, I'll allow only test accounts.
-                // if (true) {
-                //   return redirect(
-                //     `${SIGNIN_ERROR_URL}?error=PrototypingPeriod`
-                //   );
-                // }
+                if (true) {
+                  return redirect(
+                    `${SIGNIN_ERROR_URL}?error=PrototypingPeriod`
+                  );
+                }
                 await signIn(provider.id, {
-                  redirectTo: (await props.searchParams)?.callbackUrl ?? "",
+                  redirectTo: params.callbackUrl ?? "",
                 });
               } catch (error) {
                 // Signin can fail for a number of reasons, such as the user
