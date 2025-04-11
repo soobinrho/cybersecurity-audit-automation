@@ -24,15 +24,21 @@ export async function GET(req: NextRequest) {
     }
 
     // Proceed if authenticated.
-    const logs = await prisma.logs.findMany({
+    const results = await prisma.logs.findMany({
       where: {
         caa_user_id: userAuthenticatedID,
       },
     });
-    return NextResponse.json(logs, {
-      status: 200,
-      statusText: "OK",
-    });
+    if (results.length > 0) {
+      return NextResponse.json(results, {
+        status: 200,
+        statusText: "OK",
+      });
+    } else {
+      return new Response(null, {
+        status: 204,
+      });
+    }
   } catch (err) {
     console.log(err);
     return NextResponse.json("Error occurred.", {

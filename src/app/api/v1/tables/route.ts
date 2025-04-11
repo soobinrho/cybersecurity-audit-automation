@@ -24,12 +24,21 @@ export async function GET(req: NextRequest) {
     }
 
     // Proceed if authenticated.
-    const tables = await prisma.tables.findMany({
+    const results = await prisma.tables.findMany({
       where: {
         caa_user_id: userAuthenticatedID,
       },
     });
-    return NextResponse.json(tables, { status: 200, statusText: "OK" });
+    if (results.length > 0) {
+      return NextResponse.json(results, {
+        status: 200,
+        statusText: "OK",
+      });
+    } else {
+      return new Response(null, {
+        status: 204,
+      });
+    }
   } catch (err) {
     console.log(err);
     return NextResponse.json("Error occurred.", {
@@ -80,7 +89,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    let array_upsertTables = [];
+    const array_upsertTables = [];
     for (const table of array_table) {
       array_upsertTables.push(
         prisma.tables.upsert({

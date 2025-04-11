@@ -24,15 +24,21 @@ export async function GET(req: NextRequest) {
     }
 
     // Proceed if authenticated.
-    const organizationMembers = await prisma.organization_members.findMany({
+    const results = await prisma.organization_members.findMany({
       where: {
         caa_user_id: String(userAuthenticatedID),
       },
     });
-    return NextResponse.json(organizationMembers, {
-      status: 200,
-      statusText: "OK",
-    });
+    if (results.length > 0) {
+      return NextResponse.json(results, {
+        status: 200,
+        statusText: "OK",
+      });
+    } else {
+      return new Response(null, {
+        status: 204,
+      });
+    }
   } catch (err) {
     console.log(err);
     return NextResponse.json("Error occurred.", {
@@ -83,7 +89,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    let array_upsertOrganizationMembers = [];
+    const array_upsertOrganizationMembers = [];
     for (const organizationMember of array_organizationMember) {
       array_upsertOrganizationMembers.push(
         prisma.organization_members.upsert({
